@@ -4,6 +4,7 @@
 #' @param pred Array of predicted values.
 #' @return A table with R^2 empirical, RMSE, and Bias%.
 #' @examples
+#' library(Nothopack)
 #' fit <- lm(sr ~ ., data = LifeCycleSavings)
 #' fitness_table(LifeCycleSavings$sr, predict(fit))
 
