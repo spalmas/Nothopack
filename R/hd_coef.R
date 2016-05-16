@@ -1,6 +1,7 @@
 #' Dominant Height Coefficients for Nothofagus species
 #'
 #' Dominant height ecuation parameters:
+#'
 #' HD = 0.3 + a [1 – {1 – (IS / a) c } ((E + 0.5) / 18)] 1/c
 #' c = b0 + b1 * IS
 #'
