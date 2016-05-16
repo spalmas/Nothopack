@@ -18,6 +18,7 @@ A table with R^2 empirical, RMSE, and Bias%.
 Fitness values for observed and fitted values.
 }
 \examples{
+library(Nothopack)
 fit <- lm(sr ~ ., data = LifeCycleSavings)
 fitness_table(LifeCycleSavings$sr, predict(fit))
 }
