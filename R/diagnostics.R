@@ -2,12 +2,12 @@
 #'
 #' @param obs Array of observed values.
 #' @param pred Array of predicted values.
+#'
 #' @return Four different diagnostic plots
+#'
 #' @examples
-#' library(Nothopack)
 #' fit <- lm(sr ~ ., data = LifeCycleSavings)
 #' diagnostics(LifeCycleSavings$sr, predict(fit))
-#'
 
 diagnostics<-function(obs,pred){
 

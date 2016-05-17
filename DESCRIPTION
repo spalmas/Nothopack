@@ -9,3 +9,5 @@ Description: More about what it does (maybe more than one line)
 License: MIT License
 LazyData: TRUE
 RoxygenNote: 5.0.1
+Imports:
+  pracma (>= 1.8.8)

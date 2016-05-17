@@ -18,9 +18,7 @@ Four different diagnostic plots
 Diagnostic plots for regression fitted and predicted values
 }
 \examples{
-library(Nothopack)
 fit <- lm(sr ~ ., data = LifeCycleSavings)
 diagnostics(LifeCycleSavings$sr, predict(fit))
-
 }
 

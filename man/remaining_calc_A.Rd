@@ -2,7 +2,7 @@
 % Please edit documentation in R/remaining_calc_A.R
 \name{remaining_calc_A}
 \alias{remaining_calc_A}
-\title{Remaining Variable Calculator}
+\title{Remaining Variable Calculator A}
 \usage{
 remaining_calc_A(AB = NA, NHA = NA, DC = NA)
 }
