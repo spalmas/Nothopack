@@ -12,7 +12,8 @@
 #' remaining_calc_A(AB = 25, NHA = 1400)
 
 remaining_calc_A <- function(AB = NA, NHA  = NA, DC  = NA){
-  if (sum(is.na(c(AB, DC, NHA))) >2 ){
+  print(AB)
+    if (sum(is.na(c(AB, DC, NHA))) >2 ){
     stop('There must be at least two values provided')
   } else if ( sum(is.na(c(AB, DC, NHA))) == 0 ){
     warning('Why would you use this calc! You have the three variables')
