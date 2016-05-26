@@ -23,7 +23,8 @@ simulator <- function(stand, zone, EDOM0, area = 10000, sy = 30, Nmodel = 1, ABm
   N0 <- prodal$NHA
   AB0 <- prodal$BA
   DC0<-prodal$DQ
-  IS<-remaining_calc_B(dom_sp = prodal$SPDOM, ZONE = zone, HD = HDOM0, E = EDOM0)
+
+  IS<-remaining_calc_B(dom_sp = prodal$SPDOM, zone = zone, HD = HDOM0, E = EDOM0)
 
   y <- 0   #initial year
 
