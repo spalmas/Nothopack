@@ -10,7 +10,7 @@
 #'
 #' @examples
 #' library(Nothopack)
-#' stand_parameters(stand = stand, area = 2000)
+#' stand_parameters(stand=stand, area=2000)
 
 stand_parameters <- function(stand, area = 10000,
                              species.col = 'SPECIES', dbh.col = 'DBH', height.col = 'HEIGHT'){
