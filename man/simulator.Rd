@@ -4,7 +4,8 @@
 \alias{simulator}
 \title{Stand simulator path}
 \usage{
-simulator(stand, zone, EDOM0, area = 10000, sy = 30, ...)
+simulator(stand, zone, EDOM0, area = 10000, sy = 30, Nmodel = 1,
+  ABmodel = 1, ...)
 }
 \arguments{
 \item{stand}{the stand to be simulated}
@@ -13,14 +14,18 @@ simulator(stand, zone, EDOM0, area = 10000, sy = 30, ...)
 
 \item{sy}{simuation years}
 
+\item{Nmodel}{Number of model for NHA estimation (1 is original function, 2 for new function)}
+
 \item{age}{initial age of the stand}
+
+\item{BAmodel}{1 for non linear and 2 for linear coefficient estimates}
 }
 \description{
 \code{Nmodule} Simulates growth, mortality and recruitment of a given stand
 }
 \examples{
 stand <- stand_randomizer()
-simulator(stand, zone = 1, age = 15)
+simulator(stand, zone = 1, age = 15, EDOM0 = 20)
 }
 \author{
 S.Gezan, S.Palmas and P.Moreno
