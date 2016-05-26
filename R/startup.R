@@ -11,3 +11,6 @@ source('simulator.R')
 source('stand_randomizer.R')
 source('parametric_height.R')
 source('stand_parameters.R')
+
+hd_coef <- load(file = 'data/hd_coef.rda')
+hparam_coef <- load(file = 'data/hparam_coef.rda')
