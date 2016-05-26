@@ -25,7 +25,7 @@ The coefficients come from the Nothofagus Simulator
 from Gezan.
 }
 \examples{
-height_param(HD = 15, DC = 12, DBH = 14)
+height_param(HD = 15, DC = 12, DBH = 14, dom_sp = 1)
 library(Nothopack)
 }
 

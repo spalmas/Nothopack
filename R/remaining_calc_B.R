@@ -20,7 +20,7 @@
 #' remaining_calc_B(dom_sp = 1, zone = 2, HD = 20, IS = 10)
 #'
 remaining_calc_B <- function(dom_sp, zone, E = NA, HD = NA, IS = NA, hd.coef = hd_coef,...){
-  coef.list <- subset(hd.coef, zone == zona & dom_sp_code == dom_sp, select = c(a, b0, b1) )
+  coef.list <- subset(hd.coef, zone == zone & dom_sp_code == dom_sp, select = c(a, b0, b1) )
 
   if (sum(is.na(c(E, HD, IS))) > 2 ){
     stop('There must be at least two values provided')

@@ -30,7 +30,7 @@ Projections are based in year increments.
 }
 \examples{
 # Example 1: Predicts Basal Area
-BAest<-BAmodule(EDOM0=20,HDOM0=17.20,N0=2730,BA0=NA,model=2,projection=FALSE)
+BAest<-BAmodule(EDOM0=20,HDOM0=17.20,N0=2730,model=2,projection=FALSE)
 BAest$BA0
 
 # Example 2: Projects Basal Area

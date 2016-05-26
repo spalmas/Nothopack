@@ -18,7 +18,7 @@
 #'
 #' @examples
 #' # Example 1: Predicts Basal Area
-#' BAest<-BAmodule(EDOM0=20,HDOM0=17.20,N0=2730,BA0=NA,model=2,projection=FALSE)
+#' BAest<-BAmodule(EDOM0=20,HDOM0=17.20,N0=2730,model=2,projection=FALSE)
 #' BAest$BA0
 #'
 #' # Example 2: Projects Basal Area
@@ -48,4 +48,3 @@ BAmodule <- function(EDOM0=NA,HDOM0=NA,N0=NA,BA0=NA,model=1,projection=FALSE){
   }
   return(list(BA0=BA0,BA1=BA1))
 }
-

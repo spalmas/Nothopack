@@ -10,7 +10,7 @@
 stand_randomizer <- function(){
   n.trees <- rpois(n = 1, lambda = 70)     #Random number of trees
   species.options <- c('NA', 'ND', 'NO', 'XX') #options of species
-  SPECIES <- sample(species.options, size = n.trees, replace = TRUE)  #A list of n.trees species
+  SPECIES <- sample(species.options, size = n.trees, replace = TRUE, prob = c(0.8, 0.1, 0.05, 0.05))  #A list of n.trees species
   DBH <- 15 *rexp(n = n.trees)  #random diameter list
   HEIGHT <- exp(0.93687 + 0.55204*log(DBH))
   return(data.frame(SPECIES, DBH, HEIGHT))

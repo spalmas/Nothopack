@@ -4,13 +4,13 @@
 \alias{stand_parameters}
 \title{Stand Parameter calculation}
 \usage{
-stand_parameters(stand, area, species.col = "ESPECIE", dbh.col = "DAP",
-  height.col = "HT")
+stand_parameters(stand, area = 10000, species.col = "SPECIES",
+  dbh.col = "DBH", height.col = "HEIGHT")
 }
 \arguments{
 \item{stand:}{table. It must include the columns}
 
-\item{area:}{Area of plot in square meters}
+\item{area:}{Area of plot in square meters. Default to one hectare plot.}
 
 \item{species.col:}{name of species column name. Default to ESPECIES.}
 
