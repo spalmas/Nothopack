@@ -12,5 +12,5 @@ source('R/stand_randomizer.R')
 source('R/parametric_height.R')
 source('R/stand_parameters.R')
 
-hd_coef <- load(file = 'data/hd_coef.rda')
-hparam_coef <- load(file = 'data/hparam_coef.rda')
+hd_coef <- read.csv(file = 'data/hd_coef.csv')
+hparam_coef <- read.csv(file = 'data/hparam_coef.csv')
