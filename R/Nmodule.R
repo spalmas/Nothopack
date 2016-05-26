@@ -19,9 +19,15 @@
 Nmodule <- function(N0=NA,QD0=NA,model=1){
 
   # Model: log(n_trees_ha2) = log(n_trees_ha1)*(1 - theta*Delta.ANHO*(dq1/dq_max_original))
-  theta<-0.0055452 # Based on model 1, but we might have more?
+  if (model == 1){
+    theta<-0.0055452 # Using original Reineke function
+    QDmax<- exp((log(N0) - 11.6167)/-1.4112)
+  } else {
+    theta<-0.0056560  # Using new Reineke function
+    QDmax<- exp((log(N0) - 13.5)/-1.99)
 
-  QDmax<-QD0*1.5;  # This needs to change to correct calculation maybe extra input
+  }
+
   N1<-exp(log(N0)*(1-theta*(QD0/QDmax)))
 
   return(N1)

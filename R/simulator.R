@@ -14,25 +14,24 @@
 #' stand <- stand_randomizer()
 #' simulator(stand, zone = 1, age = 15)
 
-simulator <- function(stand, zone, EDOM0, area = 10000, sy = 30, ...){
+simulator <- function(stand, zone, EDOM0, area = 10000, sy = 30, Nmodel = 1, ABmodel = 1,  ...){
 
   prodal <- stand_parameters(stand, area = area)
   HDOM0 <- prodal$HD
   N0 <- prodal$NHA
   AB0 <- prodal$BA
-  DC0<-remaining_calc_A(AB=AB0,NHA=N0)
-  SPDOM <- prodal$SPDOM
-  IS<-remaining_calc_B(dom_sp = SPDOM, ZONE = ZONE, HD = HDOM0, E = EDOM0)
+  DC0<-prodal$DQ
+  IS<-remaining_calc_B(dom_sp = prodal$SPDOM, ZONE = zone, HD = HDOM0, E = EDOM0)
 
   y <- 0   #initial year
 
   #create a table to store results
-  results <- data.frame (y = y, N0 = N0, AB0 = AB0, DC0 = DC0)
+  results <- data.frame (y = y, N0 = prodal$NHA, AB0 = AB0, DC0 = DC0)
 
   for (y in 1:sy){
-    N1<-Nmodule(N0=N0,QD0=12.43,model=1)
-    DC1<-remaining_calc_A(AB = AB0, NHA=N1)
-    AB1<-BAmodule(EDOM0=EDOM0,HDOM0=HDOM0,N0=N1,BA0=AB0,model=1,projection=TRUE)$BA1
+    N1<-Nmodule(N0=N0,QD0=DC0,model=Nmodel)
+    AB1<-BAmodule(EDOM0=EDOM0,HDOM0=HDOM0,N0=N1,BA0=AB0,model=ABmodel,projection=TRUE)$BA1
+    DC1<-remaining_calc_A(AB = AB1, NHA=N1)
 
     results <- rbind(results, c(y, N1, AB1, DC0))
 
