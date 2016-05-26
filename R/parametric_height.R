@@ -21,3 +21,4 @@ height_param <- function(dom_sp, zone, HD = NA, DC = NA, DBH = NA, hparam.coef =
          + coef.list$b3 * exp(-0.08 * DBH) + coef.list$b4 * (HD^3) *exp(-0.08*DBH)
          + coef.list$b5 *(DC^3)*exp(-0.08 * DBH))
 }
+
