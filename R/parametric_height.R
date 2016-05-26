@@ -11,7 +11,7 @@
 #' @param DBH Diameter at Breast Height in centimeters.
 #' @return The individual Height in meters
 #' @examples
-#' height_param(HD = 15, DC = 12, DBH = 14, dom_sp = 1, zone=NA)
+#' height_param(HD=15, DC=12, DBH=14, dom_sp=1)
 #' library(Nothopack)
 
 height_param <- function(dom_sp, zone, HD = NA, DC = NA, DBH = NA, hparam.coef = hparam_coef,...){
@@ -21,3 +21,5 @@ height_param <- function(dom_sp, zone, HD = NA, DC = NA, DBH = NA, hparam.coef =
          + coef.list$b3 * exp(-0.08 * DBH) + coef.list$b4 * (HD^3) *exp(-0.08*DBH)
          + coef.list$b5 *(DC^3)*exp(-0.08 * DBH))
 }
+
+
