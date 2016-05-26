@@ -14,7 +14,7 @@
 #'
 #' @examples
 #' stand <- stand_randomizer()
-#' simulator(stand, zone = 1, age = 15, EDOM0 = 20)
+#' simulator(stand, zone=1, age=15, EDOM0=20)
 
 simulator <- function(stand, zone, EDOM0, area = 10000, sy = 30, Nmodel = 1, ABmodel = 1,  ...){
 
