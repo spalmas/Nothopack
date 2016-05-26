@@ -5,7 +5,8 @@
 #'
 #' @param N0 Number of trees (trees/ha) of the stand at current time.
 #' @param QD0 Quadratic Diameter (m2/ha) of the stand at current time.
-#' @param model available fitted model to use for estimation.
+#' @param model available fitted model to use for estimation 
+#' (1: Original Reineke function, 2: New Reineke function).
 #'
 #' @return Number of trees (N1, m2/ha) for the next year (at EDOM0+1)
 #'
@@ -29,7 +30,6 @@ Nmodule <- function(N0=NA,QD0=NA,model=1){
   }
 
   N1<-exp(log(N0)*(1-theta*(QD0/QDmax)))
-
   return(N1)
 }
 
