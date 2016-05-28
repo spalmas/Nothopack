@@ -1,25 +1,36 @@
-#' Height Models in function of Whole Stand parameters
+#' Estimates total tree height in function of stand level parameters
 #'
-#' Calculates individual tree heights in function of whole stand parameter
-#' like Dominant Height (HD), Quadratic Diameter (DC) and also DBH
-#' HT = b0 + b1 HD + b2 DC0.95 + b3 exp(-0.08 DAP) + b4 HD3 exp(0.08 DAP) + b5 DC3 exp(-0.08 DAP)
-#' The coefficients come from the Nothofagus Simulator
-#' from Gezan.
+#' \code{parametric_height} Estimatess individual tree heights in function of whole-stand level parameters:
+#' dominant height (HD, m), quadratic diameter (QD), and individual tree diameter at breast height (DBH, cm).
+#' Basic model is: HT = b0 + b1*HD + b2*QD^0.95 + b3*exp(-0.08*DBH) + b4*(HD^3)*exp(0.08*DBH) + b5*(QD^3)*exp(-0.08*DBH)
+#' The coefficients come from Gezan et al. (2006).
 #'
-#' @param HD Dominant height in meters.
-#' @param DC Quadratic Diameter in centimeters.
-#' @param DBH Diameter at Breast Height in centimeters.
-#' @return The individual Height in meters
+#' @references 
+#' Gezan et al. (2006). Simulador Nothofagus. Internal Report XXXXXXXX
+#'
+#' @param dom_sp Dominant species (1: Rauli, 2: Roble, 3: Coigue)
+#' @param zone Growth zone (1, 2, 3, 4)
+#' @param HD Dominant height (m).
+#' @param QD Quadratic diameter (cm).
+#' @param DBH Diameter at breast height (cm).
+#' 
+#' @return Individual total tree height (m)
+#' 
 #' @examples
-#' height_param(HD=15, DC=12, DBH=14, dom_sp=1)
-#' library(Nothopack)
+#' (HT<-height_param(HD=15, QD=12, DBH=14, dom_sp=1, zone=1))
+#' (HT<-height_param(HD=15, QD=12, DBH=14, dom_sp=2, zone=2))
 
-height_param <- function(dom_sp, zone, HD = NA, DC = NA, DBH = NA, hparam.coef = hparam_coef,...){
-  coef.list <- subset(hparam.coef, zone == zone & dom_sp_code == dom_sp, select = c(b0, b1, b2, b3, b4, b5) )
+height_param <- function(dom_sp, zone, HD=NA, QD=NA, DBH=NA, hparam.coef=hparam_coef,...){
+  coef.list <- subset(hparam_coef, hparam_zone == zone & hparam_dom_sp_code == dom_sp, 
+                      select = c(hparam_b0, hparam_b1, hparam_b2, hparam_b3, hparam_b4, hparam_b5) )
 
-  return(coef.list$b0 +  coef.list$b1 * HD + coef.list$b2 * (DC^0.95)
-         + coef.list$b3 * exp(-0.08 * DBH) + coef.list$b4 * (HD^3) *exp(-0.08*DBH)
-         + coef.list$b5 *(DC^3)*exp(-0.08 * DBH))
+  hest <-coef.list$hparam_b0 +  coef.list$hparam_b1*HD + coef.list$hparam_b2*(QD^0.95)
+  + coef.list$hparam_b3*exp(-0.08*DBH) + coef.list$hparam_b4*(HD^3)*exp(-0.08*DBH)
+  + coef.list$hparam_b5*(QD^3)*exp(-0.08*DBH) 
+  
+  return(hest)
 }
 
+# Note: 
+# - Need to update the reference for the parameters
 

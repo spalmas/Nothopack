@@ -7,12 +7,15 @@ source('R/fitness_table.R')
 source('R/hd_coef.R')
 source('R/hparam_coef.R')
 source('R/Nmodule.R')
-source('R/remaining_calc_A.R')
-source('R/remaining_calc_B.R')
+# source('R/remaining_calc_A.R') # Discontinued
+# source('R/remaining_calc_B.R') # Discontinued
 source('R/simulator.R')
 source('R/stand_randomizer.R')
 source('R/parametric_height.R')
 source('R/stand_parameters.R')
+source('R/get_stand.R')
+source('R/get_site.R')
+
 
 hd_coef <- read.csv(file = 'data/hd_coef.csv')
 hparam_coef <- read.csv(file = 'data/hparam_coef.csv')

@@ -8,16 +8,13 @@
 #' @param model available fitted model to use for estimation 
 #' (1: Original Reineke function, 2: New Reineke function).
 #'
-#' @return Number of trees (N1, m2/ha) for the next year (at EDOM0+1)
-#'
-#' @author
-#' S.Gezan, S.Palmas and P.Moreno
+#' @return Number of trees (N1, m2/ha) for the next year (i.e. ED+1)
 #'
 #' @examples
 #' N1<-Nmodule(N0=2730,QD0=12.43,model=1)
 #' N1
 
-Nmodule <- function(N0=NA,QD0=NA,model=1){
+Nmodule <- function(N0=NA, QD0=NA, model=1){
 
   # Model: log(n_trees_ha2) = log(n_trees_ha1)*(1 - theta*Delta.ANHO*(dq1/dq_max_original))
   if (model == 1){
@@ -33,3 +30,6 @@ Nmodule <- function(N0=NA,QD0=NA,model=1){
   return(N1)
 }
 
+# Note
+# - Need to update help for different models.
+# - Why both models have so few decimal places?
