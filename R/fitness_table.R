@@ -1,10 +1,17 @@
-#' Fitness values for observed and fitted values.
+#' Calculates goodness-of-fit statistics
+#' 
+#' \code{fitness} Obtains goodness-of-fit statistics (R2emp, RMSE, BIAS, RMSE% and BIAS%) 
+#' using provided observed and fitted values.
 #'
-#' @param obs Array of observed values.
-#' @param pred Array of predicted values.
-#' @return A table with R^2 empirical, RMSE, and Bias%.
+#' @param obs vector of observed values.
+#' @param pred vector of predicted values.
+#' 
+#' @return A table with goodness-of-fit statistics:
+#' R2emp: empirical coefficient of correlation
+#' RMSE (and RMSE%) root mean square error (raw and in percentage of mean of observed data) 
+#' BIAS (and BIAS%) bias (raw and in percentage of mean of observed data) 
+#' 
 #' @examples
-#' library(Nothopack)
 #' fit <- lm(sr ~ ., data = LifeCycleSavings)
 #' fitness_table(LifeCycleSavings$sr, predict(fit))
 

@@ -2,7 +2,7 @@
 #'
 #' \code{get_site} When two of stand level variebles: dominat age (ED, year), dominant height (HD, m) and site index (SI, m)
 #' are given, it returns the value of the remaining stand level parameter.
-#' Note: The coefficients for the site index curves come from Gezan et al. (2006).
+#' Note: The coefficients for the site index curves come from Gezan and Ortega (2001).
 #'
 #' @param dom_sp Dominant species (1: Rauli, 2: Roble, 3: Coigue)
 #' @param zone Growth zone (1, 2, 3, 4)
@@ -12,16 +12,20 @@
 #' @param ... additional arguments to be passed to the low level bisection function
 #'
 #' @references 
-#' Gezan et al. (2006). Simulador Nothofagus. Internal Report XXXXXXXX
+#' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para 
+#' Renovales de Roble, Rauly y Coigue. Reporte Interno. Projecto FONDEF D97I1065, Chile
 #'
 #' @return The missing stand level parameter
 #'
 #' @seealso \code{\link{hd_coef}}. For BA, QD and N see \code{\link{get_stand}}
 #'
 #' @examples
-#' remaining_calc_B(dom_sp=1, zone=2, HD=20, SI=10)
-#' remaining_calc_B(dom_sp=1, zone=2, ED=25, SI=10)
-#' remaining_calc_B(dom_sp=1, zone=2, ED=25, HD=14)
+#' ED<-get_site(dom_sp=1, zone=2, HD=14, SI=10)
+#' round(ED,0)
+#' HD<-get_site(dom_sp=1, zone=2, ED=25, SI=10)
+#' HD
+#' SI<-get_site(dom_sp=1, zone=2, ED=25, HD=14)
+#' SI
 
 get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA, hd.coef=hd_coef,...){
   coef.list <- subset(hd_coef, hd_coef_zone == zone & hd_coef_sp_code == dom_sp,
@@ -34,25 +38,35 @@ get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA, hd.coef=hd_coef,...){
     warning('Why would you use this calculation? You have allready have the three variables')
     
   } else if (is.na(ED)) {               # If Initial age is missing
-    parm<-0       #HOW?
     
+    # Definition of ED function for bisection method (should it be somewhere else?)
+    ED.eq <- function(x){
+      c <- coef.list$hd_coef_b0 + coef.list$hd_coef_b1*SI
+      0.3 + coef.list$hd_coef_a * (1-Nothopack:::exponent(1-(SI/coef.list$hd_coef_a)^c, (x+0.5)/18))^(1/c) - HD
+    }
+    # Bisection method
+    parm <- tryCatch(pracma::bisect(ED.eq,
+                                    a=0, b=100,
+                                    maxiter=100)$root,
+                     error=function(e) {NA})
+
   } else if (is.na(HD)) {              # If Dominant height is missing
-    c <- coef.list$hd_coef_b0 + coef.list$hd_coef_b1 * SI
+    c <- coef.list$hd_coef_b0 + coef.list$hd_coef_b1*SI
     parm <- 0.3 + coef.list$hd_coef_a * (1-Nothopack:::exponent(1-(SI/coef.list$hd_coef_a)^c, (ED+0.5)/18) )^(1/c)
     return(parm)
 
   } else if (is.na(SI)) {              # If Site Index is missing
 
-    #definition of IS function for bisection method (should it be somewhere else?)
+    # Definition of SI function for bisection method (should it be somewhere else?)
     SI.eq <- function(x){
       c <- coef.list$hd_coef_b0 + coef.list$hd_coef_b1 * x
       0.3 + coef.list$hd_coef_a * (1-Nothopack:::exponent(1-(x/coef.list$hd_coef_a)^c, (ED+0.5)/18))^(1/c) - HD
     }
-    #bisection method
+    # Bisection method
     parm <- tryCatch(pracma::bisect(SI.eq,
-                            a=0, b=30,
-                            maxiter = 100)$root,
-             error = function(e) {NA})
+                            a=0, b=40,
+                            maxiter=100)$root,
+             error=function(e) {NA})
   }
   return(parm)
 }

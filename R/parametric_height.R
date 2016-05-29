@@ -3,11 +3,12 @@
 #' \code{parametric_height} Estimatess individual tree heights in function of whole-stand level parameters:
 #' dominant height (HD, m), quadratic diameter (QD), and individual tree diameter at breast height (DBH, cm).
 #' Basic model is: HT = b0 + b1*HD + b2*QD^0.95 + b3*exp(-0.08*DBH) + b4*(HD^3)*exp(0.08*DBH) + b5*(QD^3)*exp(-0.08*DBH)
-#' The coefficients come from Gezan et al. (2006).
+#' The coefficients come from Gezan and Ortega (2001).
 #'
 #' @references 
-#' Gezan et al. (2006). Simulador Nothofagus. Internal Report XXXXXXXX
-#'
+#' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para 
+#' Renovales de Roble, Rauly y Coigue. Reporte Interno. Projecto FONDEF D97I1065, Chile
+#' 
 #' @param dom_sp Dominant species (1: Rauli, 2: Roble, 3: Coigue)
 #' @param zone Growth zone (1, 2, 3, 4)
 #' @param HD Dominant height (m).
