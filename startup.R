@@ -2,6 +2,7 @@ rm(list=ls()) # It removes ALL objects
 
 source('R/BAmodule.R')
 source('R/diagnostics.R')
+source('R/diametric_distribution.R')
 source('R/exponent.R')
 #source('R/fitness_table.R')  # Discontinued
 source('R/hd_coef.R')
