@@ -20,6 +20,7 @@
 #'
 #' # Example 2: Projects Basal Area
 #' (BAest<-BAmodule(ED0=20,HD0=17.20,N0=2730,BA0=33.11,model=1,projection=TRUE)$BA1)
+#' (BAest<-BAmodule(ED0=20,HD0=17.20,N0=2730,BA0=33.11,model=2,projection=TRUE)$BA1)
 
 BAmodule <- function(ED0=NA, HD0=NA, N0=NA, BA0=NA, model=1, projection=FALSE){
 
