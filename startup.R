@@ -10,7 +10,8 @@ source('R/hparam_coef.R')
 source('R/Nmodule.R')
 # source('R/remaining_calc_A.R') # Discontinued
 # source('R/remaining_calc_B.R') # Discontinued
-source('R/simulator.R')
+source('R/simulator.R') # Discontinued
+source('R/stand_simulator.R')
 source('R/stand_randomizer.R')
 source('R/parametric_height.R')
 source('R/stand_parameters.R')

@@ -16,7 +16,7 @@
 #' @examples
 #' plotnew <- stand_randomizer()
 #' prodal <- stand_parameters(plotnew, area = 1000)
-#' SIM<-stand_simulator(dom_sp=1, zone=1, HD=14, AD=20, BA=12, N=770, ADF=40)
+#' SIM<-stand_simulator(dom_sp=1, zone=1, HD=14, AD=20, BA=12, N=770, ADF=40, Nmodel=1, BAmodel=1)
 #' SIM
 #' 
 

@@ -20,14 +20,15 @@
 #' @seealso \code{\link{hd_coef}}. For BA, QD and N see \code{\link{get_stand}}
 #'
 #' @examples
-#' ED<-get_site(dom_sp=1, zone=2, HD=14, SI=10)
-#' round(ED,0)
-#' HD<-get_site(dom_sp=1, zone=2, ED=25, SI=10)
-#' HD
-#' SI<-get_site(dom_sp=1, zone=2, ED=25, HD=14)
-#' SI
+# ED<-get_site(dom_sp=1, zone=2, HD=14, SI=10)
+# round(ED,0)
+# HD<-get_site(dom_sp=1, zone=2, ED=25, SI=10)
+# HD
+# SI<-get_site(dom_sp=1, zone=2, ED=25, HD=14)
+# SI
+library (pracma)
 
-get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA, hd.coef=hd_coef,...){
+get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA){
   coef.list <- subset(hd_coef, hd_coef_zone == zone & hd_coef_sp_code == dom_sp,
                       select = c(hd_coef_a, hd_coef_b0, hd_coef_b1) )
 
@@ -42,17 +43,16 @@ get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA, hd.coef=hd_coef,...){
     # Definition of ED function for bisection method (should it be somewhere else?)
     ED.eq <- function(x){
       c <- coef.list$hd_coef_b0 + coef.list$hd_coef_b1*SI
-      0.3 + coef.list$hd_coef_a * (1-Nothopack:::exponent(1-(SI/coef.list$hd_coef_a)^c, (x+0.5)/18))^(1/c) - HD
+      - HD + coef.list$hd_coef_a * (1-(1-(SI/coef.list$hd_coef_a)^c)^((x-2)/18) )^(1/c) 
     }
     # Bisection method
     parm <- tryCatch(pracma::bisect(ED.eq,
-                                    a=0, b=100,
-                                    maxiter=100)$root,
-                     error=function(e) {NA})
+                                    a=2, b=100,
+                                    maxiter=100)$root)
 
   } else if (is.na(HD)) {              # If Dominant height is missing
     c <- coef.list$hd_coef_b0 + coef.list$hd_coef_b1*SI
-    parm <- 0.3 + coef.list$hd_coef_a * (1-Nothopack:::exponent(1-(SI/coef.list$hd_coef_a)^c, (ED+0.5)/18) )^(1/c)
+    parm <- coef.list$hd_coef_a * (1-(1-(SI/coef.list$hd_coef_a)^c)^((ED-2)/18))^(1/c)
     return(parm)
 
   } else if (is.na(SI)) {              # If Site Index is missing
@@ -60,13 +60,12 @@ get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA, hd.coef=hd_coef,...){
     # Definition of SI function for bisection method (should it be somewhere else?)
     SI.eq <- function(x){
       c <- coef.list$hd_coef_b0 + coef.list$hd_coef_b1 * x
-      0.3 + coef.list$hd_coef_a * (1-Nothopack:::exponent(1-(x/coef.list$hd_coef_a)^c, (ED+0.5)/18))^(1/c) - HD
+      - HD + coef.list$hd_coef_a * (1-(1-(x/coef.list$hd_coef_a)^c)^((ED-2)/18))^(1/c) 
     }
     # Bisection method
     parm <- tryCatch(pracma::bisect(SI.eq,
                             a=0, b=40,
-                            maxiter=100)$root,
-             error=function(e) {NA})
+                            maxiter=100)$root)
   }
   return(parm)
 }
