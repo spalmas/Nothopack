@@ -14,6 +14,9 @@
 #' @references 
 #' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para 
 #' Renovales de Roble, Rauly y Coigue. Reporte Interno. Projecto FONDEF D97I1065, Chile
+#' 
+#' Gezan, S.A. and Moreno, P. (2000). CURVAS DE SITIO – ALTURA DOMINANTE PARA RENOVALES
+#'  DE ROBLE, RAULÍ Y COIGUE. Reporte Interno. Projecto FONDEF D97I1065, Chile
 #'
 #' @return The missing stand level parameter
 #'
@@ -70,6 +73,6 @@ get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA){
   return(parm)
 }
 
-# Note: 
-# - Need to update the reference for the parameters
-# - Still needs to get the ED from the model.. need to see how...
+# Note: Model 
+# HD = a [1 – {1 – (IS / a) c } ((E - 2) / 18)] 1/c
+# c = b0 + b1 IS
