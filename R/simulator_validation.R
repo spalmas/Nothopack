@@ -6,6 +6,17 @@
 
 source('startup.R')
 
-stand_simulator(dom_sp = ensayos.data$Dominant, zone = ensayos.data$zone)
+#simulation of each row of the validation dataset
+for (row in 1:row(ensayos.data)){
+  ensayos.data[(ncol(ensayos.data) + 1):(ncol(ensayos.data) + 6),row] <- stand_simulator(dom_sp = ensayos.data$Dominant[row],
+                  zone = ensayos.data$zone[row],
+                  HD0 = ensayos.data$HD[row],
+                  AD0 = ensayos.data$EDAD1[row],
+                  BA0 = ensayos.data$BA1[row],
+                  N0 = ensayos.data$NHA1[row],
+                  ADF = ensayos.data$EDAD2[row],
+                  Nmodel = 1,
+                  BAmodel = 1)
+}
 
-stand_simulator <- function(dom_sp=NA, zone=NA, HD0=NA, AD0=NA, BA0=NA, N0=NA, ADF=80, Nmodel=1, BAmodel=1){
+
