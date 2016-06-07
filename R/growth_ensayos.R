@@ -160,7 +160,7 @@ unique_plots <- unique(cbind(PRODAL$ENSAYO, PRODAL$PARCELA, PRODAL$SUBPARC))
 column.names <- c('ENSAYO', 'PARCELA', 'SUBPARC',
                   'MEDICION1' , 'MEDICION2',
                   'NHA1', 'NHA2', 'DQ1', 'DQ2', 'dom_sp',
-                  'Delta.ANHO', 'EDAD1', 'EDAD2', 'zone')
+                  'Delta.ANHO', 'EDAD1', 'EDAD2', 'zone', 'HD', 'HD2', 'BA1', 'BA2')
 changes <- matrix(ncol = length(column.names))
 colnames(changes) = column.names
 
@@ -191,9 +191,13 @@ for (y in 1:nrow(unique_plots)){
       l <- PRODAL_plot$EDAD[x]
       m <- PRODAL_plot$EDAD[x+1]
       n <- PRODAL_plot$ZONA[x]
+      o <- PRODAL_plot$HD[x]
+      p <- PRODAL_plot$HD[x+1]
+      q <- PRODAL_plot$AB_Total[x]
+      r <- PRODAL_plot$AB_Total[x+1]
 
       # adding the values to a row in final dataframe
-      changes <- rbind(changes, c(a,b,c,d,e,f,g,h,i,j,k,l,m, n))
+      changes <- rbind(changes, c(a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r))
     }
   }
 }
