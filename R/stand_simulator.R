@@ -46,3 +46,5 @@ stand_simulator <- function(dom_sp=NA, zone=NA, HD0=NA, AD0=NA, BA0=NA, N0=NA, A
   return(results)
 }
 
+# Note
+# - Need to make sure when AD0=ADF there is only one year of output
