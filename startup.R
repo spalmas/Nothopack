@@ -21,7 +21,7 @@ source('R/fitness_stats.R')     # Replaces fitness_table
 
 hd_coef <- read.csv(file = 'data/hd_coef.csv')
 hparam_coef <- read.csv(file = 'data/hparam_coef.csv')
-prodal.data <- read.csv(file = 'data/PRODAL_ENSAYOS.csv')
+ensayos.data <- read.csv(file = 'data/growth_ensayos.csv')
 
 # Name Variables
 # N, number of trees
