@@ -10,7 +10,7 @@ source('R/hparam_coef.R')
 source('R/Nmodule.R')
 # source('R/remaining_calc_A.R') # Discontinued
 # source('R/remaining_calc_B.R') # Discontinued
-source('R/simulator.R') # Discontinued
+# source('R/simulator.R') # Discontinued
 source('R/stand_simulator.R')
 source('R/stand_randomizer.R')
 source('R/parametric_height.R')
@@ -22,6 +22,8 @@ source('R/fitness_stats.R')     # Replaces fitness_table
 hd_coef <- read.csv(file = 'data/hd_coef.csv')
 hparam_coef <- read.csv(file = 'data/hparam_coef.csv')
 ensayos.data <- read.csv(file = 'data/growth_ensayos.csv')
+
+library(pracma)
 
 # Name Variables
 # N, number of trees

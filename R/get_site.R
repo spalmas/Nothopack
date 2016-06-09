@@ -29,9 +29,12 @@
 # HD
 # SI<-get_site(dom_sp=1, zone=2, ED=25, HD=14)
 # SI
-library (pracma)
 
 get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA){
+  
+  # Correct Model is: HD = a [1 – {1 – (IS / a) c } ((E - 2) / 18)] 1/c
+  #                   c = b0 + b1 IS
+  
   coef.list <- subset(hd_coef, hd_coef_zone == zone & hd_coef_sp_code == dom_sp,
                       select = c(hd_coef_a, hd_coef_b0, hd_coef_b1) )
 
@@ -67,12 +70,12 @@ get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA){
     }
     # Bisection method
     parm <- tryCatch(pracma::bisect(SI.eq,
-                            a=0, b=40,
+                            a=0, b=35,
                             maxiter=100)$root)
   }
   return(parm)
 }
 
-# Note: Model 
-# HD = a [1 – {1 – (IS / a) c } ((E - 2) / 18)] 1/c
-# c = b0 + b1 IS
+# Note 
+#   - Need to restict input of SI (0-40), AD (2-100) to reasonable numbers
+
