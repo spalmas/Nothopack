@@ -6,6 +6,9 @@
 
 source('startup.R')
 
+#lets delete all plots where there is dominant speices is mixed (4)
+ensayos.data <- ensayos.data[!ensayos.data$dom_sp ==4,]
+
 #adding columns to right of the ensayos dataset
 ensayos.data[,(ncol(ensayos.data) + 1):(ncol(ensayos.data) + 6)] <- NA
 colnames(ensayos.data)[(ncol(ensayos.data) -5):(ncol(ensayos.data))] <- c('y', 'N1_pred', 'BA1_pred', 'QD1_pred', 'HD1_pred', 'SI_pred')
@@ -23,9 +26,8 @@ for (r in 1:nrow(ensayos.data)){
     Nmodel = 1,
     BAmodel = 1)
 
-  ensayos.data[r, (ncol(ensayos.data) + 1):(ncol(ensayos.data) + 6)] <- SIM[nrow(SIM),]
+  ensayos.data[r, (ncol(ensayos.data) - 5):(ncol(ensayos.data))] <- SIM[nrow(SIM),]
 }
 
-
-
-
+plot(ensayos.data$BA2, ensayos.data$BA1_pred)
+abline(a=0, b=1)
