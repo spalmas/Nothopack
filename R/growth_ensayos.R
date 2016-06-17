@@ -23,13 +23,11 @@ trees <- read.csv('data/ENSAYO2_TREES_MortalityCLEANED.csv', sep =',')
 zones <- read.csv('data/zonas_ensayo_Paulo.csv', sep =',')   #from Paulo
 HDcoef <- read.csv('data/hd_coef.csv', sep = ',')
 
-
-
-
 #keep only dominant species Rauli. Is there a better way?
 HDcoef <- HDcoef[HDcoef$hd_coef_dom_sp_name ==  'Rauli', ]
 
-
+#Trees with no age are eliminated. This EDAD2 is the age of the parcela.
+trees <- trees[!is.na(trees$EDAD2),]
 
 ##Adding NA as factor in species
 trees$ESPECIE  = factor(trees$ESPECIE, levels = c(levels(trees$ESPECIE), 'NA'))
@@ -91,57 +89,6 @@ for (i in 1:nrow(PRODAL)){
   }
 }
 
-
-##Site Index
-#We need to estimate the site index. We have the dominant height from our plots and we have the dominant age or age at DAP from each plot (maybe for some part of them). We can use the dominant height curves published in Gezan y Moreno (2000a) to estimate our site index. Site index is estimated by bisection method of the equation below.
-#
-#The model is
-#$$\mathrm{HD} = 0.3 + a\left[1-\left(1-(\mathrm{IS}/a)^c\right)^{(E+0.5)/18}\right]^{1/c}$$
-#$$c = b_0 + b_1 \mathrm{IS}$$
-#
-#where $\mathrm{HD}$ is Dominant height (m), $E$ is the dominant age or age at DAP (years), $\mathrm{IS}$ is the Site Index at year 20 (m), $a$, $b_0$ and $b_1$ are parameters to be estimated and $c$ is a Site index constant
-
-#There is no zone 3 for dominant species Rauli in the HDcoef table. Zones 3 and NA were changes to zones 2 in PRODAL
-PRODAL$ZONA[!PRODAL$ZONA %in% c(1,3,4)] <- 2
-
-#It will only include plots with known age (EDAD2 != NA)
-PRODAL <- PRODAL[!is.na(PRODAL$EDAD2),]
-
-
-#exponent definition to allow negative numbers to be elevated
-exponent <- function(a, pow) (abs(a)^pow)*sign(a)
-
-require(pracma)  #bisection method package
-PRODAL['IS'] <- NA  #blank column
-
-for (i in 1:nrow(PRODAL)){
-  ZONA <-   PRODAL$ZONA[i]   #getting zone
-  EDAD <- PRODAL$EDAD2[i]
-  HD <- PRODAL$HD[i]
-
-  #getting parameters from HDcoef table
-  a1 <- HDcoef$hd_coef_a[HDcoef$hd_coef_zone == ZONA]
-  b0 <- HDcoef$hd_coef_b0[HDcoef$hd_coef_zone == ZONA]
-  b1 <- HDcoef$hd_coef_b1[HDcoef$hd_coef_zone == ZONA]
-
-  #function that defines the bisection
-  IS.eq <- function(x){
-    c1 <- b0 + b1 * x
-    0.3 + a1 * (1 - exponent( 1 - (x/a1)^c1, (EDAD+0.5)/18) )^(1/c1) - HD
-  }
-
-  #x = 50
-  #IS.eq(50)
-
-  #assigning the Site Index
-  PRODAL$IS[i] <- tryCatch(bisect(IS.eq,
-                               a=10, b=30,
-                               maxiter = 100)$root,
-                               error = function(e) {NA})
-
-}
-
-
 ###growth bTable preparation
 #This long code constructs a table of the changes found in our database. (Age t to Age t + 1 in one line)
 #For each plot, we have a row of the measurements $t$ and $t+1$ with their
@@ -158,9 +105,9 @@ unique_plots <- unique(cbind(PRODAL$ENSAYO, PRODAL$PARCELA, PRODAL$SUBPARC))
 
 #Starting the table to store results and assigning column names
 column.names <- c('ENSAYO', 'PARCELA', 'SUBPARC',
-                  'MEDICION1' , 'MEDICION2',
-                  'NHA1', 'NHA2', 'DQ1', 'DQ2', 'dom_sp',
-                  'Delta.ANHO', 'EDAD1', 'EDAD2', 'zone', 'HD', 'HD2', 'BA1', 'BA2')
+                  'MEDICION0' , 'MEDICION1',
+                  'NHA0', 'NHA1', 'QD0', 'QD1', 'dom_sp',
+                  'Delta.ANHO', 'EDAD0', 'EDAD1', 'zone', 'HD0', 'HD1', 'BA0', 'BA1')
 changes <- matrix(ncol = length(column.names))
 colnames(changes) = column.names
 
@@ -205,34 +152,19 @@ for (y in 1:nrow(unique_plots)){
 #Eliminating the first blank row of the database
 changes <- data.frame(changes[2:nrow(changes),])
 
-
 #Some columns are weirdly changed from numeric to other thing
+changes$NHA0 <- as.numeric(as.vector(changes$NHA0))#as.
 changes$NHA1 <- as.numeric(as.vector(changes$NHA1))#as.
-changes$NHA2 <- as.numeric(as.vector(changes$NHA2))#as.
-changes$DQ1 <- as.numeric(as.vector(changes$DQ1))#as.
-changes$DQ2 <- as.numeric(as.vector(changes$DQ2))#as.
+changes$QD0 <- as.numeric(as.vector(changes$QD0))#as.
+changes$QD1 <- as.numeric(as.vector(changes$QD1))#as.
 changes$Delta.ANHO <- as.numeric(as.vector(changes$Delta.ANHO))#as.
-
 
 #Create a dummy variable for NA =1, Mixed = 0
 changes['DummyNA'] <- (changes$dom_sp == 'NA') *1 #sVariable not significant
-
 
 #Adding a column that had an increase in number of trees
 changes['ingrowth'] <- changes$NHA2 > changes$NHA1
 
 
-###Adding DQ_max to the changes dataframe
-#To estimate the curve described above, we need a column of $d_{q \, max}$
-#in our dataframe. We have two models for the Reineke Equation.
-#The first one from Gezan et al. (2007). and the second one estimated above. These are
-
-#$$ d_{q \, max} = \exp\left(\frac{\log(N_1) - 11.6167}{-1.4112}\right) $$
-#$$ d_{q \, max} = \exp\left(\frac{\log(N_1) - 13.5}{-1.99}\right) $$
-
-#changes['DQ_max_original'] <- exp((log(changes$NHA1) - 11.6167) / -1.4112)  #Ecuacion original
-#changes['DQ_max_new'] <- exp((log(changes$NHA1) - coef(lm1)[1]) / coef(lm1)[2])  #Ecuacion nueva con quantile regression
-
 #exporting results to a table
-
 write.csv(x = changes, file = 'data/growth_ensayos.csv')

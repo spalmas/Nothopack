@@ -21,7 +21,7 @@
 
 stand_simulator <- function(dom_sp=NA, zone=NA, HD0=NA, AD0=NA, BA0=NA, N0=NA, ADF=80, Nmodel=1, BAmodel=1){
 
-  SI <- get_site(dom_sp=dom_sp, zone=zone, HD=HD0, E=AD0)
+  SI <- get_site(dom_sp=dom_sp, zone=zone, HD=HD0, ED=AD0)
   QD0 <- get_stand(BA=BA0, N=N0)
 
   # Create a table to store results
