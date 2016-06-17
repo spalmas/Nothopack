@@ -11,10 +11,10 @@
 #' @param SI Site index at reference dominant age of 18 (m)
 #' @param ... additional arguments to be passed to the low level bisection function
 #'
-#' @references 
-#' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para 
+#' @references
+#' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para
 #' Renovales de Roble, Rauly y Coigue. Reporte Interno. Projecto FONDEF D97I1065, Chile
-#' 
+#'
 #' Gezan, S.A. and Moreno, P. (2000). CURVAS DE SITIO – ALTURA DOMINANTE PARA RENOVALES
 #'  DE ROBLE, RAULÍ Y COIGUE. Reporte Interno. Projecto FONDEF D97I1065, Chile
 #'
@@ -31,25 +31,25 @@
 # SI
 
 get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA){
-  
+
   # Correct Model is: HD = a [1 – {1 – (IS / a) c } ((E - 2) / 18)] 1/c
   #                   c = b0 + b1 IS
-  
+
   coef.list <- subset(hd_coef, hd_coef_zone == zone & hd_coef_sp_code == dom_sp,
                       select = c(hd_coef_a, hd_coef_b0, hd_coef_b1) )
 
   if (sum(is.na(c(ED, HD, SI))) > 2 ){
     stop('There must be at least two stand parameters provided')
-    
+
   } else if ( sum(is.na(c(ED, HD, SI))) == 0 ){
     warning('Why would you use this calculation? You have allready have the three variables')
-    
+
   } else if (is.na(ED)) {               # If Initial age is missing
-    
+
     # Definition of ED function for bisection method (should it be somewhere else?)
     ED.eq <- function(x){
       c <- coef.list$hd_coef_b0 + coef.list$hd_coef_b1*SI
-      - HD + coef.list$hd_coef_a * (1-(1-(SI/coef.list$hd_coef_a)^c)^((x-2)/18) )^(1/c) 
+      - HD + coef.list$hd_coef_a * (1-(1-(SI/coef.list$hd_coef_a)^c)^((x-2)/18) )^(1/c)
     }
     # Bisection method
     parm <- tryCatch(pracma::bisect(ED.eq,
@@ -64,18 +64,21 @@ get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA){
   } else if (is.na(SI)) {              # If Site Index is missing
 
     # Definition of SI function for bisection method (should it be somewhere else?)
+    #Since the function requires the coefficients and I think the bisect method
+    #looks for x in the function, it is probably safer to define it here.
     SI.eq <- function(x){
       c <- coef.list$hd_coef_b0 + coef.list$hd_coef_b1 * x
-      - HD + coef.list$hd_coef_a * (1-(1-(x/coef.list$hd_coef_a)^c)^((ED-2)/18))^(1/c) 
+      - HD + coef.list$hd_coef_a * (1-(1-(x/coef.list$hd_coef_a)^c)^((ED-2)/18))^(1/c)
     }
-    # Bisection method
-    parm <- tryCatch(pracma::bisect(SI.eq,
-                            a=0, b=35,
-                            maxiter=100)$root)
+
+    #brute search method
+    lista1 <- unlist(lapply(X = 1:40, FUN = SI.eq))   #lista de resultados. Esto solo busca IS de 1 a 40
+    parm <- which(abs(lista1 - 0) == min(abs(lista1 - 0), na.rm = TRUE))
+
   }
   return(parm)
 }
 
-# Note 
+# Note
 #   - Need to restict input of SI (0-40), AD (2-100) to reasonable numbers
 
