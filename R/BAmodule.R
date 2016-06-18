@@ -42,7 +42,9 @@ BAmodule <- function(ED0=NA, HD0=NA, N0=NA, BA0=NA, model=1, projection=FALSE){
   }
   if (projection==TRUE){
     # Projection
-    BA1<-BA0*(1+bm[2]/ED0)
+    BA1<-BA0*(1+bm[2]/ED0)  # Needs to be adjusted for other derivatives
   }
   return(list(BA0=BA0,BA1=BA1))
 }
+
+# Note: BA1 model needs to incorporate other derivatives in the future

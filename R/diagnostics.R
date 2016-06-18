@@ -6,8 +6,10 @@
 #' @return Four different diagnostic plots
 #'
 #' @examples
-#' fit <- lm(sr ~ ., data = LifeCycleSavings)
-#' diagnostics(LifeCycleSavings$sr, predict(fit))
+#' x <- c(1:20)
+#' yobs <- 10 + 0.1*x + rnorm(20)
+#' fit <- lm(yobs ~ x)
+#' diagnostics(residuals(fit),predict(fit))
 
 diagnostics<-function(obs,pred){
 
