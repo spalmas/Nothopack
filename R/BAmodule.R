@@ -7,12 +7,16 @@
 #' @param HD0 Dominant height (m) of the stand at current time.
 #' @param N0 Number of trees (trees/ha) of the stand at current time.
 #' @param BA0 Basal area (m2/ha) of the stand at curernt time (required for projections).
-#' @param model available fitted model to use for estimation.
+#' @param model Number of fitted model to use for estimation (1:non-linear fit, 2:linear fit).
 #' @param projection if TRUE projection from BA0 is executed for a 1 year increment.
 #'
 #' @return Basal area (BA0, m2/ha) for the current age (for prediction)
 #' or at ED0+1 (for projection)
 #'
+#' @references
+#' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para
+#' Renovales de Roble, Rauli y Coigue. Reporte Interno. Projecto FONDEF D97I1065. Chile
+#' 
 #' @examples
 #' # Example 1: Predicts Basal Area
 #' BAest<-BAmodule(ED0=20,HD0=17.20,N0=2730,model=1,projection=FALSE)

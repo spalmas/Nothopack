@@ -1,49 +1,73 @@
-#' Whole-stand simulator for all cohorts in the stand
+#' Simulates whole-stand for the complete stand
 #'
-#' \code{Nmodule} Simulates growth, mortality and recruitment of a given stand
-#' requiring stand paramters cthat combine all species.
-#'
-#' @param stand the stand to be simulated
-#' @param zone zone of the stand
-#' @param age initial age of the stand
-#' @param sy simuation years
-#' @param Nmodel Number of model for NHA estimation (1 is original function, 2 for new function)
-#' @param BAmodel 1 for non linear and 2 for linear coefficient estimates
-#'
+#' \code{stand_simulator} Simulates plot level growth, mortality (and recruitment) of a given stand
+#' requiring stand-level parameters that combine all species. Simulations are done using stand-level 
+#' models starting from intial age (AD0) until final age (ADF) in increments of 1 year. 
+#' 
+#' @param dom_sp Dominant specie (1:Rauli, 2:Roble, 3:Coigue, 4:Others or Mixed) 
+#' @param zone Growth zone of the corresponding stand
+#' @param HD0 dominant height (m) of current stand ata age AD0
+#' @param AD0 initial dominant age (year) to start simulations
+#' @param BA0 basal area (m2) of all tree species of current stand at age AD0
+#' @param N0 number of trees (trees/ha) of all tree species of current stand at age AD0
+#' @param ADF final dominant age (year) to finish simulations
+#' @param Nmodel Number of fitted model for N estimation (1:Original Reineke, 2:New Reineke)
+#' @param BAmodel Number of fitted model for BA to use for estimation (1:non-linear fit, 2:linear fit).
+#' 
 #' @author
 #' S.Gezan, S.Palmas and P.Moreno
 #'
 #' @examples
+#' #Example 1. Starting from known stand-level data
+#' stand_simulator(dom_sp=1, zone=1, AD0=20, ADF=40, HD0=14, BA0=12, N0=770, Nmodel=1, BAmodel=1, PropNN=0.85)
+#' 
+#' #Example 2. Starting from (simulated) plot data
 #' plotnew <- stand_randomizer()
-#' prodal <- stand_parameters(plotnew, area = 1000)
-#' SIM<-stand_simulator(dom_sp=1, zone=1, HD=14, AD=20, BA=12, N=770, ADF=40, Nmodel=1, BAmodel=1)
-#' SIM
+#' head(plotnew)
+#' prodal<-stand_parameters(plotdata=plotnew, area=500)
+#' (sims<-stand_simulator(dom_sp=prodal$dom.sp, zone=1, AD0=14, ADF=80,
+#'                 HD=prodal$HD, BA0=prodal$sd[5,3], N0=prodal$sd[5,2], 
+#'                 Nmodel=2, BAmodel=2, PropNN=prodal$PropNN))
+#' plot(sims$Age,sims$VOL,type='l',col=3, 
+#'      xlab='Dominant Age (years)', ylab='Total Volume without bark (m3/ha)')
 
-stand_simulator <- function(dom_sp=NA, zone=NA, HD0=NA, AD0=NA, BA0=NA, N0=NA, ADF=80, Nmodel=1, BAmodel=1){
+stand_simulator <- function(dom_sp=NA, zone=NA, HD0=NA, AD0=NA, BA0=NA, N0=NA, ADF=80, Nmodel=1, BAmodel=1, PropNN=NA){
 
+  # Completing stand-level information
   SI <- get_site(dom_sp=dom_sp, zone=zone, HD=HD0, ED=AD0)
   QD0 <- get_stand(BA=BA0, N=N0)
+  VOL0 <- Vmodule(BA=BA0, HD=HD0, PropNN=PropNN)
 
   # Create a table to store results
-  results <- data.frame (Age=AD0, N=N0, BA=BA0, QD=QD0, HD=HD0, SI=SI)
+  results <- data.frame(Age=AD0, N=N0, BA=BA0, QD=QD0, HD=HD0, SI=SI, VOL=VOL0)
 
   for (y in (AD0+1):ADF){
 
-    N1 <- Nmodule(N0=N0,QD0=QD0,model=Nmodel)
+    N1 <- Nmodule(N0=N0, QD0=QD0, model=Nmodel)
     BA1 <- BAmodule(ED0=AD0, HD0=HD0, N0=N0, BA0=BA0, model=BAmodel, projection=TRUE)$BA1
     QD1 <- get_stand(BA=BA1, N=N1)
-    HD1 <- get_site(dom_sp=dom_sp, zone=zone, SI=SI, E=y)
+    HD1 <- get_site(dom_sp=dom_sp, zone=zone, SI=SI, ED=y)
+    VOL1 <- Vmodule(BA=BA1, HD=HD1, PropNN=PropNN)  # Note that PropNN stays fixed!
+    
+    results <- rbind(results, c(y, N1, BA1, QD1, HD1, SI, VOL1))  # in the same order as dataframe above!
 
-    results <- rbind(results, c(y, N1, BA1, QD1, HD1, SI))  #should be in the same order as dataframe above!
-
-    #Variable replacement
+    # Variable replacement
     N0 <- N1
     QD0 <- QD1
     BA0 <- BA1
     HD0 <- HD1
+    VOL0 <- VOL1 
+      
   }
+  
   return(results)
 }
 
 # Note
 # - Need to make sure when AD0=ADF there is only one year of output
+# - We have prediction and projection.
+# - It assumes you provide: HD-AD, and BA-N
+# - Need to define if we add additional stand level parameters
+# - Also, we could add plotting if desired
+# - There is a strong assumption that PropNN and PropBA stays fixed
+# - The plot for volume increments to much (it is unrealistic, probably projection BA is wrong!)
