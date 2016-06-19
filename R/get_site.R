@@ -8,31 +8,31 @@
 #' @param zone Growth zone (1, 2, 3, 4)
 #' @param ED Dominant age (year)
 #' @param HD Dominant height (m)
-#' @param SI Site index at reference dominant age of 18 (m)
-#' @param ... additional arguments to be passed to the low level bisection function
+#' @param SI Site index at reference dominant age of 20 (m)
 #'
 #' @references
 #' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para
-#' Renovales de Roble, Rauly y Coigue. Reporte Interno. Projecto FONDEF D97I1065, Chile
+#' Renovales de Roble, Rauli y Coigue. Reporte Interno. Projecto FONDEF D97I1065, Chile
 #'
-#' Gezan, S.A. and Moreno, P. (2000). CURVAS DE SITIO – ALTURA DOMINANTE PARA RENOVALES
-#'  DE ROBLE, RAULÍ Y COIGUE. Reporte Interno. Projecto FONDEF D97I1065, Chile
+#' Gezan, S.A. and Moreno, P. (2000). Curvas de Sitio - Altura dominante para renovales
+#' de Roble, Rauli y Coigue. Reporte Interno. Projecto FONDEF D97I1065, Chile
 #'
 #' @return The missing stand level parameter
 #'
 #' @seealso \code{\link{hd_coef}}. For BA, QD and N see \code{\link{get_stand}}
 #'
 #' @examples
-# ED<-get_site(dom_sp=1, zone=2, HD=14, SI=10)
-# round(ED,0)
-# HD<-get_site(dom_sp=1, zone=2, ED=25, SI=10)
-# HD
-# SI<-get_site(dom_sp=1, zone=2, ED=25, HD=14)
-# SI
+#' # Example 1: Obtain Dominant Age
+#' (ED<-get_site(dom_sp=1, zone=2, HD=14, SI=10))
+#' round(ED,0)  # Rounded
+#' # Example 2: Obtain Dominant Height
+#' (HD<-get_site(dom_sp=1, zone=2, ED=25, SI=10))
+#' # Example 3: Obtain Site Index
+#' (SI<-get_site(dom_sp=1, zone=2, ED=19, HD=13.5))
 
 get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA){
 
-  # Correct Model is: HD = a [1 – {1 – (IS / a) c } ((E - 2) / 18)] 1/c
+  # Correct Model is: HD = a [1 – {1 – (IS / a) c } ((E - 2) / (20 - 2)] 1/c
   #                   c = b0 + b1 IS
 
   coef.list <- subset(hd_coef, hd_coef_zone == zone & hd_coef_sp_code == dom_sp,
@@ -64,17 +64,18 @@ get_site <- function(dom_sp, zone, ED=NA, HD=NA, SI=NA){
   } else if (is.na(SI)) {              # If Site Index is missing
 
     # Definition of SI function for bisection method (should it be somewhere else?)
-    #Since the function requires the coefficients and I think the bisect method
-    #looks for x in the function, it is probably safer to define it here.
+    # Since the function requires the coefficients and I think the bisect method
+    # looks for x in the function, it is probably safer to define it here.
     SI.eq <- function(x){
       c <- coef.list$hd_coef_b0 + coef.list$hd_coef_b1 * x
       - HD + coef.list$hd_coef_a * (1-(1-(x/coef.list$hd_coef_a)^c)^((ED-2)/18))^(1/c)
     }
 
     #brute search method
-    lista1 <- unlist(lapply(X = 1:40, FUN = SI.eq))   #lista de resultados. Esto solo busca IS de 1 a 40
-    parm <- which(abs(lista1 - 0) == min(abs(lista1 - 0), na.rm = TRUE))
-
+    seqX <- seq(1,40,0.01)
+    lista1 <- unlist(lapply(X = seqX, FUN = SI.eq))   #lista de resultados. Esto solo busca IS de 1 a 40
+    posit <- which(abs(lista1 - 0) == min(abs(lista1 - 0), na.rm = TRUE))
+    parm <- seqX[posit]
   }
   return(parm)
 }

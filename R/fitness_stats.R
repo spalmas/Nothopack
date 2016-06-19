@@ -33,4 +33,3 @@ fitness_stats <- function(obs, pred){
   return (tabla)
 }
 
-# Note: - Several corrections in the statistics.
