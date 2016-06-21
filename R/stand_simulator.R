@@ -25,11 +25,12 @@
 #' plotnew <- stand_randomizer()
 #' head(plotnew)
 #' prodal<-stand_parameters(plotdata=plotnew, area=500)
-#' (sims<-stand_simulator(dom_sp=prodal$dom.sp, zone=1, AD0=14, ADF=80,
+#' (sims<-stand_simulator(dom_sp=prodal$dom.sp, zone=1, AD0=44, ADF=100,
 #'                 HD=prodal$HD, BA0=prodal$sd[5,3], N0=prodal$sd[5,2], 
 #'                 Nmodel=2, BAmodel=2, PropNN=prodal$PropNN))
 #' plot(sims$Age,sims$VOL,type='l',col=3, 
 #'      xlab='Dominant Age (years)', ylab='Total Volume without bark (m3/ha)')
+#' plot_results(sims)
 
 stand_simulator <- function(dom_sp=NA, zone=NA, HD0=NA, AD0=NA, BA0=NA, N0=NA, ADF=80, Nmodel=1, BAmodel=1, PropNN=NA){
 

@@ -99,3 +99,5 @@ stand_parameters <- function(plotdata, area=0){
 }
 
 # Note. - VERY VERY IMPORTANT: - DID SEBASTIAN CALCULATED DOM.SP accorting to BA or NHA???
+#       - Change Otras dom.sp to 9 to stop the process.
+#       - What to do with Mixed stand...

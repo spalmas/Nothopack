@@ -46,8 +46,15 @@ BAmodule <- function(ED0=NA, HD0=NA, N0=NA, BA0=NA, model=1, projection=FALSE){
   }
   if (projection==TRUE){
     # Projection
-    BA1<-BA0*(1+bm[2]/ED0)  # Needs to be adjusted for other derivatives
+    #SI <- get_site(dom_sp=1, zone=1, HD=HD0, ED=ED0)
+    #HDA <- get_site(dom_sp=1, zone=1, SI=SI, ED=ED0-0.5)
+    #HDB <- get_site(dom_sp=1, zone=1, SI=SI, ED=ED0+0.5)
+    #DerHD<-(HDB-HDA) # Derivative HD
+    #BA1<-BA0*(1+bm[2]/ED0)  # Needs to be adjusted for other derivatives
+    #BA1<-BA0*(1+(bm[2]/ED0)+(bm[3]/HD0)*DerHD)  # Needs to be adjusted for other derivatives
+    BA1<-BA0*(1+bm[2]*log((ED0+1)/ED0))  # Needs to be adjusted for other derivatives
   }
+      
   return(list(BA0=BA0,BA1=BA1))
 }
 
