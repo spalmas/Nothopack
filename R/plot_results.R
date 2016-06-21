@@ -7,6 +7,8 @@
 
 plot_results <- function(results){
 
+  N.plot <- ggplot(SIM, aes(x = Age, y = N)) + geom_line() +
+    xlab("Year") + ylab("Number of trees (N/ha)") + theme(axis.title.x = element_blank(), axis.text.x = element_blank())
   BA.plot <- ggplot(SIM, aes(x = Age, y = BA)) + geom_line() +
     xlab("Year") + ylab("BA (m2)") + theme(axis.title.x = element_blank(), axis.text.x = element_blank())
   DQ.plot <- ggplot(SIM, aes(x = Age, y = QD)) + geom_line() +
@@ -15,7 +17,7 @@ plot_results <- function(results){
     xlab("Year") + ylab("Volume (m^3)")
 
   grid.newpage()
-  grid.draw(rbind(ggplotGrob(BA.plot), ggplotGrob(DQ.plot), ggplotGrob(Vol.plot), size = "last"))
+  grid.draw(rbind(ggplotGrob(N.plot), ggplotGrob(BA.plot), ggplotGrob(DQ.plot), ggplotGrob(Vol.plot), size = "last"))
   #grid.draw(rbind(ggplotGrob(BA.plot), ggplotGrob(DQ.plot), size = "last"))
 
 }
