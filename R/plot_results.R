@@ -5,7 +5,7 @@
 #'
 #'
 
-plot_results <- function(results){
+plot_results <- function(SIM){
 
   N.plot <- ggplot(SIM, aes(x = Age, y = N)) + geom_line() +
     xlab("Year") + ylab("Number of trees (N/ha)") + theme(axis.title.x = element_blank(), axis.text.x = element_blank())
