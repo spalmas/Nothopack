@@ -42,7 +42,7 @@ get_site <- function(dom_sp, zone, AD=NA, HD=NA, SI=NA){
     stop('There must be at least two stand parameters provided')
 
   } else if ( sum(is.na(c(AD, HD, SI))) == 0 ){
-    warning('Why would you use this calculation? You have allready have the three variables')
+    warning('Why would you use this calculation? You have already have the three variables')
 
   } else if (is.na(AD)) {               # If Initial age is missing
 
