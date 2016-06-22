@@ -25,8 +25,8 @@
 #' plotnew <- stand_randomizer()
 #' head(plotnew)
 #' prodal<-stand_parameters(plotdata=plotnew, area=500)
-#' (sims<-stand_simulator(dom_sp=prodal$dom.sp, zone=1, AD0=44, ADF=100,
-#'                 HD=prodal$HD, BA0=prodal$sd[5,3], N0=prodal$sd[5,2], 
+#' (sims<-stand_simulator(dom_sp=prodal$dom.sp, zone=1, AD0=44, ADF=150,
+#'                 HD0=prodal$HD, BA0=prodal$sd[5,3], N0=prodal$sd[5,2], 
 #'                 Nmodel=2, BAmodel=2, PropNN=prodal$PropNN))
 #' plot(sims$Age,sims$VOL,type='l',col=3, 
 #'      xlab='Dominant Age (years)', ylab='Total Volume without bark (m3/ha)')
@@ -35,7 +35,7 @@
 stand_simulator <- function(dom_sp=NA, zone=NA, HD0=NA, AD0=NA, BA0=NA, N0=NA, ADF=80, Nmodel=1, BAmodel=1, PropNN=NA){
 
   # Completing stand-level information
-  SI <- get_site(dom_sp=dom_sp, zone=zone, HD=HD0, ED=AD0)
+  SI <- get_site(dom_sp=dom_sp, zone=zone, HD=HD0, AD=AD0)
   QD0 <- get_stand(BA=BA0, N=N0)
   VOL0 <- Vmodule(BA=BA0, HD=HD0, PropNN=PropNN)
 
@@ -45,9 +45,9 @@ stand_simulator <- function(dom_sp=NA, zone=NA, HD0=NA, AD0=NA, BA0=NA, N0=NA, A
   for (y in (AD0+1):ADF){
 
     N1 <- Nmodule(N0=N0, QD0=QD0, model=Nmodel)
-    BA1 <- BAmodule(ED0=AD0, HD0=HD0, N0=N0, BA0=BA0, model=BAmodel, projection=TRUE)$BA1
+    BA1 <- BAmodule(AD0=AD0, HD0=HD0, N0=N0, BA0=BA0, model=BAmodel, projection=TRUE)$BA1
     QD1 <- get_stand(BA=BA1, N=N1)
-    HD1 <- get_site(dom_sp=dom_sp, zone=zone, SI=SI, ED=y)
+    HD1 <- get_site(dom_sp=dom_sp, zone=zone, SI=SI, AD=y)
     VOL1 <- Vmodule(BA=BA1, HD=HD1, PropNN=PropNN)  # Note that PropNN stays fixed!
     
     results <- rbind(results, c(y, N1, BA1, QD1, HD1, SI, VOL1))  # in the same order as dataframe above!
