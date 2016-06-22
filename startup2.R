@@ -7,20 +7,17 @@ library(pracma)
 source('R/BAmodule.R')
 source('R/diagnostics.R')
 source('R/diametric_distribution.R')
-source('R/exponent.R')          # Do we still need this one?
-source('R/fitness_stats.R')     
-source('R/get_site.R')          
-source('R/get_stand.R')         
+source('R/fitness_stats.R')
+source('R/get_site.R')
+source('R/get_stand.R')
 source('R/get_taper.R')      # It calculates relevant variables for taper equations.
-# source('R/growth_ensayos.R')  # Not sure it is a function
 source('R/hd_coef.R')
 source('R/hparam_coef.R')
 source('R/Nmodule.R')
 source('R/parametric_height.R')
 source('R/plot_results.R')
-# source('R/simulator_validation.R') # Not sure if this is a function
-source('R/stand_parameters.R')   
-source('R/stand_randomizer.R')   
+source('R/stand_parameters.R')
+source('R/stand_randomizer.R')
 source('R/stand_simulator.R')     # This seems only projection
 # source('R/tree_simulator.R')    # This has no work and needs to be implemented
 source('R/Vmodule.R')
