@@ -6,13 +6,13 @@
 #' @param N0 Number of trees (trees/ha) of the stand at current time.
 #' @param QD0 Quadratic Diameter (m2/ha) of the stand at current time.
 #' @param model Number of fitted model for N estimation (1:Original Reineke, 2:New Reineke)
-#' 
+#'
 #' @return Number of trees (N1, m2/ha) for the next year (i.e. ED+1)
 #'
 #' @references
 #' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para
 #' Renovales de Roble, Rauli y Coigue. Reporte Interno. Projecto FONDEF D97I1065. Chile
-#' 
+#'
 #' @examples
 #' (N1<-Nmodule(N0=2730,QD0=12.43,model=1))
 #' (N1<-Nmodule(N0=2730,QD0=12.43,model=2))
@@ -23,7 +23,7 @@ Nmodule <- function(N0=NA, QD0=NA, model=1){
   if (model == 1){
     theta <- 0.0055452 # Using original Reineke function
     QDmax <- exp((log(N0) - 11.6167)/-1.4112)
-  } else {
+  } else if (model == 2) {
     theta <- 0.0056560  # Using new Reineke function
     QDmax <- exp((log(N0) - 13.500416)/-1.990455)
   }
