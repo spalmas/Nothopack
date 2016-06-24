@@ -40,18 +40,23 @@ stand_randomizer <- function(zone = 1, dom_sp = 1, AD=NA, HD=NA, SI=NA, BA=NA, N
     QD <- get_stand_parm
   }
 
-
   #dominant species
   if (dom_sp == 1){
     prob <- c(0.80, 0.10, 0.05, 0.05)
-  } else if (dom_sp == 2)
+  } else if (dom_sp == 2){
+    prob <- c(0.10, 0.80, 0.05, 0.05)
+  } else if (dom_sp == 3){
+    prob <- c(0.05, 0.10, 0.80, 0.05)
+  } else if (dom_sp == 4){
+    prob <- c(0.30, 0.30, 0.30, 0.10)
+  }
 
 
   n.trees <- rpois(n=1, lambda=30)     # Random number of trees based on a Poisson
   species.options <- c(1, 2, 3, 4)     # Options of species
 
   Species <- sample(species.options, size=n.trees, replace=TRUE,
-                    prob=c(0.80, 0.10, 0.05, 0.05))  # A list of n.trees species
+                    prob=prob)  # A list of n.trees species
   DBH <- round(15*rexp(n=n.trees),2)   # Random DBH values based on exponential dist
   HT <- round(exp(0.93687 + 0.55204*log(DBH)) + rnorm(n.trees, mean=0, sd=sqrt(5)),2)
 
