@@ -20,7 +20,7 @@
 #' @examples
 #' #Example 1. Starting from known stand-level data
 #' BAest<-BAmodule(AD0=20,HD0=17.20,N0=2730,model=1,projection=FALSE)
-#' sims <- stand_simulator(dom_sp=1, zone=1, AD0=20, ADF=40, HD0=17.20, BA0=BAest$BA0, N0=2730, Nmodel=1, BAmodel=1, PropNN=0.85)
+#' sims <- stand_simulator(dom_sp=1, zone=1, AD0=20, ADF=200, HD0=12.20, BA0=BAest$BA0, N0=2730, Nmodel=1, BAmodel=1, PropNN=0.85)
 #' sims
 #' plot_results(sims)
 #' 
