@@ -16,9 +16,11 @@ source('R/hparam_coef.R')
 source('R/Nmodule.R')
 source('R/parametric_height.R')
 source('R/plot_results.R')
+source('R/RECRUITmodule.R')
 source('R/stand_parameters.R')
 source('R/stand_randomizer.R')
 source('R/stand_simulator.R')     # This seems only projection
+source('R/stand_simulator2.R')    # Using vectorized input
 # source('R/tree_simulator.R')    # This has no work and needs to be implemented
 source('R/Vmodule.R')
 # source('R/Vmodule_individual.R) # This has some work but it is not complete

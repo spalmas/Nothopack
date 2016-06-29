@@ -16,7 +16,7 @@
 #' @references
 #' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para
 #' Renovales de Roble, Rauli y Coigue. Reporte Interno. Projecto FONDEF D97I1065. Chile
-#' 
+#'
 #' @examples
 #' # Example 1: Predicts Basal Area
 #' BAest<-BAmodule(AD0=20,HD0=17.20,N0=2730,model=1,projection=FALSE)
@@ -52,9 +52,13 @@ BAmodule <- function(AD0=NA, HD0=NA, N0=NA, BA0=NA, model=1, projection=FALSE){
     #DerHD<-(HDB-HDA) # Derivative HD
     #BA1<-BA0*(1+bm[2]/AD0)  # Needs to be adjusted for other derivatives
     #BA1<-BA0*(1+(bm[2]/AD0)+(bm[3]/HD0)*DerHD)  # Needs to be adjusted for other derivatives
+    #derHD es DerN. No sabemos la derivada con el numero de arbole spor hectarea
+    #la derivad apodria ser 98 y regreso al modelo y uso un valor de 98 y da una nueva area basal.
+    #medio iterativa
+
     BA1<-BA0*(1+bm[2]*log((AD0+1)/AD0))  # Needs to be adjusted for other derivatives
   }
-      
+
   return(list(BA0=BA0,BA1=BA1))
 }
 
