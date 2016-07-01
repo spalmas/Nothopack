@@ -6,12 +6,11 @@
 #' This version keeps track of the diameter distribution of the species and adds the funcionality
 #' of the recruitment.
 #'
-#' @param dom_sp Dominant specie (1:Rauli, 2:Roble, 3:Coigue, 4:Others or Mixed)
+#' @param vBA vector de Area Basal para la especies (1:Rauli, 2:Roble, 3:Coigue, 4:Others or Mixed)
+#' @param vN vector de numero de arboles por hectarea para la especies (1:Rauli, 2:Roble, 3:Coigue, 4:Others or Mixed)
 #' @param zone Growth zone of the corresponding stand
 #' @param HD0 dominant height (m) of current stand ata age AD0
 #' @param AD0 initial dominant age (year) to start simulations
-#' @param BA0 basal area (m2) of all tree species of current stand at age AD0
-#' @param N0 number of trees (trees/ha) of all tree species of current stand at age AD0
 #' @param ADF final dominant age (year) to finish simulations
 #' @param Nmodel Number of fitted model for N estimation (1:Original Reineke, 2:New Reineke)
 #' @param BAmodel Number of fitted model for BA to use for estimation (1:non-linear fit, 2:linear fit).
@@ -21,22 +20,10 @@
 #'
 #' @examples
 #' #Example 1. Starting from known stand-level data
-#' BAest<-BAmodule(AD0=20,HD0=17.20,N0=2730,model=1,projection=FALSE)
-#' sims <- stand_simulator(dom_sp=1, zone=1, AD0=20, ADF=200, HD0=12.20, BA0=BAest$BA0, N0=2730, Nmodel=1, BAmodel=1, PropNN=0.85)
+#' sims <- stand_simulator2(vBA=c(20,4,0,0), vN=c(650,113,0,0), zone = 1, HD0=18.45, AD0 = 20, ADF = 40, Nmodel = 1, BAmodel = 1)
 #' sims
 #' plot_results(sims)
 #'
-#' #Example 2. Starting from (simulated) plot data
-#' plotnew <- stand_randomizer()
-#' head(plotnew)
-#' prodal<-stand_parameters(plotdata=plotnew, area=500)
-#' (sims<-stand_simulator(dom_sp=prodal$dom.sp, zone=1, AD0=44, ADF=150,
-#'                 HD0=prodal$HD, BA0=prodal$sd[5,3], N0=prodal$sd[5,2],
-#'                 Nmodel=2, BAmodel=2, PropNN=prodal$PropNN))
-#' plot(sims$Age,sims$VOL,type='l',col=3,
-#'      xlab='Dominant Age (years)', ylab='Total Volume without bark (m3/ha)')
-#' plot_results(sims)
-
 stand_simulator2 <- function(vBA=NA, vN=NA,
                             zone=NA, HD0=NA, AD0=NA,
                             ADF=80, Nmodel=1, BAmodel=1){
@@ -61,7 +48,8 @@ stand_simulator2 <- function(vBA=NA, vN=NA,
 
   # Create a table to store results
   results <- data.frame(Age=AD0, N=N0, BA=BA0,QD=QD0, HD=HD0, SI=SI, VOL=VOL0,
-                        N1=sum(Dd$N.sp1), N2=sum(Dd$N.sp2), N3=sum(Dd$N.sp3), N4=sum(Dd$N.sp4))
+                        N1=sum(Dd$N.sp1), N2=sum(Dd$N.sp2), N3=sum(Dd$N.sp3), N4=sum(Dd$N.sp4),
+                        BA1=vBA[1], BA2=vBA[2], BA3=vBA[3], BA4=vBA[4])
   if (AD0 == ADF){
     return(results)
   }
@@ -73,19 +61,24 @@ stand_simulator2 <- function(vBA=NA, vN=NA,
     HD1 <- get_site(dom_sp=dom_sp, zone=zone, SI=SI, AD=y)   #New dominant height
     VOL1 <- Vmodule(BA=BA1, HD=HD1, PropNN=PropNN)  # Note that PropNN stays fixed!
 
-    vN1 <- table(factor(sample(x = c(1,2,3,4), size=N1, replace=TRUE, prob=PropNSpecies),  # A list of n.trees species
-                            levels = c(1,2,3,4)))
-    vBA1 <- BA1*PropBASpecies
+    #Update the Number and BA vectors
+    vN1 <- table(factor(sample(x = c(1,2,3,4), size=N1, replace=TRUE, prob=PropNSpecies),
+                            levels = c(1,2,3,4))) # A list of n.trees species
+    vBA1 <- BA1*PropBASpecies   #The basal area i sjust proportional to the Proportoin of Nothofagus?
 
     #Update diametric distibution
-    Dd <- diam_distr(vBA=vBA, vN=vN1, HD=HD1)
-    Dd <- RECRUITmodule(vBA=vBA, vN=vN1, HD=HD1) #Need to update the Basal Area per species
-    vBA1 <-
-    PropNN <- sum(vBA[1:3], na.rm = TRUE)/BA0   #Updates proportion of Nothofagus
+    Dd <- diam_distr(vBA=vBA1, vN=vN1, HD=HD1)
+    Dd <- RECRUITmodule(vBA=vBA1, vN=vN1, HD=HD1)
 
+    #Update vN1 con los resultados de la RECRUITmodule
+    vN1 <- c(sum(Dd$N.sp1), sum(Dd$N.sp2), sum(Dd$N.sp3), sum(Dd$N.sp4))
+
+    #Updates proportion of Nothofagus
+    PropNN <- sum(vBA1[1:3], na.rm = TRUE)/BA0
 
     results <- rbind(results, c(y, N1, BA1, QD1, HD1, SI, VOL1,
-                                sum(Dd$N.sp1), sum(Dd$N.sp2), sum(Dd$N.sp3), sum(Dd$N.sp4)))  # in the same order as dataframe above!
+                                sum(Dd$N.sp1), sum(Dd$N.sp2), sum(Dd$N.sp3), sum(Dd$N.sp4),
+                                vBA1[1], vBA1[2], vBA1[3], vBA1[4]))  # in the same order as dataframe above!
 
     # Variable replacement
     N0 <- N1

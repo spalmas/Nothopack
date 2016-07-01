@@ -38,7 +38,5 @@ RECRUITmodule <- function(vBA=NA, vN=NA, HD=NA){
   Dd[1,'N.sp4'] <- Dd[1,'N.sp4'] + Species[4]
 
   return(Dd)
-
-
 }
 
