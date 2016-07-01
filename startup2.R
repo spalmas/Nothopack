@@ -2,7 +2,7 @@ rm(list=ls()) # It removes ALL objects
 
 library(ggplot2)
 library(grid)
-library(pracma)
+library(gridExtra)
 
 source('R/BAmodule.R')
 source('R/diagnostics.R')
