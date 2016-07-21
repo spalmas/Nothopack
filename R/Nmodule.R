@@ -29,6 +29,8 @@ Nmodule <- function(N0=NA, QD0=NA, model=1){
   }
 
   N1<-exp(log(N0)*(1-theta*(QD0/QDmax)))
+  #N1<-exp(log(N0)*(1-theta*(QD0/QDmax)))*1.02  # A very rought fix!
+
   return(N1)
 }
 

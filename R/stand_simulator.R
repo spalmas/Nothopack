@@ -19,8 +19,8 @@
 #'
 #' @examples
 #' #Example 1. Starting from known stand-level data
-#' BAest<-BAmodule(AD0=20,HD0=17.20,N0=2730,model=1,projection=FALSE)
-#' sims <- stand_simulator(dom_sp=1, zone=1, AD0=20, ADF=200, HD0=12.20, BA0=BAest$BA0, N0=2730, Nmodel=1, BAmodel=1, PropNN=0.85)
+#' BAest<-BAmodule(AD0=20, HD0=17.20, N0=2730, model=1, projection=FALSE)
+#' sims <- stand_simulator(dom_sp=1, zone=1, AD0=20, ADF=150, HD0=12.20, BA0=BAest$BA0, N0=2730, Nmodel=1, BAmodel=1, PropNN=0.85)
 #' sims
 #' plot_results(sims)
 #' 
@@ -52,9 +52,9 @@ stand_simulator <- function(dom_sp=NA, zone=NA, HD0=NA, AD0=NA, BA0=NA, N0=NA, A
   for (y in (AD0+1):ADF){
 
     N1 <- Nmodule(N0=N0, QD0=QD0, model=Nmodel)
-    BA1 <- BAmodule(AD0=AD0, HD0=HD0, N0=N0, BA0=BA0, model=BAmodel, projection=TRUE)$BA1
-    QD1 <- get_stand(BA=BA1, N=N1)
     HD1 <- get_site(dom_sp=dom_sp, zone=zone, SI=SI, AD=y)
+    BA1 <- BAmodule(AD0=AD0, HD0=HD0, N0=N0, BA0=BA0, HD1=HD1, N1=N1, model=BAmodel, projection=TRUE)$BA1
+    QD1 <- get_stand(BA=BA1, N=N1)
     VOL1 <- Vmodule(BA=BA1, HD=HD1, PropNN=PropNN)  # Note that PropNN stays fixed!
 
     results <- rbind(results, c(y, N1, BA1, QD1, HD1, SI, VOL1))  # in the same order as dataframe above!
