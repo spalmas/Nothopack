@@ -19,14 +19,14 @@
 #' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para
 #' Renovales de Roble, Rauli y Coigue. Reporte Interno. Projecto FONDEF D97I1065. Chile
 #'
-#' @return The misign component (di or hi) from the requested taper model 
+#' @return The missing component (di or hi) from the requested taper model 
 #'
 #' @author
 #' S.A. Gezan, P. Moreno and S. Palmas
 #'
 #' @examples
 #' # Example 1: Unknown diameter inside bark stem diameter 
-#' get_taper(dom_sp=1, zone=1, DBH=12.1, HT=14.2, hi=1.3, Tmodel=1)
+#' get_taper(dom_sp=1, zone=1, DBH=12.1, HT=14.2, hi=4.3, Tmodel=1)
 #' 
 #' # Example 2: Unknown stem height 
 #' get_taper(dom_sp=1, zone=1, DBH=12.1, HT=14.2, di=12.1, Tmodel=1)
@@ -57,7 +57,7 @@ get_taper <- function(dom_sp=NA, zone=NA, DBH=NA, HT=NA, di=NA, hi=NA, Tmodel=1)
   y <- b0 + b1*log(DBH) + b2*log(x)*(z^2) + b3*log(x)*log(z) + b4*log(x)*(DBH/HT)
   d <- exp(y)
   d[length(d)] <- 0 
-  plot(h,d)
+  #plot(h,d)
   
   # Getting missing parameter 
   if (is.na(di)) {              # If di is missing

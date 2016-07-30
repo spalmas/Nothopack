@@ -20,6 +20,9 @@
 #' @examples
 #' (HT<-height_param(HD=15, QD=12, DBH=14, dom_sp=1, zone=1))
 #' (HT<-height_param(HD=15, QD=12, DBH=14, dom_sp=2, zone=2))
+#' (HT<-height_param(HD=15, QD=12, DBH=24, dom_sp=2, zone=2))   # Why the same?
+#' (HT<-height_param(dom_sp=2, zone=2, HD=15, QD=12, DBH=24))   # Why the same?
+
 
 height_param <- function(dom_sp, zone, HD=NA, QD=NA, DBH=NA, hparam.coef=hparam_coef,...){
   coef.list <- subset(hparam_coef, hparam_zone == zone & hparam_dom_sp_code == dom_sp, 

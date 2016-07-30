@@ -9,7 +9,7 @@
 #' @param vBA vector de Area Basal para la especies (1:Rauli, 2:Roble, 3:Coigue, 4:Others or Mixed)
 #' @param vN vector de numero de arboles por hectarea para la especies (1:Rauli, 2:Roble, 3:Coigue, 4:Others or Mixed)
 #' @param zone Growth zone of the corresponding stand
-#' @param HD0 dominant height (m) of current stand ata age AD0
+#' @param HD0 dominant height (m) of current stand at age AD0
 #' @param AD0 initial dominant age (year) to start simulations
 #' @param ADF final dominant age (year) to finish simulations
 #' @param Nmodel Number of fitted model for N estimation (1:Original Reineke, 2:New Reineke)

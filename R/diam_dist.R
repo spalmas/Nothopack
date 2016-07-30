@@ -1,35 +1,41 @@
-#' Generation of the diametric distribution for a given stand
+#' Generation of the diametric distribution for a given stand to each species/cohort
 #'
-#' \code{diam_distr} Generates the diametric distribution for a given stand using the
-#' methods of parameter recovery. The probabilities are calculated by diameter classes of 
-#' 5 cm intervals. Hence, 5-10, 10-15, 15-20, etc. 
+#' \code{diam_distr} Generates the diametric distribution for a given stand for each of the 
+#' species/cohorts using the method of parameter recovery. The diameter classes are based on 5 cm 
+#' (i.e. 5-10, 10-15, 15-20, etc.). 
 #'
-#' @param vBA vector of basal areas (m2/ha) for each of the species 
-#' (1: Rauli, 2: Roble, 3: Coigue, 4: Others)
-#' @param vN vector of number of trees per hectare (trees/ha) for each of the species
-#' (1: Rauli, 2: Roble, 3: Coigue, 4: Others)
-#' @param HD Dominant height (m) of dominant specie in the stand
+#' @param vBA vector of basal areas (m2/ha) for each of the species/cohort 
+#' (1:Rauli, 2:Roble, 3:Coigue, 4:Others or Mixed, 0:Total)
+#' @param vN vector of number of trees per hectare (trees/ha) for each of the species/cohort
+#' (1:Rauli, 2:Roble, 3:Coigue, 4:Others or Mixed, 0:Total)
+#' @param HD Dominant height (m) of dominant specie in the current stand
 #' 
 #' @references
 #' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para
 #' Renovales de Roble, Rauli y Coigue. Reporte Interno. Projecto FONDEF D97I1065. Chile
 #'
-#' @return A matrix of probabilities for each diameter class by increments 
-#' of 5 cm, starting at 5 cm.
+#' @return A matrix of probabilities for each specie/cohort by diameter classes on increments 
+#' of 5 cm (starting at 5 cm).
 #'
 #' @author
 #' S.Gezan, S.Palmas and P.Moreno
 #'
 #' @examples
+#' Stand<-get_props(BA=54.76,N=1259,VOL=642.83,
+#'           PBA0=c(0.00,0.15,0.76,0.09),PN0=c(0.00,0.15,0.68,0.17),PVOL0=c(0.00,0.18,0.80,0.02)) 
+#' (DD<-diam_dist(vBA=Stand$BA,vN=Stand$N,HD=36.56))
+#' barplot(as.matrix(DD[,3:6]), beside=TRUE)   
+
+#' 
 #' # Example: Generation of distribution for 2 species (Rauli and Roble)
 #' (Dd<-diam_distr(vBA=c(20,4,0,0), vN=c(650,113,0,0), HD=18.45))
 #' # Ploting distribution for each specie
 #' barplot(as.matrix(Dd[,3:6]), beside=TRUE)   
 #' # Ploting distribution for sp 1 and 2 overlayed
-#' barplot(Dd[,3], col=1)
-#' barplot(Dd[,4], add=TRUE, col=4)
+#' barplot(DD[,4], col=1)
+#' barplot(DD[,5], add=TRUE, col=4)
 
-diam_distr <- function(vBA=NA, vN=NA, HD=NA){
+diam_dist <- function(vBA=NA, vN=NA, HD=NA){
 
   vQD <- c(get_stand(BA=vBA[1],N=vN[1]),get_stand(BA=vBA[2],N=vN[2]),
              get_stand(BA=vBA[3],N=vN[3]),get_stand(BA=vBA[4],N=vN[4]))
@@ -92,16 +98,25 @@ diam_distr <- function(vBA=NA, vN=NA, HD=NA){
   C4 <- b0_C_4 + b1_C_4*B4 + b2_C_4*vQD[4]
 
   # Calculation of the probability of NHA per diameter class, from 5 to 80 cm
-  DLlow <- matrix(data=0,nrow=0,ncol=6)
-  DLup <- matrix(data=0,nrow=0,ncol=6)
-  Prob1 <- matrix(data=0,nrow=0,ncol=6)
-  Prob2 <- matrix(data=0,nrow=0,ncol=6)
-  Prob3 <- matrix(data=0,nrow=0,ncol=6)
-  Prob4 <- matrix(data=0,nrow=0,ncol=6)
-  diam <- seq(5,80,5)
+  DBH_LL <- matrix(data=0,nrow=0,ncol=1)
+  DBH_UL <- matrix(data=0,nrow=0,ncol=1)
+  Prob1 <- matrix(data=0,nrow=0,ncol=1)
+  Prob2 <- matrix(data=0,nrow=0,ncol=1)
+  Prob3 <- matrix(data=0,nrow=0,ncol=1)
+  Prob4 <- matrix(data=0,nrow=0,ncol=1)
+  Dclass <- matrix(data=0,nrow=0,ncol=1)
+  BAclass <- matrix(data=0,nrow=0,ncol=1)
+  Hclass <- matrix(data=0,nrow=0,ncol=1)
+  Vclass <- matrix(data=0,nrow=0,ncol=1)
+  diam <- seq(from=5,to=80,by=5)
   for (j in 1:15){
-    DLlow[j] <- diam[j]
-    DLup[j] <- diam[j+1]
+    DBH_LL[j] <- diam[j]                 # cm
+    DBH_UL[j] <- diam[j+1]               # cm
+    Dclass[j] <- (diam[j]+diam[j+1])/2   # cm
+    BAclass[j] <- (pi/4)*((Dclass[j])^2) # cm2
+    Hclass[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=1, zone=1)  # dom_sp and zone should be specified
+    Vclass[j] <- Vmodule_individual(dom_sp=1, zone=1, DBH=Dclass[j], HT=Hclass[j], blength=Hclass[j], Tmodel=1) # dom_sp, zone and Tmodel
+    
     Prob1[j] <- exp(-((diam[j] - A)/B1)^C1) - exp(-((diam[j+1] - A)/B1)^C1)
     Prob2[j] <- exp(-((diam[j] - A)/B2)^C2) - exp(-((diam[j+1] - A)/B2)^C2)
     Prob3[j] <- exp(-((diam[j] - A)/B3)^C3) - exp(-((diam[j+1] - A)/B3)^C3)
@@ -111,15 +126,28 @@ diam_distr <- function(vBA=NA, vN=NA, HD=NA){
     if (is.na(Prob3[j])) {Prob3[j] <- 0} 
     if (is.na(Prob4[j])) {Prob4[j] <- 0} 
   }
-  N.sp1 <- round(vN[1]*Prob1,2)
-  N.sp2 <- round(vN[2]*Prob2,2)
-  N.sp3 <- round(vN[3]*Prob3,2)
-  N.sp4 <- round(vN[4]*Prob4,2)
-    
-  DDist<-data.frame(cbind(DLlow,DLup,N.sp1,N.sp2,N.sp3,N.sp4))
+  N.sp1 <- round(vN[1]*Prob1,3)
+  N.sp2 <- round(vN[2]*Prob2,3)
+  N.sp3 <- round(vN[3]*Prob3,3)
+  N.sp4 <- round(vN[4]*Prob4,3)
+
+  BA.sp1 <- BAclass*N.sp1/(100^2)  # cm2/ha
+  BA.sp2 <- BAclass*N.sp2/(100^2)  # cm2/ha
+  BA.sp3 <- BAclass*N.sp3/(100^2)  # cm2/ha
+  BA.sp4 <- BAclass*N.sp4/(100^2)  # cm2/ha
+  
+  VOL.sp1 <- Vclass*N.sp1
+  VOL.sp2 <- Vclass*N.sp2
+  VOL.sp3 <- Vclass*N.sp3
+  VOL.sp4 <- Vclass*N.sp4
+  
+  DDist<-data.frame(cbind(DBH_LL,DBH_UL,Dclass,Hclass,
+                          N.sp1,N.sp2,N.sp3,N.sp4,BA.sp1,
+                          BA.sp2,BA.sp3,BA.sp4,VOL.sp1,VOL.sp2,VOL.sp3,VOL.sp4))
   return(DDist)
 }
 
 # Note: - Need to check that PNHAN goes from 0 to 1, and not 0 to 100
 #'- Need to check that HD is Dominant height (m) of dominant specie in the stand
 #'- Need to put class values in output
+#'# dom_sp and zone should be specified
