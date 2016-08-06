@@ -12,7 +12,9 @@ sims <- stand_simulator(dom_sp=1, zone=2, AD0=41, ADF=81, HD0=39, BA0=43.45, N0=
 sims
 plot_results(sims)
 
-sims <- stand_simulator(dom_sp=1, zone=2, AD0=41, ADF=51, HD0=30.3, BA0=38.3, N0=1860, Nmodel=1, BAmodel=1, PropNN=NA)
+BAest<-BAmodule(AD0=41, HD0=45, N0=1260, model=1, projection=FALSE)
+BAest$BA0
+sims <- stand_simulator(dom_sp=1, zone=3, AD0=41, ADF=48, HD0=42, BA0=42.83, N0=1260, Nmodel=1, BAmodel=2, PropNN=NA)
 sims
 plot_results(sims)
 

@@ -28,12 +28,12 @@
 
 #' 
 #' # Example: Generation of distribution for 2 species (Rauli and Roble)
-#' (Dd<-diam_distr(vBA=c(20,4,0,0), vN=c(650,113,0,0), HD=18.45))
+#' (Dd<-diam_dist(vBA=c(20,4,0,0), vN=c(650,113,0,0), HD=18.45))
 #' # Ploting distribution for each specie
 #' barplot(as.matrix(Dd[,3:6]), beside=TRUE)   
 #' # Ploting distribution for sp 1 and 2 overlayed
-#' barplot(DD[,4], col=1)
-#' barplot(DD[,5], add=TRUE, col=4)
+#' barplot(Dd[,4], col=1)
+#' barplot(Dd[,5], add=F, col=4)
 
 diam_dist <- function(vBA=NA, vN=NA, HD=NA){
 

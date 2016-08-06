@@ -72,7 +72,7 @@ get_site <- function(dom_sp, zone, AD=NA, HD=NA, SI=NA){
     }
 
     #brute search method
-    seqX <- seq(1,40,0.01)
+    seqX <- seq(1,50,0.01)
     lista1 <- unlist(lapply(X = seqX, FUN = SI.eq))   #lista de resultados. Esto solo busca IS de 1 a 40
     posit <- which(abs(lista1 - 0) == min(abs(lista1 - 0), na.rm = TRUE))
     parm <- seqX[posit]
