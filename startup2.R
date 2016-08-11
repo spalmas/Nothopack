@@ -6,7 +6,7 @@ library(gridExtra)
 
 source('R/BAmodule.R')
 source('R/diagnostics.R')
-source('R/diam_dist.R')      # New but still with issues: too slow and strange output
+source('R/diam_dist.R')      # New but still with issues: too slow 
 source('R/fitness_stats.R')
 source('R/get_props.R')
 source('R/get_site.R')

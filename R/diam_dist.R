@@ -24,16 +24,16 @@
 #' Stand<-get_props(BA=54.76,N=1259,VOL=642.83,
 #'           PBA0=c(0.00,0.15,0.76,0.09),PN0=c(0.00,0.15,0.68,0.17),PVOL0=c(0.00,0.18,0.80,0.02)) 
 #' (DD<-diam_dist(vBA=Stand$BA,vN=Stand$N,HD=36.56))
-#' barplot(as.matrix(DD[,3:6]), beside=TRUE)   
+#' barplot(as.matrix(DD$StandTable[,3:6]), beside=TRUE)   
 
 #' 
 #' # Example: Generation of distribution for 2 species (Rauli and Roble)
 #' (Dd<-diam_dist(vBA=c(20,4,0,0), vN=c(650,113,0,0), HD=18.45))
 #' # Ploting distribution for each specie
-#' barplot(as.matrix(Dd[,3:6]), beside=TRUE)   
+#' barplot(as.matrix(Dd$StandTable[,3:6]), beside=TRUE)   
 #' # Ploting distribution for sp 1 and 2 overlayed
-#' barplot(Dd[,4], col=1)
-#' barplot(Dd[,5], add=F, col=4)
+#' barplot(Dd$StandTable[,4], col=1)
+#' barplot(Dd$StandTable[,5], add=F, col=4)
 
 diam_dist <- function(vBA=NA, vN=NA, HD=NA){
 
@@ -98,6 +98,7 @@ diam_dist <- function(vBA=NA, vN=NA, HD=NA){
   C4 <- b0_C_4 + b1_C_4*B4 + b2_C_4*vQD[4]
 
   # Calculation of the probability of NHA per diameter class, from 5 to 80 cm
+
   DBH_LL <- matrix(data=0,nrow=0,ncol=1)
   DBH_UL <- matrix(data=0,nrow=0,ncol=1)
   Prob1 <- matrix(data=0,nrow=0,ncol=1)
@@ -108,8 +109,9 @@ diam_dist <- function(vBA=NA, vN=NA, HD=NA){
   BAclass <- matrix(data=0,nrow=0,ncol=1)
   Hclass <- matrix(data=0,nrow=0,ncol=1)
   Vclass <- matrix(data=0,nrow=0,ncol=1)
-  diam <- seq(from=5,to=80,by=5)
-  for (j in 1:15){
+  diam <- seq(from=5,to=100,by=5)
+
+  for (j in 1:19){
     DBH_LL[j] <- diam[j]                 # cm
     DBH_UL[j] <- diam[j+1]               # cm
     Dclass[j] <- (diam[j]+diam[j+1])/2   # cm
@@ -140,11 +142,51 @@ diam_dist <- function(vBA=NA, vN=NA, HD=NA){
   VOL.sp2 <- Vclass*N.sp2
   VOL.sp3 <- Vclass*N.sp3
   VOL.sp4 <- Vclass*N.sp4
+
   
   DDist<-data.frame(cbind(DBH_LL,DBH_UL,Dclass,Hclass,
-                          N.sp1,N.sp2,N.sp3,N.sp4,BA.sp1,
-                          BA.sp2,BA.sp3,BA.sp4,VOL.sp1,VOL.sp2,VOL.sp3,VOL.sp4))
-  return(DDist)
+                          N.sp1,N.sp2,N.sp3,N.sp4,BA.sp1,BA.sp2,BA.sp3,BA.sp4,
+                          VOL.sp1,VOL.sp2,VOL.sp3,VOL.sp4))
+  
+  require (dplyr) 
+  
+  DDistf = summarise(.data = DDist , 
+                         N.sp1f = sum(N.sp1), 
+                         N.sp2f = sum(N.sp2), 
+                         N.sp3f = sum(N.sp3),
+                         N.sp4f = sum(N.sp4),
+                         BA.sp1f = sum(BA.sp1), 
+                         BA.sp2f = sum(BA.sp2), 
+                         BA.sp3f = sum(BA.sp3),
+                         BA.sp4f = sum(BA.sp4),
+                         VOL.sp1f = sum(VOL.sp1), 
+                         VOL.sp2f = sum(VOL.sp2), 
+                         VOL.sp3f = sum(VOL.sp3),
+                         VOL.sp4f = sum(VOL.sp4)
+  )
+  
+  N.sptot<-sum(DDistf$N.sp1f,DDistf$N.sp2f,DDistf$N.sp3f,DDistf$N.sp4f)
+  BA.sptot<-sum(DDistf$BA.sp1f,DDistf$BA.sp2f,DDistf$BA.sp3f,DDistf$BA.sp4f)
+  V.sptot<-sum(DDistf$VOL.sp1f,DDistf$VOL.sp2f,DDistf$VOL.sp3f,DDistf$VOL.sp4f)
+  N.sp1f<-DDistf$N.sp1f*100/N.sptot
+  N.sp2f<-DDistf$N.sp2f*100/N.sptot
+  N.sp3f<-DDistf$N.sp3f*100/N.sptot
+  N.sp4f<-DDistf$N.sp4f*100/N.sptot
+  BA.sp1f<-DDistf$BA.sp1f*100/BA.sptot
+  BA.sp2f<-DDistf$BA.sp2f*100/BA.sptot
+  BA.sp3f<-DDistf$BA.sp3f*100/BA.sptot
+  BA.sp4f<-DDistf$BA.sp4f*100/BA.sptot
+  VOL.sp1f<-DDistf$VOL.sp1f*100/V.sptot
+  VOL.sp2f<-DDistf$VOL.sp2f*100/V.sptot
+  VOL.sp3f<-DDistf$VOL.sp3f*100/V.sptot
+  VOL.sp4f<-DDistf$VOL.sp4f*100/V.sptot
+  
+  DDistp<-data.frame(cbind(N.sp1f,N.sp2f,N.sp3f,N.sp4f,BA.sp1f,BA.sp2f,BA.sp3f,BA.sp4f,
+                          VOL.sp1f,VOL.sp2f,VOL.sp3f,VOL.sp4f))
+  
+  return(list(StandTable=DDist,Total=DDistf,Porc=DDistp))
+  
+ 
 }
 
 # Note: - Need to check that PNHAN goes from 0 to 1, and not 0 to 100

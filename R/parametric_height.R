@@ -18,19 +18,16 @@
 #' @return Individual total tree height (m)
 #' 
 #' @examples
-#' (HT<-height_param(HD=15, QD=12, DBH=14, dom_sp=1, zone=1))
-#' (HT<-height_param(HD=15, QD=12, DBH=14, dom_sp=2, zone=2))
-#' (HT<-height_param(HD=15, QD=12, DBH=24, dom_sp=2, zone=2))   # Why the same?
-#' (HT<-height_param(dom_sp=2, zone=2, HD=15, QD=12, DBH=24))   # Why the same?
+#' (HT<-height_param(dom_sp=2, zone=2, HD=15, QD=12, DBH=24))
 
 
-height_param <- function(dom_sp, zone, HD=NA, QD=NA, DBH=NA, hparam.coef=hparam_coef,...){
+height_param <- function(dom_sp, zone, HD=NA, QD=NA, DBH=NA){
   coef.list <- subset(hparam_coef, hparam_zone == zone & hparam_dom_sp_code == dom_sp, 
-                      select = c(hparam_b0, hparam_b1, hparam_b2, hparam_b3, hparam_b4, hparam_b5) )
+                      select = c(hparam_b0, hparam_b1, hparam_b2, hparam_b3, hparam_b4, hparam_b5))
 
-  hest <-coef.list$hparam_b0 +  coef.list$hparam_b1*HD + coef.list$hparam_b2*(QD^0.95)
-  + coef.list$hparam_b3*exp(-0.08*DBH) + coef.list$hparam_b4*(HD^3)*exp(-0.08*DBH)
-  + coef.list$hparam_b5*(QD^3)*exp(-0.08*DBH) 
+  hest <-(coef.list$hparam_b0 + coef.list$hparam_b1*HD + coef.list$hparam_b2*(QD^0.95)
+  + coef.list$hparam_b2*exp(-0.08*DBH) + coef.list$hparam_b4*(HD^3)*exp(-0.08*DBH)
+  + coef.list$hparam_b5*(QD^3)*exp(-0.08*DBH))
   
   return(hest)
 }
