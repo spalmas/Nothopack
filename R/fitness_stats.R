@@ -20,16 +20,18 @@
 fitness_stats <- function(obs, pred){
 
   mean_obs  <- mean(obs, na.rm=TRUE)
-  fit_r2emp <- round(1 - sum((obs - pred)^2, na.rm=TRUE) / sum((obs - mean_obs)^2, na.rm=TRUE), digits=4)
-  fit_rmse  <- round(sqrt( sum( (obs - pred)^2, na.rm=TRUE) / (length(obs) - 1) ), digits=4)  # This was fixed
-  fit_rmsep <- round(100 * fit_rmse/mean_obs, digits=4)
-  fit_bias  <- round( sum( obs - pred, na.rm=TRUE) , digits=4)
-  fit_biasp <- round(100 * fit_bias/mean_obs, digits=4)
+  fit_r2emp <- round(1 - sum((obs - pred)^2, na.rm=TRUE) / sum((obs - mean_obs)^2, na.rm=TRUE), digits=2)
+  fit_rmse  <- round(sqrt( sum( (obs - pred)^2, na.rm=TRUE) / (length(obs) - 1) ), digits=2)  # This was fixed
+  fit_rmsep <- round(100 * fit_rmse/mean_obs, digits=2)
+  fit_bias  <- round( sum( obs - pred, na.rm=TRUE) , digits=2)
+  fit_biasp <- round(100 * fit_bias/mean_obs, digits=2)
 
-  tabla <- data.frame(c(fit_r2emp, fit_rmse, fit_rmsep, fit_bias, fit_biasp),
-                      row.names = c('R2emp', 'RMSE', 'RMSE%', 'BIAS', 'BIAS%'))
-  colnames(tabla) <- ('value')
-
+  tabla <- matrix(c(fit_r2emp, fit_rmse, fit_rmsep, fit_bias, fit_biasp),ncol = 5)
+  
+  tabla <- as.data.frame(tabla)
+  
+  colnames(tabla) <- c('R2emp', 'RMSE', 'RMSE%', 'BIAS', 'BIAS%')
+  
   return (tabla)
 }
 
