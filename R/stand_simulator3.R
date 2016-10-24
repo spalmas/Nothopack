@@ -29,17 +29,17 @@ stand_simulator3 <- function(vBA=NA, vNHA=NA,
                             ADF=30, Nmodel=1){
 
   BA0 <- sum(vBA, na.rm = TRUE)    #Adding all the BA
-  PBA <- vBA/BA0   #Proportion of BA per species
+  vPBA <- vBA/BA0   #Proportion of BA per species
   BAN0 <- sum(vBA[1:3], na.rm = TRUE)   #Basal Area of Nothofagus
   BA990 <- BA0 - BAN0   #Basal Area of Other Species
   PBAN <- BAN0/BA0   #Estimating proportion of Nothofagus   #Does not change over time
 
   NHA0 <- sum(vNHA, na.rm = TRUE)    #Adding all the number of trees
-  PN <- vNHA/NHA0   #Proportion of Number of trees per species
-  PNHAN <- sum(PN[1:3], na.rm = TRUE)  #Also does not change over time?
-  Dd <- diam_dist(vBA=vBA, vNHA=vNHA, HD=HD0)    #firsst estimation of diametric distribution
+  vPNHA <- vNHA/NHA0   #Proportion of Number of trees per species
+  PNHAN <- sum(vPNHA[1:3], na.rm = TRUE)  #Also does not change over time?
+  #Dd <- diam_dist(vBA=vBA, vNHA=vNHA, HD=HD0)    #firsst estimation of diametric distribution
 
-  dom_sp <- which(PBA==max(PBA))    #Dominant species
+  dom_sp <- which(vPBA==max(vPBA))    #Dominant species
 
   if (dom_sp == 4){
     stop('The stand is not dominated by Nothofagus and we dont have enough information for this simulation.')
@@ -51,10 +51,11 @@ stand_simulator3 <- function(vBA=NA, vNHA=NA,
   VOL0 <- Vmodule(BA=BA0, HD=HD0, PNHAN=PNHAN) #maybe it can be changed to volume with species specific equatoins?
 
   # Create a table to store results
+
   results <- data.frame(Age=AD0, NHA=NHA0, QD=QD0, HD=HD0, SI=SI,
                         BA=BA0, BAN=BAN0, BA99=BA990,
-                        BA1=vBA[1], BA2=vBA[2], BA3=vBA[3], BA4=vBA[4],
-                        NHA1=sum(Dd$N.sp1), NHA2=sum(Dd$N.sp2), NHA3=sum(Dd$N.sp3), NHA4=sum(Dd$N.sp4),
+                        #BA1=vBA[1], BA2=vBA[2], BA3=vBA[3], BA4=vBA[4],
+                        #NHA1=sum(Dd$N.sp1), NHA2=sum(Dd$N.sp2), NHA3=sum(Dd$N.sp3), NHA4=sum(Dd$N.sp4),
                         VOL=VOL0)
 
   if (AD0 == ADF){
@@ -65,42 +66,40 @@ stand_simulator3 <- function(vBA=NA, vNHA=NA,
     NHA1 <- Nmodule(NHA0=NHA0, QD0=QD0, model=Nmodel)   #Estimates new number of trees
     BAN1 <- BANmodule(BAN0 = BAN0, AD0=AD0,  IS=IS, NHA0=NHA0, NHA1=NHA1, PBAN0 = PBAN, PBAN1 = PBAN, projection=TRUE)$BAN1   #projects new basal area (needs to change)
     BA991 <- BA99module(BA990=BA990, AD0=AD0, PNHAN0=PNHAN, PNHAN1=PNHAN, PBAN0 = PBAN, PBAN1=PBAN, projection=TRUE)$BA991   #projects new basal area (needs to change)
-
-    BA1 <- BAN1 + BA991
-    QD1 <- get_stand(BA=BA1, N=N1)   #New quadratic diameter
+    BA1 <- BAN1 + BA991 #Finds total new Basal Area
+    QD1 <- get_stand(BA=BA1, N=NHA1)   #New quadratic diameter
     HD1 <- get_site(dom_sp=dom_sp, zone=zone, SI=SI, AD=y)   #New dominant height
     VOL1 <- Vmodule(BA=BA1, HD=HD1, PNHAN=PNHAN)  # Note that PropNN stays fixed!
 
     #Update the Number and BA vectors
-    vN1 <- table(factor(sample(x = c(1,2,3,4), size=N1, replace=TRUE, prob=PropNSpecies),
-                            levels = c(1,2,3,4))) # A list of n.trees species
-    vBA1 <- BA1*PropBASpecies   #The basal area i sjust proportional to the Proportoin of Nothofagus?
+    #vN1 <- table(factor(sample(x = c(1,2,3,4), size=NHA1, replace=TRUE, prob=vPNHA),
+    #                        levels = c(1,2,3,4))) # A list of n.trees species
+    #vBA1 <- BA1*vPBA   #The basal area is just proportional to the Proportoin of Nothofagus?
 
     #Update diametric distibution
-    Dd <- diam_distr(vBA=vBA1, vN=vN1, HD=HD1)
-    Dd <- RECRUITmodule(vBA=vBA1, vN=vN1, HD=HD1)
+    #Dd <- diam_dist(vBA=vBA1, vN=vN1, HD=HD1)
+    #Dd <- RECRUITmodule(vBA=vBA1, vN=vN1, HD=HD1)  #What is this?
 
     #Update vN1 con los resultados de la RECRUITmodule
-    vN1 <- c(sum(Dd$N.sp1), sum(Dd$N.sp2), sum(Dd$N.sp3), sum(Dd$N.sp4))
+    #vNHA1 <- c(sum(Dd$N.sp1), sum(Dd$N.sp2), sum(Dd$N.sp3), sum(Dd$N.sp4))
 
     #Updates proportion of Nothofagus
-    PABN1 <- sum(vBA1[1:3], na.rm = TRUE)/BA0
+    #PABN1 <- sum(vBA1[1:3], na.rm = TRUE)/BA0
 
-    results <- rbind(results, c(y, N1, QD1, HD1, SI,
+    results <- rbind(results, c(y, NHA1, QD1, HD1, SI,
                                 BA1, BAN1, BA991,
-                                vBA1[1], vBA1[2], vBA1[3], vBA1[4],
-                                sum(Dd$N.sp1), sum(Dd$N.sp2), sum(Dd$N.sp3), sum(Dd$N.sp4),
+                                #vBA1[1], vBA1[2], vBA1[3], vBA1[4],
+                                #sum(Dd$N.sp1), sum(Dd$N.sp2), sum(Dd$N.sp3), sum(Dd$N.sp4),
                                 VOL1))  # in the same order as dataframe above!
 
-        # Variable replacement
-    N0 <- N1
+    #Variable replacement
+    NHA0 <- NHA1
     QD0 <- QD1
     BA0 <- BA1
     BAN0 <- BAN1
     BA990 <- BA991
     HD0 <- HD1
     VOL0 <- VOL1
-
   }
 
   return(results)
