@@ -24,14 +24,14 @@ fitness_stats <- function(obs, pred){
   fit_rmse  <- round(sqrt( sum( (obs - pred)^2, na.rm=TRUE) / (length(obs) - 1) ), digits=2)  # This was fixed
   fit_rmsep <- round(100 * fit_rmse/mean_obs, digits=2)
   fit_bias  <- round( sum( obs - pred, na.rm=TRUE) , digits=2)
-  fit_biasp <- round(100 * fit_bias/mean_obs, digits=2)
+  fit_biasp <- round(100 * fit_bias/sum(obs, na.rm = TRUE), digits=2)
 
   tabla <- matrix(c(fit_r2emp, fit_rmse, fit_rmsep, fit_bias, fit_biasp),ncol = 5)
-  
+
   tabla <- as.data.frame(tabla)
-  
+
   colnames(tabla) <- c('R2emp', 'RMSE', 'RMSE%', 'BIAS', 'BIAS%')
-  
+
   return (tabla)
 }
 

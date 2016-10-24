@@ -12,6 +12,13 @@ source('startup2.R')
 prodal_ensayos <- read.csv('data/PRODAL_ENSAYOS.csv')
 #the ensayos.data comes from the mortality.rmd code. The file was manually copied to the Nothopack/data folder
 
+#Categories for subsetting the data
+DESCRIPCION_subset <- c('TESTIGO', '40 M2/HA',
+                        'RALEO POR ANILLADO', 'RALEO SUAVE')
+
+#Subsetting by dominance
+prodal_ensayos <- prodal_ensayos[prodal_ensayos$DESCRIPCION %in% DESCRIPCION_subset,]
+
 #adding a unique plot number to make it easier to find unique plots
 prodal_ensayos['unique_plot'] <- paste(prodal_ensayos$ENSAYO, prodal_ensayos$PARCELA, prodal_ensayos$SUBPARC, sep = '-')
 
@@ -31,13 +38,15 @@ for (subplot in prodal_ensayos$unique_plot){
   #do not simulate plots with only one measurement
   #with dominant species mixed or others
   #with unknown age
-  if (nrow(subset_subplot) > 1 & all(subset_subplot$dom_sp %in% c(1,2,3))){
+  if (nrow(subset_subplot) > 1 & all(subset_subplot$dom_sp %in% c(1,2,3)) & all(!is.na(subset_subplot$EDAD2))){
 
     #combinations of each anho of the subplot
     combinations <- combn(subset_subplot$EDAD2, m = 2)
 
     for (col in 1:ncol(combinations)){
+      #information on the first plot
       subset_subplot1<- subset_subplot[subset_subplot$EDAD2 == combinations[1,col],]
+      #information of the second plots
       subset_subplot2<- subset_subplot[subset_subplot$EDAD2 == combinations[2,col],]
 
       #SI <- get_site(dom_sp=dom_sp, zone=zone, HD=HD0, AD=AD0)
@@ -64,16 +73,39 @@ for (subplot in prodal_ensayos$unique_plot){
   }
 
 }
+
+results <- results[2:nrow(results),]
+results$dom_sp <- as.integer(results$dom_sp)
+results$zone <- as.integer(results$zone)
+results$EDAD1 <- as.integer(results$EDAD1)
+results$EDAD2 <- as.integer(results$EDAD2)
+results$N0 <- as.numeric(results$N0)
+results$BA0 <- as.numeric(results$BA0)
+results$N0 <- as.numeric(results$N0)
+results$HD0 <- as.numeric(results$HD0)
+results$NF <- as.numeric(results$NF)
+results$BAF <- as.numeric(results$BAF)
+results$HDF <- as.numeric(results$HDF)
+results$NF_pred <- as.numeric(results$NF_pred)
+results$BAF_pred <- as.numeric(results$BAF_pred)
+results$HDF_pred <- as.numeric(results$HDF_pred)
+
 head(results)
+
+str(results)
 
 #predicted vs observed BA
 plot(results$BAF, results$BAF_pred)
 abline(a=0, b=1)
+fitness_stats(obs = results$BAF, pred = results$BAF_pred)
 
 #predicted vs observed Number of Trees
 plot(results$NF, results$NF_pred)
 abline(a=0, b=1)
+fitness_stats(obs = results$NF, pred = results$NF_pred)
 
 #predicted vs observed Number of Trees
 plot(results$HDF, results$HDF_pred)
 abline(a=0, b=1)
+fitness_stats(obs = results$HDF, pred = results$HDF_pred)
+
