@@ -26,24 +26,54 @@
 #'
 stand_simulator3 <- function(vBA=NA, vNHA=NA,
                             zone=NA, HD0=NA, AD0=NA,
-                            ADF=30, Nmodel=1){
+                            ADF=30, Nmodel=1,
+                            dom_sp = 1,
+                            PBAN = 0.8, PNHAN = 0.8){
 
   BA0 <- sum(vBA, na.rm = TRUE)    #Adding all the BA
-  vPBA <- vBA/BA0   #Proportion of BA per species
-  BAN0 <- sum(vBA[1:3], na.rm = TRUE)   #Basal Area of Nothofagus
-  BA990 <- BA0 - BAN0   #Basal Area of Other Species
-  PBAN <- BAN0/BA0   #Estimating proportion of Nothofagus   #Does not change over time
-
   NHA0 <- sum(vNHA, na.rm = TRUE)    #Adding all the number of trees
-  vPNHA <- vNHA/NHA0   #Proportion of Number of trees per species
-  PNHAN <- sum(vPNHA[1:3], na.rm = TRUE)  #Also does not change over time?
-  #Dd <- diam_dist(vBA=vBA, vNHA=vNHA, HD=HD0)    #firsst estimation of diametric distribution
 
-  dom_sp <- which(vPBA==max(vPBA))    #Dominant species
+  #if the input is in vector form with all the species
+  if (length(vBA) == 4){
+    BAN0 <- sum(vBA[1:3], na.rm = TRUE)   #Basal Area of Nothofagus
+    vPBA <- vBA/BA0   #Proportion of Basal Area per species
+    dom_sp <- which(vPBA==max(vPBA))    #Dominant species
+
+    NHAN0 <- sum(vNHA[1:3], na.rm = TRUE)  #Number of Nothofagus
+    vPNHA <- vNHA/NHA0   #Proportion of Number of trees per species. This is a vector of 2
+
+    PBAN <- BAN0 / BA0   #Estimating proportion of Nothofagus   #Does not change over time
+    PNHAN <- NHAN0 / NHA0  #Also does not change over time?
+
+  #if the input is (Nothofagus, Others)
+  } else if (length(vBA) == 2){
+    BAN0 <- sum(vBA[1], na.rm = TRUE)   #Basal Area of Nothofagus
+    NHAN0 <- sum(vNHA[1], na.rm = TRUE)  #Number of Nothofagus
+
+    PBAN <- BAN0 / BA0   #Estimating proportion of Nothofagus   #Does not change over time
+    PNHAN <- NHAN0 / NHA0  #Also does not change over time?
+    warning('Simulating with Rauli as Dominant Species and PNHAN and PBAN of 0.8 . You can change htis in the function call.',
+            call. = FALSE)
+
+    #if the input is Total Basal Area and Total number of Trees
+  } else if (length(vBA) == 1){
+    stop('This is not a valid input. You are a dummy.')
+    #BAN0 <- NA   #Basal Area of Nothofagus
+    #NHAN0 <- NA  #Number of Nothofagus
+
+    #warning('Simulating with Rauli as Dominant Species and PNHAN and PBAN of 0.8 . You can change htis in the function call.',
+    #        call. = FALSE)
+
+  } else {
+    stop('This is not a valid input. You are a dummy.')
+  }
 
   if (dom_sp == 4){
     stop('The stand is not dominated by Nothofagus and we dont have enough information for this simulation.')
   }
+
+  BA990 <- BA0 - BAN0   #Basal Area of Other Species
+  #Dd <- diam_dist(vBA=vBA, vNHA=vNHA, HD=HD0)    #firsst estimation of diametric distribution
 
   # Completing stand-level information
   SI <- get_site(dom_sp=dom_sp, zone=zone, HD=HD0, AD=AD0)

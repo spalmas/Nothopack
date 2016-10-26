@@ -10,7 +10,7 @@ library(gridExtra)
 
 plot_results <- function(SIM){
 
-  N.plot <- ggplot(SIM, aes(x = Age, y = N)) + geom_line() +
+  N.plot <- ggplot(SIM, aes(x = Age, y = NHA)) + geom_line() +
     xlab("Year") + ylab("N (N/ha)") + theme(axis.title.x = element_blank(), axis.text.x = element_blank())
   BA.plot <- ggplot(SIM, aes(x = Age, y = BA)) + geom_line() +
     xlab("Year") + ylab("BA (m2)") + theme(axis.title.x = element_blank(), axis.text.x = element_blank())
