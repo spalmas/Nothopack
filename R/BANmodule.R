@@ -25,20 +25,21 @@
 #' BAest<-BANmodule(BAN0 = 36.5, AD0=19,  IS=14, NHA0=2730, NHA1=2650, PBAN0 = 0.91 , PBAN1 = 0.91, projection=TRUE)
 #' BAest$BAN1
 
-BANmodule <- function(BAN0=NA, AD0=NA, IS=NA, NHA0=NA, NHA1=NA, PBAN0 = NA, PBAN1=NA, projection=FALSE){
+BANmodule <- function(BAN0=NA, AD0=NA, SI=NA, NHA0=NA, NHA1=NA, PBAN0 = NA, PBAN1=NA, projection=FALSE){
+ # lm2 <- lm(log(AB_NOTH) ~ log.EDOM + log.IS + log.NHA + log.PBA_NOTH, data = PRODAL)
 
-  # Model 1 (linear): BAN = exp(b0)*EDOM^b1*IS^b2*NHA^b3*PBAN^b4
+  # Model 1 (linear): BAN = exp(b0) * EDOM^b1 * IS^b2 * NHA^b3 * PBAN^b4
   bm<-c(-3.73767, 1.53075, -0.40962, 0.49542, 1.23387) # b0,b1,b2,b3,b4
 
   #### Prediction
   if (!projection){
-    BAN0<-exp(bm[1])*(AD0^bm[2])*(IS^bm[3])*(NHA0^bm[4]*(PBAN0^bm[5]))
+    BAN0<-exp(bm[1])*(AD0^bm[2])*(SI^bm[3])*(NHA0^bm[4]*(PBAN0^bm[5]))
     BAN1<-NA
   }
 
   #### Projection
   if (projection){
-    BAN1<-BAN0*exp(bm[2]*log((AD0+1)/AD0)+bm[3]*log(NHA1/NHA0)+bm[4]*log(PBAN1/PBAN0))
+    BAN1<-BAN0*exp(bm[2]*log((AD0+1)/AD0) + bm[3]*log(SI/SI) + bm[4]*log(NHA1/NHA0) + bm[5]*log(PBAN1/PBAN0))
   }
 
   return(list(BAN0=BAN0,BAN1=BAN1))
