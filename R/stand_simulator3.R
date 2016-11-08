@@ -32,13 +32,26 @@ stand_simulator3 <- function(vBA=NA, vNHA=NA,
                             zone=NA, HD0=NA,
                             AD0=NA, ADF=NA,
                             Nmodel=1,
-                            dom_sp = NA, SI = NA){
+                            dom_sp = NA, SI = NA,
+                            plotdata = data.frame(c(NA,NA))){
+
+  #Is there is a stand table, then estimate the values.
+  #Then it will go th the vBA==4 path
+  if (!is.na(plotdata[1,1])){
+    #Estimate
+    stand_summary <- stand_parameters(plotdata=simplot, area=1000)
+
+    vBA <- stand_summary$sd$BA[1:4]
+    vNHA <- stand_summary$sd$N[1:4]
+    HD0 <- stand_summary$HD
+    dom_sp <- stand_summary$dom.sp
+
+  }
 
   BA0 <- sum(vBA, na.rm = TRUE)    #Adding all the BA
   NHA0 <- sum(vNHA, na.rm = TRUE)    #Adding all the number of trees
 
-  #if the input is in vector form with all the species
-  if (length(vBA) == 4){
+  if (length(vBA) == 4){    #if the input is in vector form with all the species
     BAN0 <- sum(vBA[1:3], na.rm = TRUE)   #Basal Area of Nothofagus
     BA990 <- vBA[4]   #Basal Area of Other Species
     vPBA <- vBA/BA0   #Proportion of Basal Area per species
@@ -101,7 +114,7 @@ stand_simulator3 <- function(vBA=NA, vNHA=NA,
   #Yearly simulations
   for (y in (AD0+1):ADF){
     NHA1 <- Nmodule(NHA0=NHA0, QD0=QD0, model=Nmodel)   #Estimates new number of trees
-    BAN1 <- BANmodule(BAN0 = BAN0, AD0=y,  SI=SI, NHA0=NHA0, NHA1=NHA1, PBAN0 = PBAN, PBAN1 = PBAN, projection=TRUE)$BAN1   #projects new basal area (needs to change)
+    BAN1 <- BANmodule(BAN0 = BAN0, AD0=y, SI=SI, NHA0=NHA0, NHA1=NHA1, PBAN0 = PBAN, PBAN1 = PBAN, projection=TRUE)$BAN1   #projects new basal area (needs to change)
     BA991 <- BA99module(BA990=BA990, AD0=y, PNHAN0=PNHAN, PNHAN1=PNHAN, PBAN0 = PBAN, PBAN1 = PBAN, projection=TRUE)$BA991   #projects new basal area (needs to change)
     BA1 <- BAN1 + BA991 #Finds total new Basal Area
     QD1 <- get_stand(BA=BA1, N=NHA1)   #New quadratic diameter

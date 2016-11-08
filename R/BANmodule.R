@@ -4,7 +4,7 @@
 #' Projections are based in 1 year increments.
 #'
 #' @param EDOM0 and EDOM1 Dominant age (years) of the stand at time 0 and at time 1
-#' @param IS Site Index
+#' @param SI Site Index
 #' @param NHA0, NHA1 Number of trees (trees/ha) of the stand at time 0 and at time 1
 #' @param PBAN0 Proportion of Basal area (m2/ha) of Nothofagus of the stand at time 0 and at time 1
 #' @param projection if TRUE projection from BA0 is executed for a 1 year increment.
@@ -18,11 +18,11 @@
 #'
 #' @examples
 #' # Example 1: Predicts Basal Area
-#' BAest<-BANmodule(AD0=19, IS=14, NHA0=2140, PBAN0 = 0.91, projection=FALSE)
+#' BAest<-BANmodule(AD0=19, SI=14, NHA0=2140, PBAN0 = 0.91, projection=FALSE)
 #' BAest$BAN0
 #'
 #' # Example 2: Projects Basal Area
-#' BAest<-BANmodule(BAN0 = 36.5, AD0=19,  IS=14, NHA0=2730, NHA1=2650, PBAN0 = 0.91 , PBAN1 = 0.91, projection=TRUE)
+#' BAest<-BANmodule(BAN0 = 36.5, AD0=19,  SI=14, NHA0=2730, NHA1=2650, PBAN0 = 0.91 , PBAN1 = 0.91, projection=TRUE)
 #' BAest$BAN1
 
 BANmodule <- function(BAN0=NA, AD0=NA, SI=NA, NHA0=NA, NHA1=NA, PBAN0 = NA, PBAN1=NA, projection=FALSE){
