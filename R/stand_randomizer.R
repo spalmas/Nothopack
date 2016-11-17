@@ -20,12 +20,12 @@ stand_randomizer <- function(){
   n.trees <- rpois(n=1, lambda=30)     # Random number of trees based on a Poisson
   species.options <- c(1, 2, 3, 99)     # Options of species
 
-  Species <- sample(species.options, size=n.trees, replace=TRUE,
+  SPECIES <- sample(species.options, size=n.trees, replace=TRUE,
                     prob=c(0.80, 0.10, 0.05, 0.05))  # A list of n.trees species
   DBH <- round(15*rexp(n=n.trees),2)   # Random DBH values based on exponential dist
   HT <- round(exp(0.93687 + 0.55204*log(DBH)) + rnorm(n.trees, mean=0, sd=sqrt(5)),2)
 
-  return(data.frame(Species, DBH, HT))
+  return(data.frame(SPECIES, DBH, HT))
 }
 
 # Note - We might need to make this more flexible in the future

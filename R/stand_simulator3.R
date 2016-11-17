@@ -95,7 +95,8 @@ stand_simulator3 <- function(vBA=NA, vNHA=NA,
 
   # Completing stand-level information
   if (is.na(SI)){SI <- get_site(dom_sp=dom_sp, zone=zone, HD=HD0, AD=AD0)}
-  QD0 <- get_stand(BA=BA0, N=NHA0)
+  QD0 <- get_stand(BA=BA0, N=NHA0)   #this is using also the number and BA of the other trees
+  #QD0 <- get_stand(BA=BAN0, N=NHAN0)   #this is using only quadratic diameter of nothofagus, not with
   VOL0 <- Vmodule(BA=BA0, HD=HD0, PNHAN=PNHAN) #maybe it can be changed to volume with species specific equatoins?
 
   # Create a table to store results
@@ -113,11 +114,14 @@ stand_simulator3 <- function(vBA=NA, vNHA=NA,
 
   #Yearly simulations
   for (y in (AD0+1):ADF){
-    NHA1 <- Nmodule(NHA0=NHA0, QD0=QD0, model=Nmodel)   #Estimates new number of trees
+    NHA1 <- Nmodule(NHA0=NHA0, QD0=QD0, Nmodel=Nmodel)   #Estimates new number of trees
+    #NHAN1 <- NHA1 * PNHAN
     BAN1 <- BANmodule(BAN0 = BAN0, AD0=y, SI=SI, NHA0=NHA0, NHA1=NHA1, PBAN0 = PBAN, PBAN1 = PBAN, projection=TRUE)$BAN1   #projects new basal area (needs to change)
+    #BAN1 <- BANmodule2(BAN0 = BAN0, AD0=y, SI=SI, NHAN0=NHAN0, NHAN1=NHAN1, PBAN0 = PBAN, PBAN1 = PBAN, projection=TRUE)$BAN1   #projects new basal area (needs to change)
     BA991 <- BA99module(BA990=BA990, AD0=y, PNHAN0=PNHAN, PNHAN1=PNHAN, PBAN0 = PBAN, PBAN1 = PBAN, projection=TRUE)$BA991   #projects new basal area (needs to change)
     BA1 <- BAN1 + BA991 #Finds total new Basal Area
     QD1 <- get_stand(BA=BA1, N=NHA1)   #New quadratic diameter
+    #QD1 <- get_stand(BA=BAN1, N=(NHA1*PNHAN))   #Quadratic diameter using only Nothofagus Data
     HD1 <- get_site(dom_sp=dom_sp, zone=zone, SI=SI, AD=y)   #New dominant height
     VOL1 <- Vmodule(BA=BA1, HD=HD1, PNHAN=PNHAN)  # Note that PropNN stays fixed!
 
