@@ -125,7 +125,8 @@ stand_simulator3 <- function(vBA=NA, vNHA=NA,
     HD1 <- get_site(dom_sp=dom_sp, zone=zone, SI=SI, AD=y)   #New dominant height
     VOL1 <- Vmodule(BA=BA1, HD=HD1, PNHAN=PNHAN)  # Note that PropNN stays fixed!
 
-    NHAN1 <- NHA1 * PNHAN
+    #NHAN1 <- NHA1 * PNHAN
+    NHAN1 <- NHA1 - NHA990    #If the NHA99 do not change over time
     NHA991 <- NHA1 * (1-PNHAN)
     #Update the Number and BA vectors
     #vN1 <- table(factor(sample(x = c(1,2,3,4), size=NHA1, replace=TRUE, prob=vPNHA),
