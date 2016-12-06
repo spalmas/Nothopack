@@ -116,7 +116,7 @@ diam_dist <- function(vBA=NA, vNHA=NA, HD=NA){
     DBH_UL[j] <- diam[j+1]               # cm
     Dclass[j] <- (diam[j]+diam[j+1])/2   # cm
     BAclass[j] <- (pi/4)*((Dclass[j])^2) # cm2
-    Hclass[j] <- height_param(HD=HD0, QD=QD, DBH=Dclass[j], dom_sp=1, zone=1)  # dom_sp and zone should be specified
+    Hclass[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=1, zone=1)  # dom_sp and zone should be specified
     Vclass[j] <- Vmodule_individual(dom_sp=1, zone=1, DBH=Dclass[j], HT=Hclass[j], blength=Hclass[j], Tmodel=1) # dom_sp, zone and Tmodel
 
     Prob1[j] <- exp(-((diam[j] - A)/B1)^C1) - exp(-((diam[j+1] - A)/B1)^C1)
