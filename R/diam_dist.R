@@ -21,11 +21,11 @@
 #' S.Gezan, S.Palmas and P.Moreno
 #'
 #' @examples
+#' source('helpers.R')
 #' Stand<-get_props(BA=54.76,N=1259,VOL=642.83,
 #'           PBA0=c(0.00,0.15,0.76,0.09),PN0=c(0.00,0.15,0.68,0.17),PVOL0=c(0.00,0.18,0.80,0.02))
 #' (DD<-diam_dist(vBA=Stand$BA,vN=Stand$N,HD=36.56))
 #' barplot(as.matrix(DD$StandTable[,3:6]), beside=TRUE)
-
 #'
 #' # Example: Generation of distribution for 2 species (Rauli and Roble)
 #' (Dd<-diam_dist(vBA=c(20,4,0,0), vN=c(650,113,0,0), HD=18.45))
