@@ -31,7 +31,7 @@
 stand_simulator3 <- function(vBA=NA, vNHA=NA,
                             zone=NA, HD0=NA,
                             AD0=NA, ADF=NA,
-                            Nmodel=1,
+                            Nmodel=1, theta = 0.0055452,
                             dom_sp = NA, SI = NA,
                             plotdata = data.frame(c(NA,NA))){
 
@@ -114,7 +114,7 @@ stand_simulator3 <- function(vBA=NA, vNHA=NA,
 
   #Yearly simulations
   for (y in (AD0+1):ADF){
-    NHA1 <- Nmodule(NHA0=NHA0, QD0=QD0, Nmodel=Nmodel)   #Estimates new number of trees
+    NHA1 <- Nmodule(NHA0=NHA0, QD0=QD0, Nmodel=Nmodel, theta = theta)   #Estimates new number of trees
     #NHAN1 <- NHA1 * PNHAN
     BAN1 <- BANmodule(BAN0 = BAN0, AD0=y, SI=SI, NHA0=NHA0, NHA1=NHA1, PBAN0 = PBAN, PBAN1 = PBAN, projection=TRUE)$BAN1   #projects new basal area (needs to change)
     #BAN1 <- BANmodule2(BAN0 = BAN0, AD0=y, SI=SI, NHAN0=NHAN0, NHAN1=NHAN1, PBAN0 = PBAN, PBAN1 = PBAN, projection=TRUE)$BAN1   #projects new basal area (needs to change)

@@ -40,6 +40,10 @@ BANmodule2 <- function(BAN0=NA, AD0=NA, SI=NA, NHAN0=NA, NHAN1=NA, PBAN0 = NA, P
   #### Projection
   if (projection){
     BAN1<-BAN0*exp(bm[2]*log((AD0+1)/AD0) + bm[3]*log(SI/SI) + bm[4]*log(NHAN1/NHAN0) + bm[5]*log(PBAN1/PBAN0))
+    
+    #Other symthetic form but takes more time to calculate.
+    #BAN1<-BAN0*((AD0+1)/AD0)^bm[2] * (SI/SI)^bm[3] * (NHAN1/NHAN0)^bm[4]*(PBAN1/PBAN0)^bm[5]
+    
   }
 
   return(list(BAN0=BAN0,BAN1=BAN1))

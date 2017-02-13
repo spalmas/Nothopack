@@ -17,21 +17,28 @@
 #' fit <- lm(yobs ~ x)
 #' fitness_stats(yobs,predict(fit))
 
-fitness_stats <- function(obs, pred){
-  mean_obs  <- mean(obs, na.rm=TRUE)
-  fit_r2emp <- round(1 - sum((obs - pred)^2, na.rm=TRUE) / sum((obs - mean_obs)^2, na.rm=TRUE), digits=2)
-  fit_rmse  <- round(sqrt( sum( (obs - pred)^2, na.rm=TRUE) / (length(obs) - 1) ), digits=2)  # This was fixed
-  fit_rmsep <- round(100 * fit_rmse/mean_obs, digits=2)
-  fit_bias  <- round( sum( obs - pred, na.rm=TRUE) , digits=2)
-  fit_biasp <- round(100 * fit_bias/sum(obs, na.rm = TRUE), digits=2)
+fitness_stats <- function(obs, pred, digits = 2){
 
-  tabla <- matrix(c(fit_r2emp, fit_rmse, fit_rmsep, fit_bias, fit_biasp),
-                  ncol = 5)
+  mean_obs  <- mean(obs, na.rm=TRUE)
+  fit_r2emp <- 1 - sum((obs - pred)^2, na.rm=TRUE) / sum((obs - mean_obs)^2, na.rm=TRUE)
+  fit_rmse  <- sqrt( sum( (obs - pred)^2, na.rm=TRUE) / (length(obs) - 1) )  # This was fixed
+  fit_rmsep <- 100 * fit_rmse/mean_obs
+  fit_bias  <- sum( obs - pred, na.rm=TRUE)
+  fit_biasp <- 100 * fit_bias/sum(obs, na.rm = TRUE)
+
+  tabla <- matrix(round( c(fit_r2emp,
+                  fit_rmse,
+                  fit_rmsep,
+                  fit_bias,
+                  fit_biasp), 
+                digits = digits), 
+         ncol = 5)
 
   tabla <- as.data.frame(tabla)
 
-  colnames(tabla) <- c('r2emp', 'RMSE', 'RMSE%', 'BIAS', 'BIAS%')
+  colnames(tabla) <- c('r2emp', 'RMSE', 'RMSE_perc', 'BIAS', 'BIAS_perc')
 
   return (tabla)
 }
 
+#fitness_stats(obs = PRODAL$PNHA_NOTH, pred = PRODAL$PNHA_NOTH.lm1, digits = 3)
