@@ -11,8 +11,16 @@
 #' fit <- lm(yobs ~ x)
 #' diagnostics(residuals(fit),predict(fit))
 
-diagnostics<-function(obs,pred){
-
+diagnostics<-function(data = NULL, obs = NULL, pred = NULL){
+  #if data is supplied use the predicted and data texts to dind the column. It avoids the need to write thedatabase several times.
+  if(is.null(data)){
+    obs = obs
+    pred = pred
+  } else {
+    data = as.data.frame(data)
+    obs = data[,obs]
+    pred = data [,pred]
+  }
   resid <-  obs - pred
   par(mfrow=c(2,3))
 
