@@ -19,6 +19,15 @@
 #'
 
 fitness_stats <- function( data = NULL, obs = NULL, pred = NULL, digits = 2){
+  if(is.null(obs) & is.null(pred)){
+    return(data.frame(n = numeric(0),
+                      r2emp = numeric(0),
+                      RMSE = numeric(0),
+                      RMSE_perc = numeric(0),
+                      BIAS = numeric(0),
+                      BIAS_perc = numeric(0)))
+  }
+
   #if data is supplied use the predicted and data texts to dind the column. It avoids the need to write thedatabase several times.
   if(is.null(data)){
     obs = obs
