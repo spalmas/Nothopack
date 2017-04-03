@@ -2,7 +2,7 @@
 #'
 #' @param PScal Array of Relative BAL (BAL/BA) for each tree
 #'
-#' @return Sociologic Status PS (In this case continuous 
+#' @return Sociologic Status PS (In this case continuous) 
 #'
 #' @examples
 #' PS<-SS(PScal=1);PS
