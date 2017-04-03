@@ -6,7 +6,7 @@
 #' together with their diameter at breast height (DBH, cm), and total tree height (HT, m).
 #' There should not be missing information in the table. Plot area must be also provided.
 #'
-#' @param plotdata: data frame with plot data including the columns: SPECIES (1, 2, 3, 99), DBH and HT.
+#' @param plotdata: data frame with plot data including the columns: SPECIES (1, 2, 3, 99), DBH (cm) and HT (m).
 #' @param area: Area of plot (m2).
 #'
 #' @return A data frame with the columns: SPECIES (1: Rauli, 2: Roble, 3:Coigue, 99:Others, 0:All),
@@ -67,7 +67,7 @@ stand_parameters <- function(plotdata, area=0){
   PBA1 <- BA1/BA0   # Rauli
   PBA2 <- BA2/BA0   # Roble
   PBA3 <- BA3/BA0   # Coigue
-  PBA99 <- BA99/BA99   # Others
+  PBA99 <- BA99/BA0   # Others
 
   PBAN <- (BA1 + BA2 + BA3)/BA0   # Proportion BA for all Nothofagus
   PNHAN <- (N1 + N2 + N3)/N0   # Proportion N  for all Nothofagus
