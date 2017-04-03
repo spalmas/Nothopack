@@ -1,8 +1,8 @@
 rm(list=ls()) # It removes ALL objects
 
+library(dplyr)
 library(grid)
 library(gridExtra)
-library(tidyverse)
 
 source('R/BAmodule.R')
 source('R/BANmodule.R')
@@ -37,7 +37,7 @@ source('R/inputmodule.R')
 hd_coef <- read.csv(file = 'data/hd_coef.csv')
 hparam_coef <- read.csv(file = 'data/hparam_coef.csv')
 ensayos.data <- read.csv(file = 'data/growth_ensayos.csv')
-taper_params <- read_csv(file = 'data/taper_parameters.csv', col_types = cols())
+taper_params <- read.csv(file = 'data/taper_parameters.csv')
 
 
 # Name Variables

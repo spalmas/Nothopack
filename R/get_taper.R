@@ -25,15 +25,14 @@
 #'
 #' @examples
 #' # Example 1: Unknown diameter inside bark stem diameter
-#' get_taper(SPECIES.=1, ZONE.=2, DBH=12.1, HT=14.2, hi=4.3)
+#' get_taper(SPECIES=1, ZONE=2, DBH=12.1, HT=14.2, hi=4.3)
 #'
 #' # Example 2: Unknown stem height
-#' get_taper(SPECIES.=1, ZONE.=2, DBH=12.1, HT=14.2, di=9.8)
+#' get_taper(SPECIES=1, ZONE=2, DBH=12.1, HT=14.2, di=9.8)
 
-
-get_taper <- function(SPECIES. = NA, ZONE.='Todas', DBH=NA, HT=NA, di=NA, hi=NA){
+get_taper <- function(SPECIES = NA, ZONE='Todas', DBH=NA, HT=NA, di=NA, hi=NA){
   #Get parameters for that tree
-  taper_params_tree <- taper_params %>% filter(SPECIES == SPECIES. & ZONE == ZONE.)
+  taper_params_tree <- taper_params %>% filter(SPECIES. == SPECIES & ZONE. == ZONE)
 
   #taper_params_tree <- taper_params %>% filter(SPECIES == 2 & ZONE == 3)
 
