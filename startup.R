@@ -1,9 +1,8 @@
 rm(list=ls()) # It removes ALL objects
 
-library(dplyr)
-library(ggplot2)
 library(grid)
 library(gridExtra)
+library(tidyverse)
 
 source('R/BAmodule.R')
 source('R/BANmodule.R')
