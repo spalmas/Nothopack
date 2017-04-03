@@ -54,7 +54,7 @@ covariates<-function(ID,area,sp,DBH,ZONA){
   for (i in (1:nrow(Temp.data1))){
     if (is.na(Temp.data1$BALc[i])){Temp.data1$BALc[i]=newBALc}
   }
-  Temp.data1$PScal<-Temp.data1$BAL/Temp.data1$BA # Sociologis status calculated by competence and stocking
+  Temp.data1$PScal<-Temp.data1$BAL/Temp.data1$BA # Sociologic status calculated by competence and stocking
   Temp.data1<-arrange(Temp.data1, ID)
   return(Temp.data1)
 }
