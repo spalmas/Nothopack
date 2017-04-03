@@ -11,10 +11,11 @@ source('R/BA99module.R')
 source('R/diagnostics.R')
 source('R/diam_dist.R')      # New but still with issues: too slow
 source('R/fitness_stats.R')
-source('R/get_props.R')
+#source('R/get_props.R')
 source('R/get_site.R')
 source('R/get_stand.R')
 source('R/get_taper.R')      # It calculates relevant variables for taper equations !INCOMPLETE missing models.
+source('R/get_domsp.R')
 source('R/hd_coef.R')
 source('R/height_param.R')
 source('R/hparam_coef.R')
@@ -24,12 +25,14 @@ source('R/plot_results.R')
 source('R/RECRUITmodule.R')
 source('R/stand_parameters.R')
 source('R/stand_randomizer.R')
-source('R/stand_simulator.R')     # This seems only projection
-source('R/stand_simulator2.R')    # Using vectorized input
+#source('R/stand_simulator.R')     # This seems only projection
+#source('R/stand_simulator2.R')    # Using vectorized input
 source('R/stand_simulator3.R')    # Using vectorized input and BAN and BA99 models
 # source('R/tree_simulator.R')    # This has no work and needs to be implemented
 source('R/Vmodule.R')
 source('R/Vmodule_individual.R')
+source('R/inputmodule.R')
+
 
 hd_coef <- read.csv(file = 'data/hd_coef.csv')
 hparam_coef <- read.csv(file = 'data/hparam_coef.csv')
