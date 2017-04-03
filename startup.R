@@ -34,6 +34,8 @@ source('R/Vmodule_individual.R')
 hd_coef <- read.csv(file = 'data/hd_coef.csv')
 hparam_coef <- read.csv(file = 'data/hparam_coef.csv')
 ensayos.data <- read.csv(file = 'data/growth_ensayos.csv')
+taper_params <- read_csv(file = 'data/taper_parameters.csv', col_types = cols())
+
 
 # Name Variables
 # N, number of trees (trees/ha)
