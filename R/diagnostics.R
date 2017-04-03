@@ -6,6 +6,7 @@
 #' @return Four different diagnostic plots
 #'
 #' @examples
+#' #Ejemplo1
 #' x <- c(1:20)
 #' yobs <- 10 + 0.1*x + rnorm(20)
 #' fit <- lm(yobs ~ x)
