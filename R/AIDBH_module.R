@@ -23,19 +23,19 @@
 #' @examples
 #' Example 1: Individual annual increment in DBH (AIDBH, mm) with model 1
 #' Gest<-AIDBH_module(BALc=2, SDI=800, DBH=15, A = 30, PS=1, Model=1)
-#' Gest$AIDBH
+#' Gest
 #'
 #' Example 2: Individual annual increment in DBH (AIDBH, mm) with model 2
 #' Gest<-AIDBH_module(BALc=2, SDI=800, DBH=15, A = 30, PS=1, DA=50, PSCAL=0.5, Model=2)
-#' Gest$AIDBH
+#' Gest
 #' 
 #' Example 3: Individual annual increment in DBH (AIDBH, mm) with model 3
 #' Gest<-AIDBH_module(BALc=2, SDI=800, DBH=15, A = 30, PS=1, SP=3, ZONE=2, Model=3)
-#' Gest$AIDBH
+#' Gest
 #' 
 #' Example 3: Individual annual increment in DBH (AIDBH, mm) with model 4
 #' Gest<-AIDBH_module(BALc=2, SDI=800, DBH=15, A = 30, PS=1, DA=50, PSCAL=0.5,SP=3, ZONE=2, Model=4)
-#' Gest$AIDBH
+#' Gest
 
 AIDBH_module <- function(BALc=NA, SDI=NA, DBH=NA, A=NA, PS=NA, DA=NA, PSCAL=NA,SP=NA, ZONE=NA, Model=NA){
   # Model 1 (CVselection): Log(AIDBH) = b0 + b1*(BALc+10) + b2*SDI + b3*log(DBH) + b4*log(A) + b5*PS
