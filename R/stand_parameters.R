@@ -63,38 +63,22 @@ stand_parameters <- function(plotdata, area=0){
   HDcalc[,3] <- HDcalc[,1]*HDcalc[,2]
   HD <- sum(HDcalc[,3])/100
 
-  # Proportion of SPECIES by basal area
-  PBA1 <- BA1/BA0   # Rauli
-  PBA2 <- BA2/BA0   # Roble
-  PBA3 <- BA3/BA0   # Coigue
-  PBA99 <- BA99/BA0   # Others
-
-  PBAN <- (BA1 + BA2 + BA3)/BA0   # Proportion BA for all Nothofagus
-  PNHAN <- (N1 + N2 + N3)/N0   # Proportion N  for all Nothofagus
-
-  # Obtaining dominant SPECIES.
-  if (PBAN < 0.6 ){    # If BA Nothodagus represent less than 60% of the stand
-    DOM.SP <- 99  # Others besides Nothofagus
-  } else {
-    if (PBA1 >= 0.7){
-      DOM.SP <- 1  # Rauli
-    } else if (PBA2 >= 0.7){
-      DOM.SP <- 2  # Roble
-    } else if (PBA3 >= 0.7){
-      DOM.SP <- 3  # Coigue
-    } else {
-      DOM.SP <- 4  # Mixed Nothofagus
-    }
-  }
-
+  N <- c(N1,N2,N3,N99,N0)
+  BA <- c(BA1,BA2,BA3,BA99,BA0)
+  QD <- c(QD1,QD2,QD3,QD99,QD0)
+    
+  DOM.SP<-get_domsp(BA=BA)
+  PBAN <- sum(BA[1:3])/BA0
+  PNHAN <- sum(N[1:3])/N0
+  
   # Elements to return: vectors of SPECIES,N,BA,QD, and HD, DOM.SP, PropBAN, PropNN
   v1 <- c((1:4),0)
-  v2 <- round(c(N1,N2,N3,N99,N0),6)
-  v3 <- round(c(BA1,BA2,BA3,BA99,BA0),6)
-  v4 <- round(c(QD1,QD2,QD3,QD99,QD0),6)
+  v2 <- round(N,6)
+  v3 <- round(BA,6)
+  v4 <- round(QD,6)
   sdmatrix <- data.frame(cbind(v1,v2,v3,v4))
   names(sdmatrix) <- c('SPECIES','N','BA','QD')
-
+  
   return(list(sd=sdmatrix, DOM.SP=DOM.SP, HD=HD, PBAN=PBAN, PNHAN=PNHAN))
 }
 
