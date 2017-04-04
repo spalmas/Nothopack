@@ -26,27 +26,33 @@
 #' inputmodule(level='stand',zone=2,AD=25,HD=23.4,N=N,BA=BA)
 #'
 #' # Example 2: Input from tree-level data (or file)
-#' 
-#' 
+#' tree.data<- read.csv(file= 'data/Plot_example.csv')
+#' names(tree.data) <- c('ID','SPECIES','DBH','AD','HT','PS')
+#' inputdata<-inputmodule(level='tree',zone=2,AD=52,SI=14.53,area=500,tree.data=tree.data)
+#' inputdata$sd
+#' inputdata$tree.matrix
 #' 
 
 inputmodule <- function(level='stand', zone=NA, AD=NA, HD=NA, SI=NA, N=NA, BA=NA, QD=NA, 
-                        AF=NA,area=0,comp=FALSE, filename=NA){
+                        AF=NA,area=0,comp=FALSE, tree.data=NA){
 
-  DOM.SP<-get_domsp(BA=BA)
-  if (is.na(AD)){
-     (AD<-get_site(dom_sp=DOM.SP, zone=zone, HD=HD, SI=SI))
-  }
-  if (is.na(HD)){
-     (HD<-get_site(dom_sp=DOM.SP, zone=zone, AD=AD, SI=SI))
-  }
-  if (is.na(SI)){
-     (SI<-get_site(dom_sp=DOM.SP, zone=zone, AD=AD, HD=HD))  
-  }
-
+  sdmatrix <- NA
+  tree.matrix <- NA
+  
   # Gathering stand-level information
   if (level=='stand'){
   
+    DOM.SP<-get_domsp(BA=BA)
+    if (is.na(AD)){
+      (AD<-get_site(dom_sp=DOM.SP, zone=zone, HD=HD, SI=SI))
+    }
+    if (is.na(HD)){
+      (HD<-get_site(dom_sp=DOM.SP, zone=zone, AD=AD, SI=SI))
+    }
+    if (is.na(SI)){
+      (SI<-get_site(dom_sp=DOM.SP, zone=zone, AD=AD, HD=HD))  
+    }
+    
     N<-c(N,sum(N))
     BA<-c(BA,sum(BA))
     QD<-c(QD,sum(QD))
@@ -86,24 +92,50 @@ inputmodule <- function(level='stand', zone=NA, AD=NA, HD=NA, SI=NA, N=NA, BA=NA
   # Gathering tree-level information
   if (level=='tree'){
   
-     # Reading file
+    # Getting stand level parms from tree-list
+    plotdata<-data.frame(tree.data$SPECIES, tree.data$DBH, tree.data$HT)
+    colnames(plotdata)<-c('SPECIES','DBH','HT')
+    params<-stand_parameters(plotdata=plotdata,area=area)
     
+    DOM.SP<-get_domsp(BA=params$sd[1:4,3])
+    if (is.na(AD)){
+      (AD<-get_site(dom_sp=DOM.SP, zone=zone, HD=HD, SI=SI))
+    }
+    if (is.na(HD)){
+      (HD<-get_site(dom_sp=DOM.SP, zone=zone, AD=AD, SI=SI))
+    }
+    if (is.na(SI)){
+      (SI<-get_site(dom_sp=DOM.SP, zone=zone, AD=AD, HD=HD))  
+    }
     
-    #PLOTS2$hest<-exp(4.62373-2.94247/PLOTS2$dbh)
-    #PLOTS2$htfin<-PLOTS2$ht
-    #for (i in 1:253) {
-    #  if(is.na(PLOTS2$ht[i])) {
-    #    PLOTS2$htfin[i]<-PLOTS2$hest[i]
-    #  }
-    #}
-    #head(PLOTS2)
+    # Completing heights
+    QD0<-params$sd[5,4]
+    n<-nrow(tree.data)
+    for (i in (1:n)) {
+      if(is.na(tree.data$HT[i])) {
+        tree.data$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.data$DBH[i]),4)
+      }
+    }
+    head(tree.data)
     
-     # Ouput tree-list database
-     # ID, SP, DBH, H, PS & (zone, AD, area, AF, DOM.SP, HD, SI)    
-  }
+    # Completing PS
+    
+    # Ouput tree-list database
+    # ID, SPECIES, DBH, H, PS & (zone, AD, area, AF, DOM.SP, HD, SI)    
+    tree.matrix<-data.frame(tree.data$ID, tree.data$SPECIES, tree.data$DBH, tree.data$HT, tree.data$PS)
+    colnames(tree.matrix)<-c('ID','SPECIES','DBH','HT','PS')
+    
+    # Collecting final stand parameters
+    sdmatrix <- params$sd  
+    PBAN <- sum(sdmatrix[1:3,3])/sum(sdmatrix[1:4,3])
+    PNHAN <- sum(sdmatrix[1:3,2])/sum(sdmatrix[1:4,2])
+    
+    }
 
   return(list(sd=sdmatrix, DOM.SP=DOM.SP, HD=HD, PBAN=PBAN, PNHAN=PNHAN, 
-              SI=SI, AD=AD, AF=AF, area=area, comp=comp, zone=zone))
+              SI=SI, AD=AD, AF=AF, area=area, comp=comp, zone=zone, tree.matrix=tree.matrix))
 
 }
+
+# Note, still to decide how to complete the PS
 
