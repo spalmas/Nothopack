@@ -24,7 +24,7 @@
 #' input <- inputmodule(level='stand',zone=2,AD=25,HD=23.4,N=N,BA=BA)
 #' report(input = input)
 
-report <- function(input = NULL, class_width=5, dmin=5, dmax = 100){
+report <- function(input = NULL, print.diam.dist = TRUE, class_width=5, dmin=5, dmax = 100){
   #Table with species codes and species names for printing
   sp.table <- tibble(SPECIES = c(1,2,3,4,0), SPECIES.NAME = c('Rauli', 'Roble', 'Coigue', 'Companion', 'All'))
 
@@ -43,10 +43,10 @@ report <- function(input = NULL, class_width=5, dmin=5, dmax = 100){
     #Chaning dominant species to vernacular names
     input$DOM.SP <- sp.table$SPECIES.NAME[sp.table$SPECIES == input$DOM.SP]
 
-    #Building a table of all other stand parameters
-    print.sp <- (input %>% as.data.frame())[1,5:14] %>% t
-    #Chaning rownames for prettier printing names
-    rownames(print.sp) <- c('Dominant Species',
+    #Building a table of all other stand parameters and changing col and rownames
+    print.sp <- (input %>% as.data.frame())[1,5:14] %>% t %>%
+    `colnames<-` (c('Value')) %>%
+    `rownames<-` (c('Dominant Species',
                             'Dominant Height (m): ',
                             'Proportion of BA of Nothofagus',
                             'Proportion of NHA of Nothofagus',
@@ -55,8 +55,9 @@ report <- function(input = NULL, class_width=5, dmin=5, dmax = 100){
                             'Final Age  (years)',
                             'Area (m)',
                             'comp',
-                            'Zone'
-    )
+                            'Zone'))
+
+    #BUILDING DIAMETER DISTRIBUTION
 
     #BEGIN PRINTING
     print('----------   CURRENT STAND PARAMETERS   ----------')
