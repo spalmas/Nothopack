@@ -24,19 +24,19 @@
 #'
 #' @examples
 #' # Example 1: Calculates tree volume for diameter limit of 5 cm (with stump of 0.3 m) 
-#' Vmodule_individual(dom_sp=1, zone=1, DBH=22.1, HT=18.2, dmin=5, Tmodel=1)
+#' Vmodule_individual(SPECIES=1, zone=1, DBH=22.1, HT=18.2, dmin=5)
 #' 
 #' # Example 2: Calculates tree volume for a bole length of 6 m (with a stump of 0.3 m)
-#' Vmodule_individual(dom_sp=1, zone=1, DBH=22.1, HT=18.2, blength=6, Tmodel=1)
+#' Vmodule_individual(SPECIES=1, zone=1, DBH=22.1, HT=18.2, blength=6)
 #' 
 #' # Example 3: Two ways to calculate total tree volume (with a stump of 0.3 m)
-#' Vmodule_individual(dom_sp=1, zone=1, DBH=22.1, HT=18.2, dmin=0, Tmodel=1)
-#' Vmodule_individual(dom_sp=1, zone=1, DBH=22.1, HT=18.2, blength=18.2, Tmodel=1)
-#'
+#' Vmodule_individual(SPECIES=1, zone=1, DBH=22.1, HT=18.2, dmin=0)
+#' Vmodule_individual(SPECIES=1, zone=1, DBH=22.1, HT=18.2, blength=18.2)
+#' 
 #' # Example 4: Calculates total tree volume without discounting for stump
-#' Vmodule_individual(dom_sp=1, zone=1, DBH=22.1, HT=18.2, dmin=0, stump=0, Tmodel=1)
+#' Vmodule_individual(SPECIES=1, zone=1, DBH=22.1, HT=18.2, dmin=0, stump=0)
 
-Vmodule_individual <- function(dom_sp=NA, zone=NA, DBH=NA, HT=NA, dmin=NA, blength=NA, stump=0.3, Tmodel=1){
+Vmodule_individual <- function(SPECIES=NA, zone=NA, DBH=NA, HT=NA, dmin=NA, blength=NA, stump=0.3){
 
   if (is.na(blength) & is.na(dmin)){
     stop('Minimum diameter or bole length need to be provided.')
@@ -46,18 +46,19 @@ Vmodule_individual <- function(dom_sp=NA, zone=NA, DBH=NA, HT=NA, dmin=NA, bleng
   }  
   # dmin provided
   if (is.na(blength) & !is.na(dmin)){  
-    blength<-get_taper(dom_sp=dom_sp, zone=zone, DBH=DBH, HT=HT, di=dmin, Tmodel=1)$hi
+    blength<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, di=dmin)$hi
   }
 
   vtree<-0
-  d0<-get_taper(dom_sp=dom_sp, zone=zone, DBH=DBH, HT=HT, hi=stump, Tmodel=1)$di
+  d0<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, hi=stump)$di
   ba0<-pi*(d0^2)/4
   for (i in seq(from=(stump+0.01),to=blength,by=0.01)) {
-      di<-get_taper(dom_sp=dom_sp, zone=zone, DBH=DBH, HT=HT, hi=i, Tmodel=1)$di
+      di<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, hi=i)$di
       bai<-pi*(di^2)/4
-      vi<-(ba0+bai)/2  # cm3
-      vtree<-vtree+vi
+      #vi<-(ba0+bai)/2  # cm3
+      vtree<-vtree+(ba0+bai)/2
       ba0<-bai
+  
   }
   vtree<-vtree/(100^3)  # m3
   return(vtree)
