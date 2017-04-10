@@ -1,7 +1,7 @@
 #' Module that requests input information for all stand- or tree-level current calculations or simulations
 #'
 #' \code{inputmodule} Module that requests input information for all stand- or tree-level current
-#' calculations or simulations
+#' calculations or simulations from the user
 #'
 #' @param level Data level for input information (1:tree, 2:stand).
 #' @param zone Growth zone (1, 2, 3, 4).
