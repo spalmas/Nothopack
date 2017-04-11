@@ -39,16 +39,16 @@
 #' core.output<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD, HD=plot$HD, SI=plot$SI,
 #'             sp.table=plot$sd)
 #' 
-
-#' names(tree.data) <- c('ID','SPECIE','DBH','HT','SS','FT')
-#' 
 #' # Example 2: Input from tree-level data (or file)
-#' tree.data<-read.csv(file= 'data/Plot_example.csv')
-#' head(tree.data)
-#' names(tree.data) <- c('ID','SPECIE','DBH','HT','SS','FT')
-#' plot<-inputmodule(level='tree',zone=2,AD=52,SI=14.53,area=500,tree.data=tree.data)
+#' plot<- read.csv(file= 'data/Plot_example.csv')
+#' head(plot)
+#' plot<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=plot)
+#' attributes(plot) 
+#' head(plot$tree.list) 
+#' plot$sp.table
+#' 
 #' core.output<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD, HD=plot$HD, SI=plot$SI,
-#'             sp.table=plot$sd, tree.list=plot$tree.data)
+#'             sp.table=plot$sd, tree.list=plot$tree.list)
 #' core.output$sd
 #' core.output$tree.list
 #'  

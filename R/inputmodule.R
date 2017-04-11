@@ -103,7 +103,7 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
   if (type=='tree'){
   
     # Getting stand level parms from tree-list
-    plotdata<-data.frame(tree.data$SPECIE, tree.data$DBH, tree.data$HT)
+    plotdata<-data.frame(tree.list$SPECIE, tree.list$DBH, tree.list$HT)
     colnames(plotdata)<-c('SPECIES','DBH','HT')
     params<-stand_parameters(plotdata=plotdata,area=area)
     
@@ -120,18 +120,17 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     
     # Completing heights
     QD0<-params$sd[5,4]
-    n<-nrow(tree.data)
+    n<-nrow(tree.list)
     for (i in (1:n)) {
-      if(is.na(tree.data$HT[i])) {
-        tree.data$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.data$DBH[i]),4)
+      if(is.na(tree.list$HT[i])) {
+        tree.list$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.list$DBH[i]),4)
       }
     }
-    head(tree.data)
-    
+
     # Ouput tree-list database
-    FT<-rep(1,length(tree.data$ID))
-    tree.list<-data.frame(tree.data$ID, tree.data$SPECIE, tree.data$DBH, 
-                          round(tree.data$HT,3), tree.data$SS, FT)
+    FT<-rep(1,length(tree.list$ID))
+    tree.list<-data.frame(tree.list$ID, tree.list$SPECIE, tree.list$DBH, 
+                          round(tree.list$HT,3), tree.list$SS, FT)
     colnames(tree.list)<-c('ID','SPECIE','DBH','HT','SS','FT')
     
     # Collecting final stand parameters
