@@ -44,8 +44,7 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                         N=NA, BA=NA, QD=NA){
   
   sdmatrix <- NA
-  tree.matrix <- NA
-  
+
   # Gathering stand-level information
   if (type=='stand'){
   

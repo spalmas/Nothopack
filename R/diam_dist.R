@@ -24,9 +24,9 @@
 #' # Example: Generation of distribution from stand-level input data
 #' BA<-c(36.5,2.8,1.6,2.4)
 #' N<-c(464,23,16,48)
-#' stand.matrix<-inputmodule(level='stand',zone=2,AD=25,HD=23.4,N=N,BA=BA)
-#' Dd<-diam_dist(sp.table=stand.matrix$sd, HD=stand.matrix$HD,  
-#'               DOM.SP=stand.matrix$DOM.SP, zone=stand.matrix$zone)
+#' plot<-inputmodule(type='stand',zone=2,AD=28,HD=23.5,N=N,BA=BA)
+#' Dd<-diam_dist(sp.table=plot$sp.table, HD=plot$HD,  
+#'               DOM.SP=plot$DOM.SP, zone=plot$zone)
 #' Dd[5,,]  # Total diameter distribution
 #' # Ploting distribution for each specie
 #' barplot(as.matrix(Dd[5,,5]), main='Diameter Distribution all species', xlab='DBH Class', beside=TRUE, col=4)
@@ -117,10 +117,15 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA){
     Dclass[j] <- (diam[j]+diam[j+1])/2   # cm
     BAclass[j] <- (pi/4)*((Dclass[j])^2) # cm2
     Hclass[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=DOM.SP, zone=zone)
-    Prob1[j] <- exp(-((diam[j] - A)/B1)^C1) - exp(-((diam[j+1] - A)/B1)^C1)
-    Prob2[j] <- exp(-((diam[j] - A)/B2)^C2) - exp(-((diam[j+1] - A)/B2)^C2)
-    Prob3[j] <- exp(-((diam[j] - A)/B3)^C3) - exp(-((diam[j+1] - A)/B3)^C3)
-    Prob4[j] <- exp(-((diam[j] - A)/B4)^C4) - exp(-((diam[j+1] - A)/B4)^C4)
+    if (vNHA[1]==0) { Prob1[j]=0 
+    } else { Prob1[j] <- exp(-((diam[j] - A)/B1)^C1) - exp(-((diam[j+1] - A)/B1)^C1) }
+    if (vNHA[2]==0) { Prob2[j]=0 
+    } else { Prob2[j] <- exp(-((diam[j] - A)/B2)^C2) - exp(-((diam[j+1] - A)/B2)^C2) }
+    if (vNHA[3]==0) { Prob3[j]=0 
+    } else { Prob3[j] <- exp(-((diam[j] - A)/B3)^C3) - exp(-((diam[j+1] - A)/B3)^C3) }
+    if (vNHA[4]==0) { Prob4[j]=0 
+    } else { Prob4[j] <- exp(-((diam[j] - A)/B4)^C4) - exp(-((diam[j+1] - A)/B4)^C4) }
+     
     if (is.na(Prob1[j])) {Prob1[j] <- 0}
     if (is.na(Prob2[j])) {Prob2[j] <- 0}
     if (is.na(Prob3[j])) {Prob3[j] <- 0}

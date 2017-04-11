@@ -35,9 +35,16 @@
 #' # Example 1: Input from stand-level data
 #' BA<-c(36.5,2.8,1.6,2.4)
 #' N<-c(464,23,16,48)
-#' plot<-inputmodule(level='stand',zone=2,AD=25,HD=23.4,N=N,BA=BA)
-#' core.output<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD, HD=plot$HD, SI=plot$SI,
-#'             sp.table=plot$sd)
+#' plot<-inputmodule(type='stand',zone=2,AD=28,HD=23.5,N=N,BA=BA)
+#' core.output<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD, 
+#'                          HD=plot$HD, SI=plot$SI, PBAN=plot$PBAN, PNHAN=plot$PNHAN,
+#'                          type='stand',sp.table=plot$sp.table)
+#' attributes(core.output)
+#' core.output$sp.table
+#' core.output$stand.table[5,,]
+#' 
+#' 
+#' 
 #' 
 #' # Example 2: Input from tree-level data (or file)
 #' plot<- read.csv(file= 'data/Plot_example.csv')
@@ -49,7 +56,7 @@
 #' 
 #' core.output<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD, HD=plot$HD, SI=plot$SI,
 #'             sp.table=plot$sd, tree.list=plot$tree.list)
-#' core.output$sd
+#' core.output$sp.table
 #' core.output$tree.list
 #'  
 
@@ -64,34 +71,40 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     
   if (is.na(tree.list)){    # tree.list not provided then generate one - always
     
+    # Calculating Stand-level volume (total)
+    sp.table<-cbind.data.frame(sp.table,VTHA=c(1:5)*0)
+    VTHA <- Vmodule(BA=sp.table$BA[5], HD=HD, PNHAN=PNHAN)  # It calls model that requires PNHAN
+    sp.table[5,5]<-round(VTHA,3)
+  
+    # Assigning volume proportional to PBA
+    PBA<-sp.table[1:4,3]/sp.table[5,3]
+    sp.table[1:4,5]<-round(VTHA*PBA,3) 
+    print(sp.table)
+    
     # Generate stand-table from diameter distibution (does not contain volumes)
     stand.table<-diam_dist(sp.table=sp.table, HD=HD, DOM.SP=DOM.SP, zone=zone)
-    #print(stand.table[5,,])
-    
-    # Calculating Stand-level volume (total)
-    VHA <- Vmodule(BA=sp.table$BA[5], HD=HD, PNHAN=PNHAN)  # It calls model that requires PNHAN
-
+   
     # Calculating class-level volume (total) by specie and class
     r_names<-c('DBH_ll','DBH_ul','D_class','H_class','N','BA','VOL')
     stand.table.updated<-array(data=NA, dim=c(5,85,7), dimnames=list(c(1:5),c(1:85),r_names))
     stand.table.updated[,,-7]<-stand.table
-    #stand.table.updated[5,,]
+    print(stand.table.updated[1,,])
     
-    #for (i in 1:85) {
-    #  Vi.sp1<-Vmodule_individual(SPECIES=1, zone=zone, DBH=stand.table[1,i,3], 
-    #                             HT=stand.table[1,i,4], blength=stand.table[1,i,4])
-    #  Vi.sp2<-Vmodule_individual(SPECIES=2, zone=zone, DBH=stand.table[2,i,3], 
-    #                             HT=stand.table[2,i,4], blength=stand.table[2,i,4])
-    #  Vi.sp3<-Vmodule_individual(SPECIES=3, zone=zone, DBH=stand.table[3,i,3], 
-    #                             HT=stand.table[3,i,4], blength=stand.table[3,i,4])
-    #  Vi.sp4<-Vmodule_individual(SPECIES=DOM.SP, zone=zone, DBH=stand.table[4,i,3], 
-    #                             HT=stand.table[4,i,4], blength=stand.table[4,i,4])
-    #  stand.table.updated[1,i,7]<-Vi.sp1
-    #  stand.table.updated[2,i,7]<-Vi.sp2
-    #  stand.table.updated[3,i,7]<-Vi.sp3
-    #  stand.table.updated[4,i,7]<-Vi.sp4
-    #}
-    #print(stand.table.updated[1,,])
+    for (i in 1:85) {
+      Vi.sp1<-Vmodule_individual(SPECIES=1, zone=zone, DBH=stand.table[1,i,3], 
+                                 HT=stand.table[1,i,4], blength=stand.table[1,i,4])
+      Vi.sp2<-Vmodule_individual(SPECIES=2, zone=zone, DBH=stand.table[2,i,3], 
+                                 HT=stand.table[2,i,4], blength=stand.table[2,i,4])
+      Vi.sp3<-Vmodule_individual(SPECIES=3, zone=zone, DBH=stand.table[3,i,3], 
+                                 HT=stand.table[3,i,4], blength=stand.table[3,i,4])
+      Vi.sp4<-Vmodule_individual(SPECIES=DOM.SP, zone=zone, DBH=stand.table[4,i,3], 
+                                 HT=stand.table[4,i,4], blength=stand.table[4,i,4])
+      stand.table.updated[1,i,7]<-Vi.sp1
+      stand.table.updated[2,i,7]<-Vi.sp2
+      stand.table.updated[3,i,7]<-Vi.sp3
+      stand.table.updated[4,i,7]<-Vi.sp4
+    }
+    print(stand.table.updated[1,,])
     
     if (comp==TRUE){         # then we do compatibility if requested
       comp      
@@ -104,7 +117,8 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
   }  
   
   return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-              area=area, type=type, ddiam=ddiam, comp=comp, N_model, V_model, IADBH_model,
+              area=area, type=type, ddiam=ddiam, comp=comp, N_model=N_model, V_model=V_model, 
+              IADBH_model=IADBH_model,
               sp.table=sp.table, stand.table=stand.table, tree.list=tree.list))
 }
 
