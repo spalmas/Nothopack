@@ -30,12 +30,24 @@
 #' inputmodule(type='stand',zone=2,AD=28,HD=23.5,N=N,BA=BA)
 #'
 #' # Example 2: Input from tree-level data (or file)
+<<<<<<< HEAD
 #' plot<- read.csv(file= 'data/Plot_example.csv')
 #' head(plot)
 #' input.plot<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=plot)
 #' attributes(input.plot) 
 #' head(input.plot$tree.list) 
 #' input.plot$sp.table
+=======
+#' tree.data<- read.csv(file= 'data/Plot_example.csv')
+#' names(tree.data) <- c('ID','SPECIES','DBH','AD','HT','PS')
+#' inputdata<-inputmodule(level='tree',zone=2,AD=52,SI=14.53,area=500,tree.data=tree.data)
+#' inputdata$sd
+#' inputdata$tree.matrix
+#' inputdata
+
+inputmodule <- function(level='stand', zone=NA, AD=NA, HD=NA, SI=NA, N=NA, BA=NA, QD=NA, 
+                        AF=NA,area=0,comp=FALSE, tree.data=NA){
+>>>>>>> 2900c5368b3054abd32a6c1021cff81f71b18a72
 
 inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA, 
                         SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0, 
