@@ -21,7 +21,7 @@
 
 ## Code for obtaining covariates from ingrowth DBH models
 ## Require plot with id tree, area, sp, DBH and zone
-covariates<-function(ID,area,sp,DBH,ZONA,PS){
+covariates<-function(ID,area,sp,DBH,ZONA,SS){
   #require(dplyr)
   N <- length(ID)#Getting the number of trees in the plot
   area.plot <- unique(area)   #area of the measurement
@@ -36,7 +36,7 @@ covariates<-function(ID,area,sp,DBH,ZONA,PS){
   for (fila in (1:(N))) {
     bac[fila] <- if (sp[fila] != 4) {ba[fila]}else {0}
   }
-  Temp.data<-data.frame(ID,DBH,ba,bac,SPZONA,NHA,BA,QD,SDI,PS)
+  Temp.data<-data.frame(ID,DBH,ba,bac,SP,ZONA,SPZONA,NHA,BA,QD,SDI,SS)
   Temp.data1<-arrange(Temp.data, desc(ba))
   Acum=0;Acumc=0
   Temp.data1$BAL[1]=0
@@ -55,8 +55,8 @@ covariates<-function(ID,area,sp,DBH,ZONA,PS){
     if (is.na(Temp.data1$BALc[i])){Temp.data1$BALc[i]=newBALc}
   }
   Temp.data1$PScal<-Temp.data1$BAL/Temp.data1$BA # Sociologic status calculated by competence and stocking
-  if (is.na(Temp.data1$PS)){
-    Temp.data1$PS<-Social_Status(Temp.data1$PScal)
+  if (is.na(Temp.data1$SS)){
+    Temp.data1$SS<-Social_Status(Temp.data1$PScal)
   }
   Temp.data1<-arrange(Temp.data1, ID)
   return(Temp.data1)
