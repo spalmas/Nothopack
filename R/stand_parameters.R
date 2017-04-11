@@ -19,9 +19,9 @@
 #' head(simplot)
 #' stand_parameters(plotdata=simplot, area=1000)
 
-stand_parameters <- function(plotdata, area=0){
+stand_parameters <- function(plotdata, area = NA){
 
-  if (area == 0 ){ stop('Plot area must be provided') }
+  if (is.na(area) ){ stop('Plot area must be provided') }
   CF <- 10000 / area  # Correction factor
 
   # Number of trees by SPECIES and total
@@ -66,11 +66,11 @@ stand_parameters <- function(plotdata, area=0){
   N <- c(N1,N2,N3,N99,N0)
   BA <- c(BA1,BA2,BA3,BA99,BA0)
   QD <- c(QD1,QD2,QD3,QD99,QD0)
-    
+
   DOM.SP<-get_domsp(BA=BA)
   PBAN <- sum(BA[1:3])/BA0
   PNHAN <- sum(N[1:3])/N0
-  
+
   # Elements to return: vectors of SPECIES,N,BA,QD, and HD, DOM.SP, PropBAN, PropNN
   v1 <- c((1:4),0)
   v2 <- round(N,6)
@@ -78,7 +78,7 @@ stand_parameters <- function(plotdata, area=0){
   v4 <- round(QD,6)
   sdmatrix <- data.frame(cbind(v1,v2,v3,v4))
   names(sdmatrix) <- c('SPECIES','N','BA','QD')
-  
+
   return(list(sd=sdmatrix, DOM.SP=DOM.SP, HD=HD, PBAN=PBAN, PNHAN=PNHAN))
 }
 
