@@ -21,7 +21,7 @@
 #' @param SDI Stand density index (trees/ha)
 #' @param PNHAN Proportion of number of trees per hectarea in the stand that correspond to Nothofagus.
 #' @param AF Final dominant age (years) for simulation
-#' @param tree.list Optional tree-list for a plot with columns: ID, SPECIES, DBH, HT, SS, F)
+#' @param tree.list Optional tree-list for a plot with columns: ID, SPECIE, DBH, HT, SS, FT)
 #' @param area Area of plot from tree-list data (m2).
 #' @param type Type of simulation required: stand: only stand-level, tree: only tree-level, both: both modules (default=stand)
 #' @param ddiam Logical for requesting generation of diameter distribution (default=FALSE)
@@ -39,18 +39,24 @@
 #' core.output<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD, HD=plot$HD, SI=plot$SI,
 #'             sp.table=plot$sd)
 #' 
+
+#' names(tree.data) <- c('ID','SPECIE','DBH','HT','SS','FT')
 #' 
 #' # Example 2: Input from tree-level data (or file)
-#' tree.data<- read.csv(file= 'data/Plot_example.csv')
-#' names(tree.data) <- c('ID','SPECIES','DBH','AD','HT','PS')
-#' inputdata<-inputmodule(level='tree',zone=2,AD=52,SI=14.53,area=500,tree.data=tree.data)
-#' inputdata$sd
-#' inputdata$tree.matrix
-#' 
+#' tree.data<-read.csv(file= 'data/Plot_example.csv')
+#' head(tree.data)
+#' names(tree.data) <- c('ID','SPECIE','DBH','HT','SS','FT')
+#' plot<-inputmodule(level='tree',zone=2,AD=52,SI=14.53,area=500,tree.data=tree.data)
+#' core.output<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD, HD=plot$HD, SI=plot$SI,
+#'             sp.table=plot$sd, tree.list=plot$tree.data)
+#' core.output$sd
+#' core.output$tree.list
+#'  
 
 core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA, 
                         SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0, 
-                        type='stand', ddiam=FALSE, comp=FALSE){
+                        type='stand', ddiam=FALSE, comp=FALSE, 
+                        N_model=1, V_model=1, IADBH_model=1){
 
   stand.table <- NA
 
@@ -98,7 +104,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
   }  
   
   return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-              area=area, type=type, ddiam=ddiam, comp=comp, 
+              area=area, type=type, ddiam=ddiam, comp=comp, N_model, V_model, IADBH_model,
               sp.table=sp.table, stand.table=stand.table, tree.list=tree.list))
 }
 

@@ -52,7 +52,7 @@ Vmodule_individual <- function(SPECIES=NA, zone=NA, DBH=NA, HT=NA, dmin=NA, blen
   vtree<-0
   d0<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, hi=stump)$di
   ba0<-pi*(d0^2)/4
-  for (i in seq(from=(stump+0.01),to=blength,by=0.01)) {
+  for (i in seq(from=(stump+0.1),to=blength,by=0.1)) {
       di<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, hi=i)$di
       bai<-pi*(di^2)/4
       #vi<-(ba0+bai)/2  # cm3
