@@ -31,7 +31,7 @@
 #' inputdata<-inputmodule(level='tree',zone=2,AD=52,SI=14.53,area=500,tree.data=tree.data)
 #' inputdata$sd
 #' inputdata$tree.matrix
-#' 
+#' inputdata
 
 inputmodule <- function(level='stand', zone=NA, AD=NA, HD=NA, SI=NA, N=NA, BA=NA, QD=NA, 
                         AF=NA,area=0,comp=FALSE, tree.data=NA){
