@@ -1,15 +1,15 @@
 #' Calculates stand-level parameter based on individual tree data
 #'
 #' \code{stand_parameters} Calculates all relevant stand-level parameters from an inventory plot for
-#' each of the SPECIES and for all together (1: Rauli, 2: Roble, 3:Coigue, 99:Others, 0:All).
-#' The input table should contain the colums of SPECIES (1: Rauli, 2: Roble, 3:Coigue, 99:Others)
+#' each of the SPECIES and for all together (1: Rauli, 2: Roble, 3:Coigue, 4:Others, 0:All).
+#' The input table should contain the colums of SPECIES (1: Rauli, 2: Roble, 3:Coigue, 4:Others)
 #' together with their diameter at breast height (DBH, cm), and total tree height (HT, m).
 #' There should not be missing information in the table. Plot area must be also provided.
 #'
-#' @param plotdata: data frame with plot data including the columns: SPECIES (1, 2, 3, 99), DBH (cm) and HT (m).
+#' @param plotdata: data frame with plot data including the columns: SPECIES (1, 2, 3, 4), DBH (cm) and HT (m).
 #' @param area: Area of plot (m2).
 #'
-#' @return A data frame with the columns: SPECIES (1: Rauli, 2: Roble, 3:Coigue, 99:Others, 0:All),
+#' @return A data frame with the columns: SPECIES (1: Rauli, 2: Roble, 3:Coigue, 4:Others, 0:All),
 #' N (number of trees per ha), BA (basal area, m2), QD (quadratic diameter, cm). Also, the parameters
 #' DOM.SP (dominant specie), HD (dominant height, HD), PropBAN (proportion of basal area of Nothofagus),
 #' and PropNN (proportion of number of trees of Nothofagus).
@@ -28,7 +28,7 @@ stand_parameters <- function(plotdata, area = NA){
   N1 <- CF * sum(plotdata$SPECIES == 1, na.rm = TRUE)    # Rauli
   N2 <- CF * sum(plotdata$SPECIES == 2, na.rm = TRUE)    # Roble
   N3 <- CF * sum(plotdata$SPECIES == 3, na.rm = TRUE)    # Coigue
-  N99 <- CF * sum(plotdata$SPECIES == 99, na.rm = TRUE)    # Others
+  N99 <- CF * sum(plotdata$SPECIES == 4, na.rm = TRUE)    # Others
   N0 <- N1 + N2 + N3 + N99
 
   # Basal area by SPECIES and total
@@ -36,7 +36,7 @@ stand_parameters <- function(plotdata, area = NA){
   BA1 <- CF * sum(plotdata[(plotdata$SPECIES == 1),4], na.rm = TRUE)
   BA2 <- CF * sum(plotdata[(plotdata$SPECIES == 2),4], na.rm = TRUE)
   BA3 <- CF * sum(plotdata[(plotdata$SPECIES == 3),4], na.rm = TRUE)
-  BA99 <- CF * sum(plotdata[(plotdata$SPECIES == 99),4], na.rm = TRUE)
+  BA99 <- CF * sum(plotdata[(plotdata$SPECIES == 4),4], na.rm = TRUE)
   BA0 <- BA1 + BA2 + BA3 + BA99
 
   # Quadratic diameters by SPECIES and total

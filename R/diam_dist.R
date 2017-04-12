@@ -9,6 +9,7 @@
 #' @param HD Dominant height (m) of dominant specie in the current stand
 #' @param DOM.SP The dominant specie (1: Rauli, 2: Roble, 3: Coigue, 4:Mixed)
 #' @param zone Growth zone (1, 2, 3, 4).
+#' @param class Diameter class width (cm)
 #' 
 #' @references
 #' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para
@@ -31,7 +32,7 @@
 #' # Ploting distribution for each specie
 #' barplot(as.matrix(Dd[5,,5]), main='Diameter Distribution all species', xlab='DBH Class', beside=TRUE, col=4)
 
-diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA){
+diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
 
   vNHA <- sp.table$N
   vBA <- sp.table$BA
@@ -109,9 +110,10 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA){
   Hclass <- matrix(data=0,nrow=0,ncol=1)
   Vclass <- matrix(data=0,nrow=0,ncol=1)
   
-  diam <- seq(from=5,to=90,by=1)   # Diameter classes
+  maxD <- 90/class
+  diam <- seq(from=5,to=90,by=class)   # Diameter classes
 
-  for (j in 1:85){
+  for (j in 1:(length(diam)-1)){
     DBH_LL[j] <- diam[j]                 # cm
     DBH_UL[j] <- diam[j+1]               # cm
     Dclass[j] <- (diam[j]+diam[j+1])/2   # cm
@@ -133,10 +135,10 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA){
   }
   Hclass <- round(Hclass,2)
   
-  N.sp1 <- round(vNHA[1]*Prob1,3)
-  N.sp2 <- round(vNHA[2]*Prob2,3)
-  N.sp3 <- round(vNHA[3]*Prob3,3)
-  N.sp4 <- round(vNHA[4]*Prob4,3)
+  N.sp1 <- round(vNHA[1]*Prob1,2)
+  N.sp2 <- round(vNHA[2]*Prob2,2)
+  N.sp3 <- round(vNHA[3]*Prob3,2)
+  N.sp4 <- round(vNHA[4]*Prob4,2)
   N.total <- N.sp1 + N.sp2 + N.sp3 + N.sp4 
   
   # Adjusting N.total with NHA
@@ -144,16 +146,16 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA){
   K2 <- sum(N.sp2)/vNHA[2]
   K3 <- sum(N.sp3)/vNHA[3]
   K4 <- sum(N.sp4)/vNHA[4]
-  N.sp1 <- round(N.sp1/K1,4)
-  N.sp2 <- round(N.sp2/K2,4)
-  N.sp3 <- round(N.sp3/K3,4)
-  N.sp4 <- round(N.sp4/K4,4)
+  N.sp1 <- round(N.sp1/K1,2)
+  N.sp2 <- round(N.sp2/K2,2)
+  N.sp3 <- round(N.sp3/K3,2)
+  N.sp4 <- round(N.sp4/K4,2)
   N.total <- N.sp1 + N.sp2 + N.sp3 + N.sp4 
 
-  BA.sp1 <- round(BAclass*N.sp1/(100^2),4)  # cm2/ha
-  BA.sp2 <- round(BAclass*N.sp2/(100^2),4)  # cm2/ha
-  BA.sp3 <- round(BAclass*N.sp3/(100^2),4)  # cm2/ha
-  BA.sp4 <- round(BAclass*N.sp4/(100^2),4)  # cm2/ha
+  BA.sp1 <- round(BAclass*N.sp1/(100^2),2)  # cm2/ha
+  BA.sp2 <- round(BAclass*N.sp2/(100^2),2)  # cm2/ha
+  BA.sp3 <- round(BAclass*N.sp3/(100^2),2)  # cm2/ha
+  BA.sp4 <- round(BAclass*N.sp4/(100^2),2)  # cm2/ha
   BA.total <- BA.sp1 + BA.sp2 + BA.sp3 + BA.sp4 
   
   # Adjusting BA.total with BA
@@ -161,17 +163,18 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA){
   K2 <- sum(BA.sp2)/vBA[2]
   K3 <- sum(BA.sp3)/vBA[3]
   K4 <- sum(BA.sp4)/vBA[4]
-  BA.sp1 <- round(BA.sp1/K1,4)
-  BA.sp2 <- round(BA.sp2/K2,4)
-  BA.sp3 <- round(BA.sp3/K3,4)
-  BA.sp4 <- round(BA.sp4/K4,4)
+  BA.sp1 <- round(BA.sp1/K1,2)
+  BA.sp2 <- round(BA.sp2/K2,2)
+  BA.sp3 <- round(BA.sp3/K3,2)
+  BA.sp4 <- round(BA.sp4/K4,2)
   BA.total <- BA.sp1 + BA.sp2 + BA.sp3 + BA.sp4 
 
   #print(sum(BA.total))
   #print(BA)
   
   r_names<-c('DBH_ll','DBH_ul','D_class','H_class','N','BA')
-  DDist<-array(data=NA, dim=c(5,85,6), dimnames=list(c(1:5),c(1:85),r_names))
+  DDist<-array(data=NA, dim=c(5,(length(diam)-1),6),
+               dimnames=list(c(1:5),c(1:(length(diam)-1)),r_names))
   DDist[1,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass,N.sp1,BA.sp1)  #1: Rauli
   DDist[2,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass,N.sp2,BA.sp2)  #2: Roble
   DDist[3,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass,N.sp3,BA.sp3)  #3: Coigue

@@ -10,7 +10,7 @@
 #' @param HT total tree height (m)
 #' @param dmin minimum stem diameter inside bark (cm) 
 #' @param blength bole length (m) 
-#' @param stump length of stump to discuont (default 0.3 m) 
+#' @param stump length of stump to discount (default 0.3 m) 
 #' @param Tmodel Number of fitted taper model to use (1:M4, 2:M5, 3:M6)
 #' 
 #' @references
@@ -38,6 +38,8 @@
 
 Vmodule_individual <- function(SPECIES=NA, zone=NA, DBH=NA, HT=NA, dmin=NA, blength=NA, stump=0.3){
 
+  incr <- 10/100 # Using increments of 10 cm
+  
   if (is.na(blength) & is.na(dmin)){
     stop('Minimum diameter or bole length need to be provided.')
   }
@@ -52,11 +54,11 @@ Vmodule_individual <- function(SPECIES=NA, zone=NA, DBH=NA, HT=NA, dmin=NA, blen
   vtree<-0
   d0<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, hi=stump)$di
   ba0<-pi*(d0^2)/4
-  for (i in seq(from=(stump+0.1),to=blength,by=0.1)) {
+  for (i in seq(from=(stump+incr),to=blength,by=incr)) {
       di<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, hi=i)$di
       bai<-pi*(di^2)/4
       #vi<-(ba0+bai)/2  # cm3
-      vtree<-vtree+(ba0+bai)/2
+      vtree<-vtree+(100*incr)*(ba0+bai)/2
       ba0<-bai
   
   }

@@ -10,7 +10,7 @@ source('R/BANmodule.R')
 source('R/BA99module.R')
 source('R/covariates.R')
 source('R/diagnostics.R')
-source('R/diam_dist.R')      # New but still with issues: too slow
+source('R/diam_dist.R')   
 source('R/fitness_stats.R')
 source('R/get_site.R')
 source('R/get_stand.R')
@@ -32,11 +32,11 @@ source('R/Vmodule_individual.R')
 source('R/inputmodule.R')
 source('R/core_module.R')
 
-hd_coef <- read.csv(file = 'data/hd_coef.csv')
-hparam_coef <- read.csv(file = 'data/hparam_coef.csv')
+hd_coef      <- read.csv(file = 'data/hd_coef.csv')
+hparam_coef  <- read.csv(file = 'data/hparam_coef.csv')
 ensayos.data <- read.csv(file = 'data/growth_ensayos.csv')
 taper_params <- read.csv(file = 'data/taper_parameters.csv')
-plot_roble <- read.csv(file= 'data/Plot_example.csv')
+plot_roble   <- read.csv(file = 'data/Plot_example.csv')
 
 # Name Variables
 # N, number of trees (trees/ha)
@@ -46,14 +46,10 @@ plot_roble <- read.csv(file= 'data/Plot_example.csv')
 # HD, dominant height (m)
 # AD, dominant age (years)   ### - To change from ED  ###
 # VOL, total stand level volume (m3/ha)
-# dom_sp, dominant specie
+# DOM.SP, dominant specie
 # zone, growth zone
 # HT, total tree height (m)
 # DBH, diameter breast height (cm)
 # N.Noth total number of trees Nothofagus (trees/ha)
-# PropNN proportion trees Nothofagus (0-1??)
-# PropBAN proportion trees Nothofagus (0-1??)
-
-
-# MIXED STANDS... they have some issues that need to be fixed..
-# (mainly we need to assign it to the main  specie)
+# PNHAN proportion trees Nothofagus (0-1??)
+# PBAN proportion trees Nothofagus (0-1??)

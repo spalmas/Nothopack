@@ -3,7 +3,7 @@
 #' \code{inputmodule} Module that requests input information for all stand- or tree-level current
 #' calculations or simulations from the user, and completes missing information as required.
 #'
-#''@param zone Growth zone (1, 2, 3, 4).
+#' @param zone Growth zone (1, 2, 3, 4).
 #' @param DOM.SP The dominant specie (1: Rauli, 2: Roble, 3: Coigue, 4:Mixed)
 #' @param AD Dominant age (years) of the stand.
 #' @param HD Dominant height (m) of the stand.
