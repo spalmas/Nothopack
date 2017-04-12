@@ -18,7 +18,13 @@
 #' S.Gezan, S.Palmas and P.Moreno
 #'
 #' @examples
-#' 
+#' plot<- read.csv(file= 'data/Plot_example.csv')
+#' head(plot)
+#' input.plot<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,AF=35,tree.list=plot)
+#' sim.tree<-tree_simulator(tree.list=input.plot$tree.list, zone=input.plot$zone, area=input.plot$area, AD=input.plot$AD, ADF=input.plot$AF,DOM.SP=input.plot$DOM.SP,SI=input.plot$SI,AIDBH_model=1)
+#' attributes(input.plot) 
+#' head(input.plot$tree.list) 
+#' input.plot$sp.table
 
 tree_simulator <- function(tree.list=NA,
                              zone=NA, area=NA,
@@ -38,8 +44,10 @@ tree_simulator <- function(tree.list=NA,
   input.data1<-covariates(ID,area,sp,DBH,ZONA,SS)
   
   ### Simulation
+    NARBp<-NA;areap<-NA;SPp<-NA;DBHp<-NA;ZONAp<-NA;BALcp<-NA;SDIp<-NA;Ap<-NA;PSp<-NA;DAp<-NA;PSCALp<-NA;Gest<-NA;DBHp1<-NA
     data.proy<-input.data1
     # Initial variables
+    n<-nrow(data.proy)
     IDp<-data.proy$ID
     areap<-area
     SPp<-data.proy$sp
@@ -60,7 +68,7 @@ tree_simulator <- function(tree.list=NA,
       #BY TREE
       for (j in (1:n)) {
         #Annual Increment in DBH by Tree
-        Gest[j]<-AIDBH_module(BALc=BALcp[j], SDI=SDIp[j], DBH=DBHp[j], A=Ap[j], PS=PSp[j],DA=DAp[j],PSCAL = PSCALp[j], SP=SPp[j],ZONE=ZONAp[j], Model=AIDBH_model)
+        Gest[j]<-AIDBH_module(BALc=BALcp[j], SDI=SDIp[j], DBH=DBHp[j], A=Ap[j], SS=SSp[j],DA=DAp[j],PSCAL = PSCALp[j], SP=SPp[j],ZONE=ZONAp[j], Model=AIDBH_model)
         DBHp1[j]<-DBHp[j]+(Gest[j]/10)
       }
       

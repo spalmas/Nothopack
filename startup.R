@@ -4,9 +4,11 @@ library(dplyr)
 library(grid)
 library(gridExtra)
 
+source('R/AIDBH_module.R')
 source('R/BAmodule.R')
 source('R/BANmodule.R')
 source('R/BA99module.R')
+source('R/covariates.R')
 source('R/diagnostics.R')
 source('R/diam_dist.R')      # New but still with issues: too slow
 source('R/fitness_stats.R')
@@ -20,10 +22,11 @@ source('R/hparam_coef.R')
 source('R/Nmodule.R')
 source('R/plot_results.R')
 source('R/RECRUITmodule.R')
+source('R/Social_Status.R')
 source('R/stand_parameters.R')
 source('R/stand_randomizer.R')
 source('R/stand_simulator.R')     # This seems only projection
-# source('R/tree_simulator.R')    # This has no work and needs to be implemented
+source('R/tree_simulator1.R')    # until now only growth
 source('R/Vmodule.R')
 source('R/Vmodule_individual.R')
 source('R/inputmodule.R')

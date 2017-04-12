@@ -37,7 +37,7 @@
 #' Gest<-AIDBH_module(BALc=2, SDI=800, DBH=15, A = 30, PS=1, DA=50, PSCAL=0.5,SP=3, ZONE=2, Model=4)
 #' Gest
 
-AIDBH_module <- function(BALc=NA, SDI=NA, DBH=NA, A=NA, PS=NA, DA=NA, PSCAL=NA,SP=NA, ZONE=NA, Model=NA){
+AIDBH_module <- function(BALc=NA, SDI=NA, DBH=NA, A=NA, SS=NA, DA=NA, PSCAL=NA,SP=NA, ZONE=NA, Model=NA){
   # Model 1 (CVselection): Log(AIDBH) = b0 + b1*(BALc+10) + b2*SDI + b3*log(DBH) + b4*log(A) + b5*PS
   betas1<-c(2.4097492437, -0.0070621315,  0.0002745541,  0.9045958975, -1.1380841801, -0.1335811948) # b0,b1,b2,b3,b4,b5
   # Model 2 (LASSO): Log(AIDBH) = b0 + b1*PS + b2*(BALc+10) + b3*SDI + b4*log(DA) + b5*log(DBH) + b6*log(A) + b7*(1/sqrt(PSCAL+10))
@@ -51,10 +51,10 @@ AIDBH_module <- function(BALc=NA, SDI=NA, DBH=NA, A=NA, PS=NA, DA=NA, PSCAL=NA,S
   
   #### Projection
   if (Model==1){
-    est<-betas1[1] + betas1[2]*(BALc+10) + betas1[3]*SDI + betas1[4]*log(DBH) + betas1[5]*log(A) + betas1[6]*PS
+    est<-betas1[1] + betas1[2]*(BALc+10) + betas1[3]*SDI + betas1[4]*log(DBH) + betas1[5]*log(A) + betas1[6]*SS
   }
   else if (Model==2){
-    est<-betas2[1] + betas2[2]*PS + betas2[3]*(BALc+10) + betas2[4]*SDI + betas2[5]*log(DA) + betas2[6]*log(DBH) + betas2[7]*log(A) + betas2[8]*(1/sqrt(PSCAL+10))
+    est<-betas2[1] + betas2[2]*SS + betas2[3]*(BALc+10) + betas2[4]*SDI + betas2[5]*log(DA) + betas2[6]*log(DBH) + betas2[7]*log(A) + betas2[8]*(1/sqrt(PSCAL+10))
   }
   else if (Model==3){
     SPZONE12=0;SPZONE14=0;SPZONE21=0;SPZONE22=0;SPZONE23=0;SPZONE24=0;SPZONE31=0;SPZONE32=0;SPZONE33=0;SPZONE34=0
@@ -71,7 +71,7 @@ AIDBH_module <- function(BALc=NA, SDI=NA, DBH=NA, A=NA, PS=NA, DA=NA, PSCAL=NA,S
     else {SPZONE34=1}
     est<-betas3[1] + betas3[2]*SPZONE12+ betas3[3]*SPZONE14+ betas3[4]*SPZONE21+ betas3[5]*SPZONE22+ betas3[6]*SPZONE23+
       betas3[7]*SPZONE24+ betas3[8]*SPZONE31+ betas3[9]*SPZONE32+ betas3[10]*SPZONE33+ betas3[11]*SPZONE34 +
-      betas3[12]*(BALc+10) + betas3[13]*SDI + betas3[14]*log(DBH) + betas3[15]*log(A) + betas3[16]*PS
+      betas3[12]*(BALc+10) + betas3[13]*SDI + betas3[14]*log(DBH) + betas3[15]*log(A) + betas3[16]*SS
     
   }
   else if (Model==4){
@@ -83,7 +83,7 @@ AIDBH_module <- function(BALc=NA, SDI=NA, DBH=NA, A=NA, PS=NA, DA=NA, PSCAL=NA,S
     else if (cod==24){SPZONE24=1}
     else if (cod==32){SPZONE32=1}
     else if (cod==33){SPZONE33=1}
-    est<-betas4[1] +  betas4[2]*PS + betas4[3]*(BALc+10) + betas4[4]*SDI + betas4[5]*log(DA)+
+    est<-betas4[1] +  betas4[2]*SS + betas4[3]*(BALc+10) + betas4[4]*SDI + betas4[5]*log(DA)+
       betas4[6]*log(DBH) + betas4[7]*log(A) + betas4[8]*(1/(sqrt(PSCAL+10))) +
       betas4[9]*SPZONE14 + betas4[10]*SPZONE21 + betas4[11]*SPZONE22 + betas4[12]*SPZONE24+
       betas4[13]*SPZONE32 + betas4[14]*SPZONE33
