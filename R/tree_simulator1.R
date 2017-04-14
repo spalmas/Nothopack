@@ -97,7 +97,7 @@ tree_simulator <- function(treelist=NA,
     #obtaining sp.table
     plotdata<-data.frame(plot.proy$sp, plot.proy$DBH, plot.proy$HT)
     colnames(plotdata)<-c('SPECIES','DBH','HT')
-    params<-stand_parameters(plotdata=plotdata,area=area)
+    params<-stand_parameters(plotdata=plotdata,area=area)$sd
     #obtaining new HD
     DA<-unique(DAp)
     HD<-get_site(dom_sp=DOM.SP, zone=zone, AD=DA, SI=SI)

@@ -51,7 +51,7 @@
 #' core.tree<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD, 
 #'                          HD=plot$HD, SI=plot$SI, PBAN=plot$PBAN, PNHAN=plot$PNHAN,
 #'                          type='tree', area=500,
-#'                          sp.table=plot$sp.table, tree.list=plot$tree.list,V_model=1)
+#'                          sp.table=plot$sp.table, tree.list=plot$tree.list, V_model=1)
 #' 
 #' 
 #' core.tree$sp.table
