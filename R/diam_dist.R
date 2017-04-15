@@ -107,8 +107,12 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
   Prob4 <- matrix(data=0,nrow=0,ncol=1)
   Dclass <- matrix(data=0,nrow=0,ncol=1)
   BAclass <- matrix(data=0,nrow=0,ncol=1)
-  Hclass <- matrix(data=0,nrow=0,ncol=1)
   Vclass <- matrix(data=0,nrow=0,ncol=1)
+  Hclass1 <- matrix(data=0,nrow=0,ncol=1)
+  Hclass2 <- matrix(data=0,nrow=0,ncol=1)
+  Hclass3 <- matrix(data=0,nrow=0,ncol=1)
+  Hclass4 <- matrix(data=0,nrow=0,ncol=1)
+  Hclass5 <- matrix(data=0,nrow=0,ncol=1)
   
   maxD <- 90/class
   diam <- seq(from=5,to=90,by=class)   # Diameter classes
@@ -118,7 +122,16 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
     DBH_UL[j] <- diam[j+1]               # cm
     Dclass[j] <- (diam[j]+diam[j+1])/2   # cm
     BAclass[j] <- (pi/4)*((Dclass[j])^2) # cm2
-    Hclass[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=DOM.SP, zone=zone)
+    
+    Hclass1[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=1, zone=zone)
+    Hclass2[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=2, zone=zone)
+    Hclass3[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=3, zone=zone)
+    Hclass4[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=DOM.SP, zone=zone)
+    if (Hclass1[j]<1.3) { Hclass1[j]<-1.3 }
+    if (Hclass2[j]<1.3) { Hclass2[j]<-1.3 }
+    if (Hclass3[j]<1.3) { Hclass3[j]<-1.3 }
+    if (Hclass4[j]<1.3) { Hclass4[j]<-1.3 }
+    
     if (vNHA[1]==0) { Prob1[j]=0 
     } else { Prob1[j] <- exp(-((diam[j] - A)/B1)^C1) - exp(-((diam[j+1] - A)/B1)^C1) }
     if (vNHA[2]==0) { Prob2[j]=0 
@@ -133,14 +146,13 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
     if (is.na(Prob3[j])) {Prob3[j] <- 0}
     if (is.na(Prob4[j])) {Prob4[j] <- 0}
   }
-  Hclass <- round(Hclass,2)
-  
+
   N.sp1 <- round(vNHA[1]*Prob1,2)
   N.sp2 <- round(vNHA[2]*Prob2,2)
   N.sp3 <- round(vNHA[3]*Prob3,2)
   N.sp4 <- round(vNHA[4]*Prob4,2)
   N.total <- N.sp1 + N.sp2 + N.sp3 + N.sp4 
-  
+
   # Adjusting N.total with NHA
   K1 <- sum(N.sp1)/vNHA[1]
   K2 <- sum(N.sp2)/vNHA[2]
@@ -169,20 +181,27 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
   BA.sp4 <- round(BA.sp4/K4,2)
   BA.total <- BA.sp1 + BA.sp2 + BA.sp3 + BA.sp4 
 
+  # Generating heights
+  Hclass1 <- round(Hclass1,2)
+  Hclass2 <- round(Hclass2,2)
+  Hclass3 <- round(Hclass3,2)
+  Hclass4 <- round(Hclass4,2)
+  
+  Hclass5 <- (Hclass1*N.sp1 + Hclass2*N.sp2 + Hclass3*N.sp3 + Hclass4*N.sp4)/(N.total)
+  Hclass5 <- round(Hclass5,2)
+  
   #print(sum(BA.total))
   #print(BA)
   
   r_names<-c('DBH_ll','DBH_ul','D_class','H_class','N','BA')
   DDist<-array(data=NA, dim=c(5,(length(diam)-1),6),
                dimnames=list(c(1:5),c(1:(length(diam)-1)),r_names))
-  DDist[1,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass,N.sp1,BA.sp1)  #1: Rauli
-  DDist[2,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass,N.sp2,BA.sp2)  #2: Roble
-  DDist[3,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass,N.sp3,BA.sp3)  #3: Coigue
-  DDist[4,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass,N.sp4,BA.sp4)  #4: Others
-  DDist[5,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass,N.total,BA.total)  #0: Total  
+  DDist[1,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass1,N.sp1,BA.sp1)  #1: Rauli
+  DDist[2,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass2,N.sp2,BA.sp2)  #2: Roble
+  DDist[3,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass3,N.sp3,BA.sp3)  #3: Coigue
+  DDist[4,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass4,N.sp4,BA.sp4)  #4: Others
+  DDist[5,,]<-cbind(DBH_LL,DBH_UL,Dclass,Hclass5,N.total,BA.total)  #0: Total  
 
-  r_names<-c('A','B','C','D','E','F')
-  
   return(stand.table=DDist)
 
 }
