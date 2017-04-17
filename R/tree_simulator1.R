@@ -21,13 +21,20 @@
 #' plot<- read.csv(file= 'data/Plot_example.csv')
 #' head(plot)
 #' input.plot<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,AF=35,tree.list=plot)
-#' sim.tree<-tree_simulator(treelist=input.plot$tree.list, zone=input.plot$zone, area=input.plot$area, AD=input.plot$AD, ADF=input.plot$AF,DOM.SP=input.plot$DOM.SP,SI=input.plot$SI,AIDBH_model=1)
+#' sim.tree<-tree_simulator(treelist=input.plot$tree.list, zone=input.plot$zone, area=input.plot$area, 
+#'                AD=input.plot$AD, ADF=input.plot$AF,DOM.SP=input.plot$DOM.SP,SI=input.plot$SI,AIDBH_model=1)
 #' attributes(input.plot) 
 #' head(input.plot$tree.list) 
 #' input.plot$sp.table
 #' attributes(sim.tree)
 #' head(sim.tree$tree.list) 
 #' sim.tree$sp.table
+#' core.tree<-core_module(zone=sim.tree$zone, DOM.SP=sim.tree$DOM.SP, AD=sim.tree$AD, 
+#'                          HD=sim.tree$HD, SI=sim.tree$SI, PBAN=sim.tree$PBAN, PNHAN=sim.tree$PNHAN,
+#'                          type='tree', area=sim.tree$area,
+#'                          sp.table=sim.tree$sp.table, tree.list=sim.tree$tree.list)
+#' core.tree$sp.table
+#' core.tree$stand.table[2,,]
 tree_simulator <- function(treelist=NA,
                              zone=NA, area=NA,
                              AD=NA, ADF=NA, DOM.SP=NA, SI=NA,

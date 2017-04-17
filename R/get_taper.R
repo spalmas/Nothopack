@@ -1,7 +1,7 @@
 #' Calculates elements from taper equation models
 #'
 #' \code{diam_distr} Reads input of tree information (Specie, DBH, HT), stand (dom_sp, zone),
-#' and specification of parameters (di, hi) and provides de other elements based on a selection of
+#' and specification of parameters (di, hi) and provides the other element based on a selection of
 #' different fitted taper equation models.
 #
 #' @param dom_sp Dominant specie (1:Rauli, 2:Roble, 3:Coigue, 4:Others or Mixed)
@@ -10,7 +10,9 @@
 #' @param HT Total tree height (m)
 #' @param di Stem diameter (cm) at given stem height hi (m)
 #' @param hi Stem height (m) at given stem diameter (cm)
-#'
+#' @param d Vector of stem diameters (cm) 
+#' @param h Vector of stem heights (m) (starting in 0.01 until HT by 0.01)
+#' 
 #' @references
 #' Gezan, S.A. and Moreno, P. (2000b). ????????????.
 #' Reporte Interno. Projecto FONDEF D97I1065. Chile
@@ -18,17 +20,20 @@
 #' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para
 #' Renovales de Roble, Rauli y Coigue. Reporte Interno. Projecto FONDEF D97I1065. Chile
 #'
-#' @return The missing component (di or hi) from the requested taper model
+#' @return The missing component (di or hi) from the requested taper model. Or returns the complete
+#' vectors of d and h
 #'
 #' @author
 #' S.A. Gezan, P. Moreno and S. Palmas
 #'
 #' @examples
 #' # Example 1: Unknown diameter inside bark stem diameter
-#' get_taper(SPECIES=1, zone=2, DBH=12.1, HT=14.2, hi=4.3)
+#' get_taper(SPECIES=1, zone=2, DBH=12.1, HT=14.2, hi=4.3)$di
 #'
 #' # Example 2: Unknown stem height
-#' get_taper(SPECIES=1, zone=2, DBH=12.1, HT=14.2, di=9.8)
+#' tree<-get_taper(SPECIES=1, zone=2, DBH=12.1, HT=14.2, di=9.8)
+#' tree$hi 
+#' plot(tree$h,tree$d)
 
 get_taper <- function(SPECIES = NA, zone='Todas', DBH=NA, HT=NA, di=NA, hi=NA){
   #Get parameters for that tree
@@ -49,7 +54,6 @@ get_taper <- function(SPECIES = NA, zone='Todas', DBH=NA, HT=NA, di=NA, hi=NA){
 
   # Get the complete tree profile (in increments of 1 cm)
   h <- seq(0.01,HT,by=0.01)
-
 
   if(taper_params_tree$M == 4){
     x <- (HT-h)/(HT-1.3)
@@ -78,7 +82,7 @@ get_taper <- function(SPECIES = NA, zone='Todas', DBH=NA, HT=NA, di=NA, hi=NA){
     posit <- which(abs(d - di) == min(abs(d - di)))
     hi <- h[posit]
   }
-  return(list(di=di,hi=hi))
+  return(list(di=di,hi=hi,d=d,h=h))
 }
 
 # Note: - Need to check that di and hi are not illogical from the DBH and HT of the tree

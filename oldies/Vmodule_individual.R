@@ -34,9 +34,11 @@
 #' Vmodule_individual(SPECIES=1, zone=1, DBH=22.1, HT=18.2, blength=18.2)
 #' 
 #' # Example 4: Calculates total tree volume without discounting for stump
-#' Vmodule_individual2(SPECIES=1, zone=1, DBH=22.1, HT=18.2, dmin=0, stump=0)
+#' Vmodule_individual(SPECIES=1, zone=1, DBH=22.1, HT=18.2, dmin=0, stump=0)
 
 Vmodule_individual <- function(SPECIES=NA, zone=NA, DBH=NA, HT=NA, dmin=NA, blength=NA, stump=0.3){
+
+  incr <- 0.01 # Using increments of 10 cm
 
   if (is.na(blength) & is.na(dmin)){
     stop('Minimum diameter or bole length need to be provided.')
@@ -49,18 +51,19 @@ Vmodule_individual <- function(SPECIES=NA, zone=NA, DBH=NA, HT=NA, dmin=NA, blen
     blength<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, di=dmin)$hi
   }
 
-  incr<-0.01  # default increment in h from get_taper
-  tree.profile<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, hi=blength)
-  d<-tree.profile$d
-  h<-tree.profile$h
-  ba0<-pi*((d/100)^2)/4
-  ba1<-c(ba0[2:length(ba0)],0)
-  vsection<-incr*(ba0+ba1)/2
+  vtree<-0
+  #d0<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, hi=stump)$di
+  #ba0<-pi*(d0^2)/4
+  ba0<-0
+  for (i in seq(from=(stump),to=blength,by=incr)) {
+      di<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, hi=i)$di
+      bai<-pi*(di^2)/4
+      #vi<-(ba0+bai)/2  # cm3
+      vtree<-vtree+(100*incr)*(ba0+bai)/2
+      ba0<-bai
   
-  s.start<-which.min(abs(h-stump))
-  s.fin<-which.min(abs(h-blength))
-  vtree<-sum(vsection[s.start:s.fin])
-  
+  }
+  vtree<-vtree/(100^3)  # m3
   return(vtree)
 }
 
