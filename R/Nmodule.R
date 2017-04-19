@@ -19,14 +19,14 @@
 #' (N1<-Nmodule(N0=2730,QD0=12.43,model=3))
 #' (N1<-Nmodule(N0=2730,QD0=12.43,model=3))
 
-Nmodule <- function(NHA0=NA, QD0=NA, Nmodel=1, theta = 0.0055452){
+Nmodule <- function(NHA0=NA, QD0=NA, N_model=1){
   # Model: log(n_trees_ha2) = log(n_trees_ha1)*(1 - theta*Delta.ANHO*(dq1/dq_max_original))
 
-  if (Nmodel == 1){
-    theta <- theta # Using original Reineke function and esimated theta
+  if (N_model == 1){
+    theta <- 0.005567037 # Using original Reineke function and esimated theta
     QDmax <- exp((log(NHA0) - 11.6167)/-1.4112)
 
-  } else if (Nmodel == 2) {
+  } else if (N_model == 2) {    #Modelo no muy revisado
     theta <- 0.0056560  # Using new Reineke function and estimated theta
     QDmax <- exp((log(NHA0) - 13.500416)/-1.990455)
   }
