@@ -87,7 +87,7 @@ stand_simulator <- function(core.stand = NULL){
     core.stand$sp.table$N[5] <- NHA1
     core.stand$sp.table$QD[5] <- QD1
     core.stand$sp.table$BA[5] <- BA1
-    BAN0 <- BAN1   #Needs to replace species BA in stand!
+    BAN0 <- BAN1   #Needs to replace species BA in sp.stand!
     BA990 <- core.stand$sp.table$BA[4]
     HD0 <- core.stand$HD
     VOL0 <- core.stand$sp.table$VTHA[5]
