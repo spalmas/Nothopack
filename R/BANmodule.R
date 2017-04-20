@@ -29,7 +29,7 @@ BANmodule <- function(BAN0=NA, AD0=NA, SI=NA, NHA0=NA, NHA1=NA, PBAN0 = NA, PBAN
  # lm2 <- lm(log(AB_NOTH) ~ log.EDOM + log.IS + log.NHA + log.PBA_NOTH, data = PRODAL)
 
   # Model 1 (linear): BAN = exp(b0) * EDOM^b1 * IS^b2 * NHA^b3 * PBAN^b4
-  bm<-c(-3.73767, 1.53075, -0.40962, 0.49542, 1.23387) # b0,b1,b2,b3,b4
+  bm<-c(-6.85382, 1.28466, 0.70700, 0.55894, 1.51427) # b0,b1,b2,b3,b4
 
   #### Prediction
   if (!projection){

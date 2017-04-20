@@ -26,7 +26,7 @@
 BA99module <- function(BA990=NA, AD0=NA, PNHAN0=NA, PNHAN1=NA, PBAN0 = NA, PBAN1=NA, projection=FALSE){
 
   # Model 1 (linear): BA99 = exp(b0)*EDOM^b1*PNHAN^b2*PBAN^b3 - 10
-  bm<-c(2.02301, 0.10305, -0.21553, -1.88807) # b0,b1,b2,b3
+  bm<-c(2.04068, 0.07997, -0.13080, -2.22934) # b0,b1,b2,b3
 
   #### Prediction  #CHECK EQUATION
   if (!projection){
