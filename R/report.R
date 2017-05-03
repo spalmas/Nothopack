@@ -10,6 +10,7 @@
 #' @param class.width Minimum Diameter to show on Diametric Distribution
 #' @param dmax Maximum Diameter to show on Diametric Distribution
 #' @param dmax Maximum Diameter to show on Diametric Distribution
+#' @param pdf If the user wants a pdf output
 #'
 #' @return Prints pretty report tables
 #'
@@ -23,58 +24,68 @@
 #' # Example 1: From stand level table
 #' BA<-c(36.5,2.8,1.6,2.4)
 #' N<-c(464,23,16,48)
-#' sp.table <- inputmodule(level='stand',zone=2,AD=25,HD=23.4,N=N,BA=BA)
-#' report(tree.list = tree.list)
-#'
-#' # Example 3: From stand level table
-#' BA<-c(36.5,2.8,1.6,2.4)
-#' N<-c(464,23,16,48)
-#' sp.table <- inputmodule(level='stand',zone=2,AD=25,HD=23.4,N=N,BA=BA)
+#' input<-inputmodule(type='stand',zone=1,AD=28,HD=23.5,N=N,BA=BA, AF = 40)
+#' core.stand<-core_module(input)
+#' report(core.stand = core.stand)
 #' report(sp.table = sp.table)
+#'
+#' Example 2: From a simulation
 
-report <- function(tree.list = NULL, stand.table = NULL,  sp.table = NULL,
+report <- function(core.stand,
                    print.diam.dist = TRUE,
-                   class.width = 5, dmin = 5, dmax = 100){
+                   class.width = 5, dmin = 5, dmax = 100,
+                   pdf = FALSE,
+                   export.csv = FALSE,
+                   ind.simulation = TRUE){
 
   #Table with species codes and species names for printing
-  sp.names <- tibble(SPECIES = c(1,2,3,4,0),
+  sp.names <- tibble(SPECIE = c(1,2,3,4,0),
                      SPECIES.NAME = c('Rauli', 'Roble', 'Coigue', 'Companion', 'All'))
 
 
-  #Three options... SP.TABLE, stand.table and tree.list
-  if(!is.null(tree.list)){
+  #CHanging Stand parameters species to vernacular names
+  sp.table$sd <- sp.table$sp.table %>% left_join(sp.names, by = 'SPECIE') %>%
+    mutate(SPECIES = SPECIES.NAME) %>%
+    select(-SPECIES.NAME)
 
-  sp.table <- tree.list %>% group_by(SPECIES) %>%
-    summarise()
+  #Chaning dominant species to vernacular names
+  sp.table$DOM.SP <- sp.names$SPECIES.NAME[sp.names$SPECIE == sp.table$DOM.SP]
 
+  #PRINT TABLE PREPARATIONS
+  results.print <- sp.table[1:16] %>% as_tibble() %>% t %>% as_tibble()
+    `colnames<-` (c('Value')) %>%
+    `rownames<-` (c('Zone',
+                  'Dominant Species',
+                  'Dominant Age (years)',
+                  'Dominant Height (m)',
+                  'Site Index (m)',
+                  'SDI (m)',
+                  'Proportion of BA of Nothofagus',
+                  'Proportion of NHA of Nothofagus',
+                  'Final Age  (years)',
+                  'Area (m)',
+                  'type',
+                  'ddiam',
+                  'comp',
+                  'Mortality model',
+                  'Volume model',
+                  'IADBH model'
+                  ))
 
-  } else if (!is.null(stand.table)){
-    #BUILDING DIAMETER DISTRIBUTION
-
-  } else if (!is.null(sp.table)){
-
-    #CHanging Stand parameters species to vernacular names
-    sp.table$sd <- sp.table$sd %>% left_join(sp.names, by = 'SPECIES') %>%
-      mutate(SPECIES = SPECIES.NAME) %>%
-      select(-SPECIES.NAME)
-
-    #Chaning dominant species to vernacular names
-    sp.table$DOM.SP <- sp.names$SPECIES.NAME[sp.names$SPECIES == sp.table$DOM.SP]
-
-    #Building a table of all other stand parameters and changing col and rownames
-  }
-
-  #TABLE PREPARATIONS
-  print.sp <- (sp.table %>% as.data.frame())[1,5:14] %>% t %>%
-  `colnames<-` (c('Value')) %>%
-  `rownames<-` (c('Dominant Species', 'Dominant Height (m): ',
-                'Proportion of BA of Nothofagus', 'Proportion of NHA of Nothofagus',
-                'Site Index (m)', 'Dominant Age (years)',
-                'Final Age  (years)','Area (m)', 'comp', 'Zone'))
 
   #BEGIN PRINTING
-  print('----------   CURRENT STAND PARAMETERS   ----------')
-  print.sp %>% kable %>% print
+  print('----------   ----------   ----------   ----------')
+  print('----------     SIMULATION RESULTS      ----------')
+  print('----------   ----------   ----------   ----------')
+  Sys.time() %>% format("%x") %>% paste0('Date: ', .) %>% print
+  Sys.time() %>% format("%X") %>% paste0('Time: ', .) %>% print
+
+
+  print('----------     Model parameters      ----------')
+  results.print %>% slice(11:16) %>% kable %>% print
+
+  print('---------- STAND PARAMETERS   ----------')
+  results.print %>% kable %>% print
 
   print('----------   CURRENT STAND PARAMETERS BY SPECIES   ----------')
   sp.table$sd %>% kable %>% print

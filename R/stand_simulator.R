@@ -14,17 +14,13 @@
 #' #Example 1. Starting from known stand-level data
 #' BA<-c(36.5,2.8,1.6,2.4)
 #' N<-c(464,23,16,48)
-#' plot<-inputmodule(type='stand',zone=1,AD=28,HD=23.5,N=N,BA=BA, AF = 40)
-#' # Without generation of stand-table
-#' core.stand<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD, AF = plot$AF,
-#'                          HD=plot$HD, SI=plot$SI, PBAN=plot$PBAN, PNHAN=plot$PNHAN,
-#'                          type='stand',sp.table=plot$sp.table, V_model=2, ddiam=FALSE)
+#' input<-inputmodule(type='stand',zone=1,AD=28,HD=23.5,N=N,BA=BA, AF = 40)
+#' core.stand<-core_module(input = input)
 #' stand_simulator(core.stand = core.stand)
 #'
 #'
+#'
 stand_simulator <- function(core.stand = NULL){
-
-  #Reasons why the simulator can't move forward
 
   #Error with dominant species
   if (core.stand$DOM.SP == 4){
@@ -93,7 +89,13 @@ stand_simulator <- function(core.stand = NULL){
     VOL0 <- core.stand$sp.table$VTHA[5]
   }
 
-  return(results)
+  #Estiamting time that the simulation took
+  sim_time <- Sys.time() - core.stand$start_time
+
+  return(list(sim_time = sim_time,
+              type = 'stand_simulation',
+              simulation = results)
+         )
 }
 
 # Note
