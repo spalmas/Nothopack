@@ -48,7 +48,7 @@ report <- function(core.stand,
   #CHanging Stand parameters species to vernacular names
   core.stand$sp.table <- core.stand$sp.table %>% left_join(sp.names, by = 'SPECIE') %>%
     mutate(SPECIES = SPECIES.NAME) %>%
-    select(-SPECIES.NAME)
+    select(SPECIES, N, BA, QD, VTHA)
 
   #Chaning dominant species to vernacular names
   core.stand$DOM.SP <- sp.names$SPECIES.NAME[core.stand$DOM.SP]
@@ -92,6 +92,6 @@ report <- function(core.stand,
   results.print %>% kable %>% print
 
   print('----------   CURRENT STAND PARAMETERS BY SPECIES   ----------')
-  sp.table$sd %>% kable %>% print
+  core.stand$sp.table %>% kable %>% print
 }
 
