@@ -25,9 +25,8 @@
 #' BA<-c(36.5,2.8,1.6,2.4)
 #' N<-c(464,23,16,48)
 #' input<-inputmodule(type='stand',zone=1,AD=28,HD=23.5,N=N,BA=BA, AF = 40)
-#' core.stand<-core_module(input)
+#' core.stand<-core_module(input = input, ddiam = TRUE)
 #' report(core.stand = core.stand)
-#' report(sp.table = sp.table)
 #'
 #' Example 2: From a simulation
 
@@ -38,21 +37,24 @@ report <- function(core.stand,
                    export.csv = FALSE,
                    ind.simulation = TRUE){
 
+
+
+
   #Table with species codes and species names for printing
   sp.names <- tibble(SPECIE = c(1,2,3,4,0),
                      SPECIES.NAME = c('Rauli', 'Roble', 'Coigue', 'Companion', 'All'))
 
 
   #CHanging Stand parameters species to vernacular names
-  sp.table$sd <- sp.table$sp.table %>% left_join(sp.names, by = 'SPECIE') %>%
+  core.stand$sp.table <- core.stand$sp.table %>% left_join(sp.names, by = 'SPECIE') %>%
     mutate(SPECIES = SPECIES.NAME) %>%
     select(-SPECIES.NAME)
 
   #Chaning dominant species to vernacular names
-  sp.table$DOM.SP <- sp.names$SPECIES.NAME[sp.names$SPECIE == sp.table$DOM.SP]
+  core.stand$DOM.SP <- sp.names$SPECIES.NAME[core.stand$DOM.SP]
 
   #PRINT TABLE PREPARATIONS
-  results.print <- sp.table[1:16] %>% as_tibble() %>% t %>% as_tibble()
+  results.print <- core.stand[1:16] %>% as.matrix() %>%   # %>% as.data.frame() %>% t %>%
     `colnames<-` (c('Value')) %>%
     `rownames<-` (c('Zone',
                   'Dominant Species',
@@ -70,19 +72,21 @@ report <- function(core.stand,
                   'Mortality model',
                   'Volume model',
                   'IADBH model'
-                  ))
+                  )) %>%
+    as.data.frame() %>%
+    rownames_to_column()
 
 
   #BEGIN PRINTING
   print('----------   ----------   ----------   ----------')
   print('----------     SIMULATION RESULTS      ----------')
   print('----------   ----------   ----------   ----------')
-  Sys.time() %>% format("%x") %>% paste0('Date: ', .) %>% print
-  Sys.time() %>% format("%X") %>% paste0('Time: ', .) %>% print
+  Sys.time() %>% format("%x") %>% paste0('Current Date: ', .) %>% print
+  Sys.time() %>% format("%X") %>% paste0('Current Time: ', .) %>% print
 
 
   print('----------     Model parameters      ----------')
-  results.print %>% slice(11:16) %>% kable %>% print
+  results.print [11:16,] %>% kable %>% print
 
   print('---------- STAND PARAMETERS   ----------')
   results.print %>% kable %>% print
