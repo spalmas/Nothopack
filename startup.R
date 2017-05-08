@@ -38,6 +38,7 @@ hparam_coef  <- read.csv(file = 'data/hparam_coef.csv')
 ensayos.data <- read.csv(file = 'data/growth_ensayos.csv')
 taper_params <- read.csv(file = 'data/taper_parameters.csv')
 plot_roble   <- read.csv(file = 'data/Plot_example.csv')
+products_setup <- read.csv(file = 'data/products_setup.csv')
 
 # Name Variables
 # N, number of trees (trees/ha)

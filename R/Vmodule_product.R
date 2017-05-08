@@ -21,39 +21,69 @@
 #' @return Tree volume without bark (m3) based on the specifications of restrictions provided
 #'
 #' @examples
-#' # Example 1: Calculates tree volume for diameter limit of 5 cm (with stump of 0.3 m) 
-#' Vmodule_product(SPECIES=1, zone=1, DBH=22.1, HT=18.2, dmin=5)
-#' 
+#' # Example: Calculates volume for different products (start with stump = 0) 
+#' Vmodule_product(SPECIES=1, zone=1, DBH=22.1, HT=18.2)
 
+Vmodule_product <- function(SPECIES=NA, zone=NA, DBH=NA, HT=NA){
 
-Vmodule_prodcut <- function(SPECIES=NA, zone=NA, DBH=NA, HT=NA, d.min=NA, blength=NA, stump=0.3){
-
-  if (is.na(blength) & is.na(dmin)){
-    stop('Minimum diameter or bole length need to be provided.')
-  }
-  if (!is.na(blength) & !is.na(dmin)){
-    stop('Minimum diameter or bole length are both provided.')
-  }  
-  # dmin provided
-  if (is.na(blength) & !is.na(dmin)){  
-    blength<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, di=dmin)$hi
+  products <- products_setup
+  p<-length(products)
+  
+  hp <- matrix(data=0,nrow=p,ncol=1) # height for a product
+  vp <- matrix(data=0,nrow=p,ncol=1) # volume for a product
+  for (k in 1:p) {
+    hp[k]<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, di=products$Dmin[k])$hi
   }
 
-  incr<-0.01  # default increment in h from get_taper
-  tree.profile<-get_taper(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, hi=blength)
-  d<-tree.profile$d
-  h<-tree.profile$h
-  ba0<-pi*((d/100)^2)/4
-  ba1<-c(ba0[2:length(ba0)],0)
-  vsection<-incr*(ba0+ba1)/2
+  # Defining sections and their type for 30 sections.
+  h.init <- matrix(data=0,nrow=30,ncol=1)
+  h.fin  <- matrix(data=0,nrow=30,ncol=1)
+  h.prod <- matrix(data=0,nrow=30,ncol=1)
+  I <- 1
+  for (k in 1:30) {   
+    if ((hp[I]-h.init[k])>=products$Length[I]) {
+      h.fin[k] <- h.init[k]+products$Length[I]
+      h.prod[k] <- I
+      h.init[k+1] <- h.fin[k]
+      h.init[k+2] <- h.fin[k]
+      h.init[k+3] <- h.fin[k]
+      h.init[k+4] <- h.fin[k]
+      h.init[k+5] <- h.fin[k]
+    }
+    else {
+      I <- I + 1
+    }
+    if (I>p) { break }
+  }
+  sections <- data.frame(h.init=h.init,h.fin=h.fin,h.prod=h.prod) 
+  sections <- sections[ which(sections$h.prod!=0),]
+  for (k in 1:nrow(sections)) {   
+    sections$vcum[k] <- Vmodule_individual(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, 
+                                               blength=sections$h.fin[k], stump=0)
+    if (k==1) {
+      sections$vsection[k] <- sections$vcum[k] 
+    } else {
+    sections$vsection[k] <- sections$vcum[k]-sections$vcum[k-1] 
+    }
+  }
+  sections
+  vtot <- Vmodule_individual(SPECIES=SPECIES, zone=zone, DBH=DBH, HT=HT, blength=HT, stump=0)
+  vsums <- aggregate(sections$vsection,by=list(sections$h.prod), FUN=sum)
+  colnames(vsums)<-c('P','vsum')
   
-  s.start<-which.min(abs(h-stump))
-  s.fin<-which.min(abs(h-blength))
-  vtree<-sum(vsection[s.start:s.fin])
+  vprod <- data.frame(matrix(data=0,nrow=p,ncol=2))
+  vprod[,1] <- seq(1:5)
+  colnames(vprod)<-c('P','vsums')
   
-  return(vtree)
+  vprod2<-merge(vprod,vsums,by=c('P'),all=TRUE)
+  
+  for (k in 1:nrow(vprod2)) {
+    if (is.na(vprod2$vsum[k])) {
+      vprod2$vsum[k] <- 0
+    }
+  }
+  vprod2$vsum[5]<-vtot-sum(vprod2$vsum[1:4])
+  vfin <- data.frame(P=vprod2$P,vol=vprod2$vsum)
+  
+  return(vfin)
 }
-
-# Note 
-# - If we need a different product stump is the lower height and blength is the upper height
-# - remember it is di without bark, hence at hi=1.3, di<>DBH.

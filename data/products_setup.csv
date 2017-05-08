@@ -1,0 +1,6 @@
+Product,Type,Dmin,Length,Tipo
+SL1,Saw-log (large),18,4.1,Aserrable largo
+SL2,Saw-log (small),16,3.3,Aserrable corto
+P,Panel,10,2.44,Madera tablero
+IF,Industrial firewood,5,1.22,Lena industrial
+R,Residual,0,99,Desecho

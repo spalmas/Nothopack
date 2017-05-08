@@ -34,7 +34,7 @@
 #' Vmodule_individual(SPECIES=1, zone=1, DBH=22.1, HT=18.2, blength=18.2)
 #' 
 #' # Example 4: Calculates total tree volume without discounting for stump
-#' Vmodule_individual2(SPECIES=1, zone=1, DBH=22.1, HT=18.2, dmin=0, stump=0)
+#' Vmodule_individual(SPECIES=1, zone=1, DBH=22.1, HT=18.2, dmin=0, stump=0)
 
 Vmodule_individual <- function(SPECIES=NA, zone=NA, DBH=NA, HT=NA, dmin=NA, blength=NA, stump=0.3){
 
