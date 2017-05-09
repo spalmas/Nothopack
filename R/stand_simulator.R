@@ -17,9 +17,15 @@
 #' input<-inputmodule(type='stand',zone=1,AD=28,HD=23.5,N=N,BA=BA, AF = 40)
 #' core.stand<-core_module(input = input)
 #' stand_simulator(core.stand = core.stand)
-#'
-#'
-#'
+#
+#' #Example 2. Starting from known stand-level data
+#' BA<-c(36.5,2.8,1.6,2.4)
+#' N<-c(464,23,16,48)
+#' plot<-inputmodule(type='stand',zone=1,AD=28,HD=23.5,N=N,BA=BA,AF=40)
+#' core.stand<-core_module(input=plot$input)
+#' stand_simulator(core.stand=core.stand$input)
+#' stand_simulator(core.stand=core.stand$input)
+
 stand_simulator <- function(core.stand = NULL){
 
   #Error with dominant species
@@ -92,16 +98,14 @@ stand_simulator <- function(core.stand = NULL){
   #Estiamting time that the simulation took
   sim_time <- Sys.time() - core.stand$start_time
 
-  return(list(sim_time = sim_time,
-              type = 'stand_simulation',
-              simulation = results)
-         )
+  return(list(sim_time = sim_time, type = 'stand_simulation', simulation = results) )
 }
 
 # Note
 # - We have prediction and projection.
 # - It assumes you provide: HD-AD, and BA-N
 # - Need to define if we add additional stand level parameters
+# - Volume should not be calculated here, it shoud be done in core_module (with ddiam TRUE or FALSE)
 # - There is a strong assumption that PropNN and PropBA stays fixed
 # - The plot for volume increments to much (it is unrealistic, probably projection BA is wrong!)
 # - There needs to be a match when converting back to diameter distribution and when the BA is predicted

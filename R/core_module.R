@@ -26,52 +26,45 @@
 #' @param type Type of simulation required: stand: only stand-level, tree: only tree-level, both: both modules (default=stand)
 #' @param ddiam Logical for requesting generation of diameter distribution (default=FALSE)
 #' @param comp Logical for requesting compatibility between stand- and tree-level simulations (default=FALSE)
-#' @param input This is the object created by input_module. It can be the only input to avoid all above
+#' @param input List created by inputmodule, that is used to pass the variables as a list
+#' @param stand_simulation XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 #'
-#' @return A series of stand-level parameters (same as input), plus a tree-list (based on current tree-list if
-#' provided otherwise generated from a diameter distribution),  together with parameters provided from the user
-#' in input module.
+#' @return A series of elements and parameters with updated tables (adding volume). The main output elmenets are:
+#'                 sp.table    table with stand level summary by species (1,2,3,4) and total (0), and volume
+#'                 stand.tbale data feame with the complete stand table by specie in classes of 5 cm.
+#'                 tree.list   data frame with complete tree list 
+#'                 input       list with all parameters of input and stand level statistics
+#'                             (zone, DOM.SP, AD, HD, SI, SDI, PBAN, PNHAN, AF, area, type, ddiam, comp, N_model,
+#'                             V_model,IADBH_model,start_time)
 #'
 #' @examples
 #' # Example 1: Input from stand-level data
 #' BA<-c(36.5,2.8,1.6,2.4)
 #' N<-c(464,23,16,48)
-#' plot<-inputmodule(type='stand',zone=1,AD=28,HD=23.5,N=N,BA=BA)
+#' plot<-inputmodule(type='stand',zone=1,AD=28,AF=40,HD=23.5,N=N,BA=BA,V_model=2,ddiam=FALSE)
 #' # Without generation of stand-table
-#' core.stand<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD,
-#'                          HD=plot$HD, SI=plot$SI, PBAN=plot$PBAN, PNHAN=plot$PNHAN,
-#'                          type='stand',sp.table=plot$sp.table, V_model=2, ddiam=FALSE)
+#' core.stand<-core_module(input=plot$input)
 #' core.stand$sp.table
 #' # With generation of stand-table
-#' core.stand<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD,
-#'                          HD=plot$HD, SI=plot$SI, PBAN=plot$PBAN, PNHAN=plot$PNHAN,
-#'                          type='stand',sp.table=plot$sp.table, V_model=2, ddiam=TRUE)
-#' core.stand$sp.table
+#' plot$input$ddiam<-TRUE
+#' core.stand<-core_module(input=plot$input)
 #' core.stand$stand.table[5,,]
-#'
+#' core.stand$input
+#' 
 #' # Example 2: Input from tree-level data (or file)
-#' plot<- read.csv(file= 'data/Plot_example.csv')
-#' plot<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=plot)
-#' head(plot$tree.list)
-#' core.tree<-core_module(zone=plot$zone, DOM.SP=plot$DOM.SP, AD=plot$AD,
-#'                          HD=plot$HD, SI=plot$SI, PBAN=plot$PBAN, PNHAN=plot$PNHAN,
-#'                          type='tree', area=500,
-#'                          sp.table=plot$sp.table, tree.list=plot$tree.list, V_model=1)
+#' plot2<- read.csv(file= 'data/Plot_example.csv')
+#' plot2<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=plot2)
+#' plot2$sp.table
+#' head(plot2$tree.list)
+#' core.tree<-core_module(input=plot2$input)
 #' core.tree$sp.table
 #' core.tree$stand.table[5,,]
-#'
-#' #' # Example 3: Using only input as variables
-#' BA<-c(36.5,2.8,1.6,2.4)
-#' N<-c(464,23,16,48)
-#' input<-inputmodule(type='stand',zone=1,AD=28,HD=23.5,N=N,BA=BA)
-#' core.stand<-core_module(input = input, ddiam = TRUE)
-
 
 core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                         SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0,
-                        type='stand', ddiam=TRUE, comp=FALSE,
-                        N_model=1, V_model=1, IADBH_model=1, input = NA,
-                        stand_simulation  = NA){
+                        type='stand', ddiam=TRUE, 
+                        N_model=1, V_model=1, IADBH_model=1, input=NA,
+                        stand_simulation=NA){
 
 
   # this is in case input is the only variable.
@@ -278,15 +271,19 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
   }
 
-  if (comp==TRUE){         # then we do compatibility if requested
-    print(comp)
-  }
-
+  # List that is output from here input somewhere else
+  input <- list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
+                area=area, type=type, ddiam=ddiam, comp=comp, N_model=N_model, V_model=V_model,
+                IADBH_model=IADBH_model, start_time=start_time, sp.table=sp.table, stand.table=DDist, tree.list=tree.list )
+  
+  
   return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
               area=area, type=type, ddiam=ddiam, comp=comp, N_model=N_model, V_model=V_model,
               IADBH_model=IADBH_model, start_time = start_time,
-              sp.table=sp.table, stand.table=DDist, tree.list=tree.list))
+              sp.table=sp.table, stand.table=DDist, tree.list=tree.list, input=input))
 }
 
 # Note: V_model=1 or anything else is always the same
 # Note: it needs some standarization on output of sp.table and stand.table between stand and tree-level (e.g. SPECIE or SPECIES)
+# Deifnition of stand simulation is not incorporated
+# This module should now separate VT for all products(additional columns)

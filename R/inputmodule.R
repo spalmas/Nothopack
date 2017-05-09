@@ -1,7 +1,7 @@
 #' Module that requests input information for all stand- or tree-level current calculations or simulations
 #'
 #' \code{inputmodule} Module that requests input information for all stand- or tree-level current
-#' calculations or simulations from the user, and completes missing information as required.
+#' calculations or simulations from the user, and completes some of the missing information that is required later.
 #'
 #' @param zone Growth zone (1, 2, 3, 4).
 #' @param DOM.SP The dominant specie (1: Rauli, 2: Roble, 3: Coigue, 4:Mixed)
@@ -21,21 +21,29 @@
 #' @param ddiam Logical for requesting generation of diameter distribution (default=FALSE)
 #' @param comp Logical for requesting compatibility between stand- and tree-level simulations (default=FALSE)
 #'
-#' @return Series of data input and parameters to be required for downstream modules. Particularly core module.
+#' @return Series of data input and parameters to be required for downstream modules. Particularly core module. The main 
+#' output elements are: sp.table    table with stand level summary by species (1,2,3,4) and total (0)
+#'                      tree.list   data frame with complete tree list with missing values completed (e.g. HT)
+#'                      input       list with all parameters of input and stand level statistics
+#'                                  (zone, DOM.SP, AD, HD, SI, SDI, PBAN, PNHAN, AF, area, type, ddiam, comp, N_model,
+#'                                  V_model,IADBH_model,start_time)
 #'
 #' @examples
 #' # Example 1: Input from stand-level data
 #' BA<-c(36.5,2.8,1.6,2.4)
 #' N<-c(464,23,16,48)
-#' inputmodule(type='stand',zone=2,AD=28,HD=23.5,N=N,BA=BA)
+#' input<-inputmodule(type='stand',zone=2,AD=28,HD=23.5,N=N,BA=BA)
+#' input
+#' input$sp.table
 #'
 #' # Example 2: Input from tree-level data (or file)
 #' plot<- read.csv(file= 'data/Plot_example.csv')
 #' head(plot)
-#' input.plot<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=plot)
-#' attributes(input.plot)
-#' head(input.plot$tree.list)
-#' input.plot$sp.table
+#' plot<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=plot)
+#' attributes(plot)
+#' head(plot$tree.list)
+#' plot$sp.table
+#' plot$input
 
 inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                         SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0,
@@ -96,7 +104,7 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
     PBAN <- sum(BA[1:3])/(BA[5])
     PNHAN <- sum(N[1:3])/(N[5])
-    SDI <- N[5]*(25.4/QD[5])^-1.4112   # This needs to be checked
+    SDI <- N[5]*(25.4/QD[5])^-1.4112   # This needs to be checked for model selected
 
   }
 
@@ -119,7 +127,7 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
       (SI<-get_site(dom_sp=DOM.SP, zone=zone, AD=AD, HD=HD))
     }
 
-    # Completing heights
+    # Completing heights using parametrized height-dbh model
     QD0<-params$sd[5,4]
     n<-nrow(tree.list)
     for (i in (1:n)) {
@@ -141,14 +149,19 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
     }
 
+  # List that is output from here input somewhere else
+  input <- list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
+                    area=area, type=type, ddiam=ddiam, comp=comp, N_model=N_model, V_model=V_model,
+                    IADBH_model=IADBH_model,start_time=start_time, sp.table=sdmatrix, tree.list=tree.list)
+  
   return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
               area=area, type=type, ddiam=ddiam, comp=comp, N_model=N_model, V_model=V_model,
-              start_time = start_time,
-              IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list))
+              start_time=start_time,
+              IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list, input=input))
 
 }
 
-# Note, still to decide how to complete the PS
-# Note, SDI needs to be completed.
-# HD can be calculated form the tree.list but HT does not contain missing.
+# Note, still to decide how to complete the PS (SS, from covariates code)
+# Note, SDI needs to be checked (also, should we put SDI%, depends on DOM.SP)
+# Note, what happens if the user wants to calculate HD form tree.data.
 
