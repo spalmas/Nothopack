@@ -20,46 +20,53 @@
 #' @examples
 #' plot<- read.csv(file= 'data/Plot_example.csv')
 #' head(plot)
-#' input.plot<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,AF=35,tree.list=plot)
-#' sim.tree<-tree_simulator(treelist=input.plot$tree.list, zone=input.plot$zone, area=input.plot$area, 
-#'                AD=input.plot$AD, ADF=input.plot$AF,DOM.SP=input.plot$DOM.SP,SI=input.plot$SI,AIDBH_model=1)
-#' attributes(input.plot) 
-#' head(input.plot$tree.list) 
-#' input.plot$sp.table
+#' tree<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,AF=35,tree.list=plot)
+#' attributes(tree) 
+#' head(tree$tree.list) 
+#' tree$sp.table
+#' core.tree<-core_module(input=tree$input)
+#' sim.tree<-tree_simulator(core.tree=core.tree$input)
 #' attributes(sim.tree)
 #' head(sim.tree$tree.list) 
-#' sim.tree$sp.table
-#' core.tree<-core_module(zone=sim.tree$zone, DOM.SP=sim.tree$DOM.SP, AD=sim.tree$AD, 
-#'                          HD=sim.tree$HD, SI=sim.tree$SI, PBAN=sim.tree$PBAN, PNHAN=sim.tree$PNHAN,
-#'                          type='tree', area=sim.tree$area,
-#'                          sp.table=sim.tree$sp.table, tree.list=sim.tree$tree.list)
-#' core.tree$sp.table
-#' core.tree$stand.table[2,,]
-tree_simulator <- function(treelist=NA,
-                             zone=NA, area=NA,
-                             AD=NA, ADF=NA, DOM.SP=NA, SI=NA,
-                             AIDBH_model=1){     #,Nmodel=1, theta = 0.0055452){
+
+
+tree_simulator <- function(core.tree = NULL){
+  
   ### Initializations of variables
-  ID<-treelist$ID
-  sp<-treelist$SPECIE
-  DBH<-treelist$DBH
-  HT<-treelist$HT
-  Ss<-treelist$SS
-  FT<-treelist$FT
-  area<-area
-  ZONA<-zone
-  A<-AD
-  DA<-AD
-  input.data1<-covariates(ID=ID,area=area,sp=sp,DBH=DBH,ZONA=ZONA,Ss=Ss)
+  ID<-core.tree$tree.list[,1]
+  sp<-core.tree$tree.list[,2]
+  DBH<-core.tree$tree.list[,3]
+  HT<-core.tree$tree.list[,4]
+  Ss<-core.tree$tree.list[,5]
+  FT<-core.tree$tree.list[,6]
+  Factor<-10000/core.tree$area
+  Fa<-FT*Factor
+  ZONA<-FT*core.tree$zone
+  A<-FT*core.tree$AD
+  DA<-FT*core.tree$AD
+  ADF<-core.tree$AF
+  AD<-core.tree$AD
+  AIDBH_model<-core.tree$IADBH_model
+  N_model<-core.tree$N_model
+  area<-core.tree$area
+  zone<-core.tree$zone
+  SI<-core.tree$SI
+  DOM.SP<-core.tree$DOM.SP
+  HD<-core.tree$HD
+  input.data1<-covariates(ID=ID,Fa=Fa,sp=sp,DBH=DBH,ZONA=ZONA,Ss=Ss)
   Ss<-input.data1$Ss
-  ### Simulation
-    NARBp<-NA;areap<-NA;SPp<-NA;DBHp<-NA;ZONAp<-NA;BALcp<-NA;SDIp<-NA;Ap<-NA;PSp<-NA;DAp<-NA;PSCALp<-NA;Gest<-NA;DBHp1<-NA
+  
+  ### SIMULATION
+  
+    NARBp<-NA;QDp<-NA;Fap<-NA;SPp<-NA;DBHp<-NA;ZONAp<-NA;BALcp<-NA;SDIp<-NA;Ap<-NA;PSp<-NA;DAp<-NA;PSCALp<-NA;Gest<-NA;DBHp1<-NA
     data.proy<-input.data1
     n<-nrow(data.proy)
     # Initial variables
     n<-nrow(data.proy)
     IDp<-data.proy$ID
-    areap<-area
+    Fap<-Fa
+    NARBp<-data.proy$NHA
+    QDp<-data.proy$QD
     SPp<-data.proy$sp
     DBHp<-data.proy$DBH
     ZONAp<-data.proy$ZONA
@@ -75,18 +82,26 @@ tree_simulator <- function(treelist=NA,
     # identification of proyection period
     period<-ADF-AD
     
-    #BY PERIOD
+    #BY PERIOD (LOOP 1)
     for (k in 1:period) {
-      #BY TREE
+      #BY TREE (LOOP 2)
       for (j in (1:n)) {
         #Annual Increment in DBH by Tree
         Gest[j]<-AIDBH_module(BALc=BALcp[j], SDI=SDIp[j], DBH=DBHp[j], A=Ap[j], Ss=SSp[j],DA=DAp[j],PSCAL = PSCALp[j], SP=SPp[j],ZONE=ZONAp[j], Model=AIDBH_model)
         DBHp1[j]<-DBHp[j]+(Gest[j]/10)
       }
+  
+      #MORTALITY
+      N1<-Nmodule(NHA0=NARBp,QD0=QDp,N_model=N_model)
+      Mortality<-unique(NARBp)-N1
+      BALr<-PSCALp/sum(PSCALp)
+      Mi<-BALr*Mortality
+      Fap1<-Fap-Mi
       
       #NEW PREDICTORS
-      data.temp<-covariates(ID=ID,area=areap,sp=SPp,DBH=DBHp1,ZONA=ZONAp,Ss=SSp)
+      data.temp<-covariates(ID=ID,Fa=Fap1,sp=SPp,DBH=DBHp1,ZONA=ZONAp,Ss=SSp)
       DBHp<-data.temp$DBH
+      Fap<-data.temp$Fa
       BALcp<-data.temp$BALc
       SDIp<-data.temp$SDI
       Ap<-Ap+1# new age
@@ -97,18 +112,13 @@ tree_simulator <- function(treelist=NA,
       QDp<-data.temp$QD
       SSp<-data.temp$Ss
     }
-    plot.proy<-data.frame(data.temp,HT,FT,Ap,DAp)
+    plot.proy<-data.frame(data.temp,HT,Fap,Ap,DAp)
+   
     #obtaining tree.list
-    treedata<-data.frame(plot.proy$ID, plot.proy$sp, round(plot.proy$DBH,2),round(plot.proy$HT,2),round(plot.proy$Ss,1),plot.proy$FT)
-    colnames(treedata)<-c('ID','SPECIE','DBH','HT','SS','FT')
-    #obtaining sp.table
-    plotdata<-data.frame(plot.proy$sp, plot.proy$DBH, plot.proy$HT)
-    colnames(plotdata)<-c('SPECIES','DBH','HT')
-    params<-stand_parameters(plotdata=plotdata,area=area)$sd
-    #obtaining new HD
-    DA<-unique(DAp)
-    HD<-get_site(dom_sp=DOM.SP, zone=zone, AD=DA, SI=SI)
-    return(list(sp.table=params, tree.list=treedata, zone=zone, DOM.SP=DOM.SP, AD=DAp, HD=HD, SI=SI, 
+    treedata<-data.frame(plot.proy$ID, plot.proy$sp, round(plot.proy$DBH,2),round(plot.proy$HT,2),round(plot.proy$Ss,1),round(plot.proy$Fap,3))
+    colnames(treedata)<-c('ID','SPECIES','DBH','HT','SS','FT')
+    
+    return(list(tree.list=treedata, zone=zone, DOM.SP=DOM.SP, AD=DAp, SI=SI, 
                 SDI=unique(SDIp), AF=DA, area=area))
 }
 

@@ -112,9 +112,9 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
   if (type=='tree'){
 
     # Getting stand level parms from tree-list
-    plotdata<-data.frame(tree.list$SPECIE, tree.list$DBH, tree.list$HT)
-    colnames(plotdata)<-c('SPECIES','DBH','HT')
-    params<-stand_parameters(plotdata=plotdata,area=area)
+    plotdata<-data.frame(tree.list$SPECIE, tree.list$DBH, tree.list$HT, tree.list$FT)
+    colnames(plotdata)<-c('SPECIES','DBH','HT','FT')
+    params<-stand_parameters1(plotdata=plotdata)
 
     DOM.SP<-get_domsp(BA=params$sd[1:4,3])
     if (is.na(AD)){

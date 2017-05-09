@@ -1,4 +1,4 @@
-#' Calculates stand-level parameter based on individual tree data
+#' Calculates stand-level parameter based on individual tree data (works with tree_simulator)
 #'
 #' \code{stand_parameters} Calculates all relevant stand-level parameters from an inventory plot for
 #' each of the SPECIES and for all together (1: Rauli, 2: Roble, 3:Coigue, 4:Others, 0:All).
@@ -19,33 +19,32 @@
 #' head(simplot)
 #' stand_parameters(plotdata=simplot, area=1000)
 
-stand_parameters <- function(plotdata, area = NA){
-
-  if (is.na(area) ){ stop('Plot area must be provided') }
-  CF <- 10000 / area  # Correction factor
-
+stand_parameters1 <- function(plotdata=NA){
+  
+  
   # Number of trees by SPECIES and total
-  N1 <- CF * sum(plotdata$SPECIES == 1, na.rm = TRUE)    # Rauli
-  N2 <- CF * sum(plotdata$SPECIES == 2, na.rm = TRUE)    # Roble
-  N3 <- CF * sum(plotdata$SPECIES == 3, na.rm = TRUE)    # Coigue
-  N99 <- CF * sum(plotdata$SPECIES == 4, na.rm = TRUE)    # Others
+  N1 <- sum(plotdata$FT[plotdata$SPECIES == 1], na.rm = TRUE)    # Rauli
+  N2 <- sum(plotdata$FT[plotdata$SPECIES == 2], na.rm = TRUE)    # Roble
+  N3 <- sum(plotdata$FT[plotdata$SPECIES == 3], na.rm = TRUE)    # Coigue
+  N99 <- sum(plotdata$FT[plotdata$SPECIES == 4], na.rm = TRUE)    # Others
   N0 <- N1 + N2 + N3 + N99
-
+  
   # Basal area by SPECIES and total
   plotdata$baind <- as.numeric(pi * (plotdata$DBH/2)^2 / 10000 )  # Units: m2
-  BA1 <- CF * sum(plotdata[(plotdata$SPECIES == 1),4], na.rm = TRUE)
-  BA2 <- CF * sum(plotdata[(plotdata$SPECIES == 2),4], na.rm = TRUE)
-  BA3 <- CF * sum(plotdata[(plotdata$SPECIES == 3),4], na.rm = TRUE)
-  BA99 <- CF * sum(plotdata[(plotdata$SPECIES == 4),4], na.rm = TRUE)
+  plotdata$BAind <- plotdata$baind * plotdata$FT
+  BA1 <- sum(plotdata$BAind[plotdata$SPECIES == 1], na.rm = TRUE)
+  BA2 <- sum(plotdata$BAind[plotdata$SPECIES == 2], na.rm = TRUE)
+  BA3 <- sum(plotdata$BAind[plotdata$SPECIES == 3], na.rm = TRUE)
+  BA99 <- sum(plotdata$BAind[plotdata$SPECIES == 4], na.rm = TRUE)
   BA0 <- BA1 + BA2 + BA3 + BA99
-
+  
   # Quadratic diameters by SPECIES and total
   QD1<-get_stand(BA=BA1,N=N1)
   QD2<-get_stand(BA=BA2,N=N2)
   QD3<-get_stand(BA=BA3,N=N3)
   QD99<-get_stand(BA=BA99,N=N99)
   QD0<-get_stand(BA=BA0,N=N0)
-
+  
   # Dominant Height - 100 trees with largest DBH
   # (this is for any of the SPECIES, not only dominant sp)
   N.HD <- 100/CF   # Number of trees to consider for HD
@@ -62,16 +61,16 @@ stand_parameters <- function(plotdata, area = NA){
   }
   HDcalc[,3] <- HDcalc[,1]*HDcalc[,2]
   HD <- sum(HDcalc[,3])/100
-
+  
   N <- c(N1,N2,N3,N99,N0)
   BA <- c(BA1,BA2,BA3,BA99,BA0)
   QD <- c(QD1,QD2,QD3,QD99,QD0)
-
+  
+ 
   PBAN <- sum(BA[1:3])/BA0
   PNHAN <- sum(N[1:3])/N0
   DOM.SP<-get_domsp(BA=BA)
-
-
+  
   # Elements to return: vectors of SPECIES,N,BA,QD, and HD, DOM.SP, PropBAN, PropNN
   v1 <- c((1:4),0)
   v2 <- round(N,6)
@@ -79,8 +78,8 @@ stand_parameters <- function(plotdata, area = NA){
   v4 <- round(QD,6)
   sdmatrix <- data.frame(cbind(v1,v2,v3,v4))
   names(sdmatrix) <- c('SPECIES','N','BA','QD')
-
-  return(list(sd=sdmatrix, DOM.SP=DOM.SP, HD=HD, PBAN=PBAN, PNHAN=PNHAN))
+  
+  return(list(sd=sdmatrix, DOM.SP=DOM.SP, HD=HD,PBAN=PBAN, PNHAN=PNHAN))
 }
 
 #       - Change Otras DOM.SP to 9 to stop the process.

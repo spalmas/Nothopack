@@ -12,22 +12,22 @@
 #'
 #' @examples
 #' ID<-c(1,2,3)
-#' area<-c(25,25,25)
+#' Fa<-c(400,400,400)
 #' sp<-c(1,1,2)
 #' DBH<-c(15,25,37)
 #' ZONA<-c(1,1,1)
-#' COV<-covariates(ID,area,sp,DBH,ZONA);COV
+#' Ss<-c(1,2,2)
+#' COV<-covariates(ID,Fa,sp,DBH,ZONA,Ss);COV
 
 
 ## Code for obtaining covariates from ingrowth DBH models
 ## Require plot with id tree, area, sp, DBH and zone
 
-covariates<-function(ID,area,sp,DBH,ZONA,Ss){
+covariates<-function(ID=NA,Fa=NA,sp=NA,DBH=NA,ZONA=NA,Ss=NA){
   #require(dplyr)
   N <- length(ID)#Getting the number of trees in the plot
-  area.plot <- unique(area)   #area of the measurement
-  NHA <- N * 10000/area.plot #Getting the number of trees in the stand by hectare
-  BA =  sum(pi * (DBH/2/100)^2, na.rm = TRUE) * 10000/area.plot#total basal area by hectare
+  NHA <- sum(Fa) #Getting the number of trees in the stand by hectare
+  BA =  sum(pi * (DBH/2/100)^2, na.rm = TRUE) * Fa #total basal area by hectare
   QD <-  (100*((4/pi)*(BA/NHA))^0.5)#total quadratic diameter,
   SDI<-NHA*((25.4/QD)^(-1.4112))#Stand density index
   SPZONA<-sp*10+ZONA
@@ -37,16 +37,16 @@ covariates<-function(ID,area,sp,DBH,ZONA,Ss){
   for (fila in (1:(N))) {
     bac[fila] <- if (sp[fila] != 4) {ba[fila]}else {0}
   }
-  Temp.data<-data.frame(ID,DBH,ba,bac,sp,ZONA,SPZONA,NHA,BA,QD,SDI,Ss)
+  Temp.data<-data.frame(ID,Fa,DBH,ba,bac,sp,ZONA,SPZONA,NHA,BA,QD,SDI,Ss)
   Temp.data1<-arrange(Temp.data, desc(ba))
   Acum=0;Acumc=0
   Temp.data1$BAL[1]=0
   Temp.data1$BALc[1]=0
   for (i in (2:nrow(Temp.data1))) {
-    Acum <- Acum + (Temp.data1$ba[i-1]*10000/area.plot)
+    Acum <- Acum + (Temp.data1$ba[i-1]*Fa[i])
     Temp.data1$BAL[i] <- Acum
     if(Temp.data1$bac[i]!=0){
-      Acumc <- Acumc + (Temp.data1$bac[i-1]*10000/area.plot)
+      Acumc <- Acumc + (Temp.data1$bac[i-1]*Fa[i])
       Temp.data1$BALc[i] <- Acumc
     }
     else {Temp.data1$BALc[i]=NA}
