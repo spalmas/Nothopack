@@ -25,6 +25,7 @@ source('R/RECRUITmodule.R')
 source('R/report.R')
 source('R/Social_Status.R')
 source('R/stand_parameters.R')
+source('R/stand_parameters1.R')
 source('R/stand_randomizer.R')
 source('R/stand_simulator.R')     # This seems only projection
 source('R/tree_simulator1.R')    # until now only growth
