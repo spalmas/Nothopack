@@ -33,6 +33,7 @@
 #' result.tree$sp.table
 #' result.tree$stand.table[5,,]
 #' head(result.tree$tree.list)
+#' report(core.stand=result.tree)
 
 tree_simulator <- function(core.tree = NULL){
   
@@ -138,9 +139,17 @@ tree_simulator <- function(core.tree = NULL){
     #obtaining tree.list
     treedata<-data.frame(plot.proy$ID, plot.proy$sp, round(plot.proy$DBH,2),round(HTn,2),round(plot.proy$Ss,1),round(plot.proy$Fap,3))
     colnames(treedata)<-c('ID','SPECIES','DBH','HT','SS','FT')
-    input <- list(tree.list=treedata, zone=zone, DOM.SP=DOM.SP, AD=DAp[1], SI=SI, HD=HD,
-                       SDI=unique(SDIp), area=area,type='tree')
     
+    input <- list(zone=zone, DOM.SP=DOM.SP, AD=DAp[1], HD=HD, SI=SI, SDI=SDIp[1], 
+                  PBAN=core.tree$PBAN, PNHAN=core.tree$PNHAN, AF=DAp[1],
+                  area=core.tree$area, type=core.tree$type, ddiam=core.tree$ddiam, comp=core.tree$comp, N_model=core.tree$N_model,
+                  V_model=core.tree$V_model, IADBH_model=core.tree$IADBH_model, start_time=core.tree$start_time, 
+                  sp.table=NA, stand.table=NA, tree.list=treedata)
+    
+    # 
+    # input <- list(tree.list=treedata, zone=zone, DOM.SP=DOM.SP, AD=DAp[1], SI=SI, HD=HD,
+    #                    SDI=unique(SDIp), area=area,type='tree')
+    # 
     return(list(input=input))
 }
 
