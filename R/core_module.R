@@ -53,12 +53,13 @@
 #' 
 #' # Example 2: Input from tree-level data (or file)
 #' plot2<- read.csv(file= 'data/Plot_example.csv')
-#' plot2<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=plot2)
+#' plot2<-inputmodule(type='tree',zone=2,AD=28,HD=15.5,area=500,tree.list=plot2)
 #' plot2$sp.table
 #' head(plot2$tree.list)
 #' core.tree<-core_module(input=plot2$input, type='tree')
 #' core.tree$sp.table
 #' core.tree$stand.table[5,,]
+#' head(core.tree$tree.list)
 
 core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                         SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0,
@@ -165,6 +166,14 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     n <- length(tree.list$ID)
     vind <- matrix(NA,nrow=n)
 
+    # Completing heights using parametrized height-dbh model
+    QD0<-params$sd[5,4]
+    for (i in (1:n)) {
+      if(is.na(tree.list$HT[i])) {
+        tree.list$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.list$DBH[i]),4)
+      }
+    }
+    
     #if (is.na(area) ){ stop('Plot area must be provided') }
     #CF <- 10000 / area  # Correction factor
     #baind <- as.numeric(pi*(tree.list$DBH/2)^2/10000)  # Units: m2
@@ -270,6 +279,9 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
   }
 
+  # Need to add compatibility between tree and stand
+  
+  
   # Special calculations if the input is in form stand_simulation
   # (if the stand_simulation exists)
   # Probably needs to be before to avoid some errors

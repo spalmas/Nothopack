@@ -25,6 +25,12 @@
 #' core.stand<-core_module(input=plot$input)
 #' stand_simulator(core.stand=core.stand$input)
 #' stand_simulator(core.stand=core.stand$input)
+#' 
+#' #Example 3. Starting from known stand-level data
+#' plot<- read.csv(file= 'data/Plot_example.csv')
+#' head(plot)
+#' tree<-inputmodule(type='stand',zone=2,AD=28,HD=15.5,area=500,AF=35,tree.list=plot)
+#' stand_simulator(core.stand=tree$input)
 
 stand_simulator <- function(core.stand = NULL){
 

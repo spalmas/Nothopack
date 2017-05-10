@@ -129,13 +129,13 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     }
 
     # Completing heights using parametrized height-dbh model
-    QD0<-params$sd[5,4]
-    n<-nrow(tree.list)
-    for (i in (1:n)) {
-      if(is.na(tree.list$HT[i])) {
-        tree.list$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.list$DBH[i]),4)
-      }
-    }
+    #QD0<-params$sd[5,4]
+    #n<-nrow(tree.list)
+    #for (i in (1:n)) {
+    #  if(is.na(tree.list$HT[i])) {
+    #    tree.list$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.list$DBH[i]),4)
+    #  }
+    #}
 
     # Ouput tree-list database
     FT<-rep(1,length(tree.list$ID))* (10000/area)

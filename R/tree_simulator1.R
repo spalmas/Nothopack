@@ -20,17 +20,19 @@
 #' @examples
 #' plot<- read.csv(file= 'data/Plot_example.csv')
 #' head(plot)
-#' tree<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,AF=35,tree.list=plot)
+#' tree<-inputmodule(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=35,tree.list=plot)
 #' attributes(tree) 
 #' head(tree$tree.list) 
-#' tree$sp.table
 #' core.tree<-core_module(input=tree$input)
+#' core.tree$sp.table
+#' head(core.tree$tree.list)
 #' sim.tree<-tree_simulator(core.tree=core.tree$input)
 #' attributes(sim.tree)
-#' head(sim.tree$input) 
+#' head(sim.tree$input) ###
 #' result.tree<-core_module(input=sim.tree$input)
 #' result.tree$sp.table
 #' result.tree$stand.table[5,,]
+#' head(result.tree$tree.list)
 
 tree_simulator <- function(core.tree = NULL){
   
@@ -115,11 +117,28 @@ tree_simulator <- function(core.tree = NULL){
       SSp<-data.temp$Ss
     }
     plot.proy<-data.frame(data.temp,HT,Fap,Ap,DAp)
-   
+    
+    # Height Increment Module
+    HT0<-HT
+    m<-length(HT0)
+    HTparam.0 <- matrix(data=0,nrow=m,ncol=1)
+    HTparam.n <- matrix(data=0,nrow=m,ncol=1)
+    Dif.HT <- matrix(data=0,nrow=m,ncol=1)
+    HDp<-get_site(dom_sp=DOM.SP, zone=zone, AD=DAp[1], SI=SI)
+    
+    for (i in (1:m)) {
+      HTparam.0[i]<-height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=data.proy$QD[1], DBH=DBH[i])
+      HTparam.n[i]<-height_param(dom_sp=DOM.SP, zone=zone, HD=HDp, QD=QDp[1], DBH=DBHp[i])
+      Dif.HT[i]<-HTparam.n[i]-HTparam.0[i]
+      if (Dif.HT[i]<=0) {Dif.HT[i]=0}
+    }
+    HTn<-HT0+Dif.HT
+    #print(data.frame(HT0,HTparam.0,HTparam.n,HTn,Dif.HT))
+
     #obtaining tree.list
-    treedata<-data.frame(plot.proy$ID, plot.proy$sp, round(plot.proy$DBH,2),round(plot.proy$HT,2),round(plot.proy$Ss,1),round(plot.proy$Fap,3))
+    treedata<-data.frame(plot.proy$ID, plot.proy$sp, round(plot.proy$DBH,2),round(HTn,2),round(plot.proy$Ss,1),round(plot.proy$Fap,3))
     colnames(treedata)<-c('ID','SPECIES','DBH','HT','SS','FT')
-    input <- list(tree.list=treedata, zone=zone, DOM.SP=DOM.SP, AD=DAp, SI=SI, 
+    input <- list(tree.list=treedata, zone=zone, DOM.SP=DOM.SP, AD=DAp[1], SI=SI, HD=HD,
                        SDI=unique(SDIp), area=area,type='tree')
     
     return(list(input=input))
