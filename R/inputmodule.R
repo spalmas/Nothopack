@@ -114,7 +114,8 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     # Getting stand level parms from tree-list
     plotdata<-data.frame(tree.list$SPECIE, tree.list$DBH, tree.list$HT, tree.list$FT)
     colnames(plotdata)<-c('SPECIES','DBH','HT','FT')
-    params<-stand_parameters1(plotdata=plotdata)
+    plotdata$FT<-plotdata$FT* (10000/area)
+    params<-stand_parameters1(plotdata=plotdata,area=area)
 
     DOM.SP<-get_domsp(BA=params$sd[1:4,3])
     if (is.na(AD)){
@@ -137,10 +138,10 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     }
 
     # Ouput tree-list database
-    FT<-rep(1,length(tree.list$ID))
+    FT<-rep(1,length(tree.list$ID))* (10000/area)
     tree.list<-data.frame(tree.list$ID, tree.list$SPECIE, tree.list$DBH,
                           round(tree.list$HT,3), tree.list$SS, FT)
-    colnames(tree.list)<-c('ID','SPECIE','DBH','HT','SS','FT')
+    colnames(tree.list)<-c('ID','SPECIES','DBH','HT','SS','FT')
 
     # Collecting final stand parameters
     sdmatrix <- params$sd

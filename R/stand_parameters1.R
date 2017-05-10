@@ -19,8 +19,8 @@
 #' head(simplot)
 #' stand_parameters(plotdata=simplot, area=1000)
 
-stand_parameters1 <- function(plotdata=NA){
-  
+stand_parameters1 <- function(plotdata=NA,area=area){
+  CF <- 10000 / area  # Correction factor
   
   # Number of trees by SPECIES and total
   N1 <- sum(plotdata$FT[plotdata$SPECIES == 1], na.rm = TRUE)    # Rauli
@@ -32,6 +32,7 @@ stand_parameters1 <- function(plotdata=NA){
   # Basal area by SPECIES and total
   plotdata$baind <- as.numeric(pi * (plotdata$DBH/2)^2 / 10000 )  # Units: m2
   plotdata$BAind <- plotdata$baind * plotdata$FT
+  BAind<-plotdata$BAind
   BA1 <- sum(plotdata$BAind[plotdata$SPECIES == 1], na.rm = TRUE)
   BA2 <- sum(plotdata$BAind[plotdata$SPECIES == 2], na.rm = TRUE)
   BA3 <- sum(plotdata$BAind[plotdata$SPECIES == 3], na.rm = TRUE)
@@ -47,7 +48,7 @@ stand_parameters1 <- function(plotdata=NA){
   
   # Dominant Height - 100 trees with largest DBH
   # (this is for any of the SPECIES, not only dominant sp)
-  N.HD <- 100/CF   # Number of trees to consider for HD
+  N.HD <- area/100   # Number of trees to consider for HD
   HT.HD <- plotdata[order(plotdata$DBH,decreasing=TRUE),3]
   HDcalc <- matrix(data=0,nrow=nrow(plotdata),ncol=3)  # As long as trees in stand
   nt <- 0
@@ -79,7 +80,7 @@ stand_parameters1 <- function(plotdata=NA){
   sdmatrix <- data.frame(cbind(v1,v2,v3,v4))
   names(sdmatrix) <- c('SPECIES','N','BA','QD')
   
-  return(list(sd=sdmatrix, DOM.SP=DOM.SP, HD=HD,PBAN=PBAN, PNHAN=PNHAN))
+  return(list(sd=sdmatrix, DOM.SP=DOM.SP, HD=HD,PBAN=PBAN, PNHAN=PNHAN, BAind=BAind))
 }
 
 #       - Change Otras DOM.SP to 9 to stop the process.

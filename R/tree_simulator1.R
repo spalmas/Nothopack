@@ -27,8 +27,10 @@
 #' core.tree<-core_module(input=tree$input)
 #' sim.tree<-tree_simulator(core.tree=core.tree$input)
 #' attributes(sim.tree)
-#' head(sim.tree$tree.list) 
-
+#' head(sim.tree$input) 
+#' result.tree<-core_module(input=sim.tree$input)
+#' result.tree$sp.table
+#' result.tree$stand.table[5,,]
 
 tree_simulator <- function(core.tree = NULL){
   
@@ -39,11 +41,11 @@ tree_simulator <- function(core.tree = NULL){
   HT<-core.tree$tree.list[,4]
   Ss<-core.tree$tree.list[,5]
   FT<-core.tree$tree.list[,6]
-  Factor<-10000/core.tree$area
-  Fa<-FT*Factor
-  ZONA<-FT*core.tree$zone
-  A<-FT*core.tree$AD
-  DA<-FT*core.tree$AD
+  FTv<-rep(1,length(ID))
+  Fa<-FT
+  ZONA<-FTv*core.tree$zone
+  A<-FTv*core.tree$AD
+  DA<-FTv*core.tree$AD
   ADF<-core.tree$AF
   AD<-core.tree$AD
   AIDBH_model<-core.tree$IADBH_model
@@ -117,8 +119,9 @@ tree_simulator <- function(core.tree = NULL){
     #obtaining tree.list
     treedata<-data.frame(plot.proy$ID, plot.proy$sp, round(plot.proy$DBH,2),round(plot.proy$HT,2),round(plot.proy$Ss,1),round(plot.proy$Fap,3))
     colnames(treedata)<-c('ID','SPECIES','DBH','HT','SS','FT')
+    input <- list(tree.list=treedata, zone=zone, DOM.SP=DOM.SP, AD=DAp, SI=SI, 
+                       SDI=unique(SDIp), area=area,type='tree')
     
-    return(list(tree.list=treedata, zone=zone, DOM.SP=DOM.SP, AD=DAp, SI=SI, 
-                SDI=unique(SDIp), AF=DA, area=area))
+    return(list(input=input))
 }
 

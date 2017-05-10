@@ -56,7 +56,7 @@
 #' plot2<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=plot2)
 #' plot2$sp.table
 #' head(plot2$tree.list)
-#' core.tree<-core_module(input=plot2$input)
+#' core.tree<-core_module(input=plot2$input, type='tree')
 #' core.tree$sp.table
 #' core.tree$stand.table[5,,]
 
@@ -155,28 +155,34 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
   }
 
   if (type=='tree'){   # tree.list is provided
-
+    
+    params<-stand_parameters1(plotdata=tree.list, area=area)
+    # Collecting final stand parameters
+    sp.table <- params$sd
+    PBAN <- sum(sp.table[1:3,3])/sum(sp.table[1:4,3])
+    PNHAN <- sum(sp.table[1:3,2])/sum(sp.table[1:4,2])
+    
     n <- length(tree.list$ID)
     vind <- matrix(NA,nrow=n)
 
-    if (is.na(area) ){ stop('Plot area must be provided') }
-    CF <- 10000 / area  # Correction factor
-    baind <- as.numeric(pi*(tree.list$DBH/2)^2/10000)  # Units: m2
+    #if (is.na(area) ){ stop('Plot area must be provided') }
+    #CF <- 10000 / area  # Correction factor
+    #baind <- as.numeric(pi*(tree.list$DBH/2)^2/10000)  # Units: m2
     for (i in 1:n) {
-      if (tree.list$SPECIE[i]==4) { SP<-DOM.SP
-      } else { SP<-tree.list$SPECIE[i] }
+      if (tree.list$SPECIES[i]==4) { SP<-DOM.SP
+      } else { SP<-tree.list$SPECIES[i] }
       vind[i] <- Vmodule_individual(SPECIES=SP, zone=zone, DBH=tree.list$DBH[i],
                                         HT=tree.list$HT[i], blength=tree.list$HT[i])
     }
     Dclass <- ceiling(tree.list$DBH/5)*5-2.5
-    N <- CF*tree.list$FT
-    BA <- N*baind
+    N <- tree.list$FT
+    BA <- params$BAind
     VT <- N*vind
-    tree.list<-data.frame(tree.list,N,BA,VT,Dclass)
-    HT.agg<-aggregate(HT~Dclass+SPECIE,FUN=mean,data=tree.list)
-    N.agg<-aggregate(N~Dclass+SPECIE,FUN=sum,data=tree.list)
-    BA.agg<-aggregate(BA~Dclass+SPECIE,FUN=sum,data=tree.list)
-    VT.agg<-aggregate(VT~Dclass+SPECIE,FUN=sum,data=tree.list)
+    tree.list<-data.frame(tree.list,BA,VT,Dclass)
+    HT.agg<-aggregate(HT~Dclass+SPECIES,FUN=mean,data=tree.list)
+    N.agg<-aggregate(N~Dclass+SPECIES,FUN=sum,data=tree.list)
+    BA.agg<-aggregate(BA~Dclass+SPECIES,FUN=sum,data=tree.list)
+    VT.agg<-aggregate(VT~Dclass+SPECIES,FUN=sum,data=tree.list)
     data.agg<-data.frame(HT.agg,N.agg[3],BA.agg[3],VT.agg[3])
 
     class <- 5
@@ -200,13 +206,13 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     DDist<-array(data=NA, dim=c(5,(length(diam)-1),7),
                  dimnames=list(c(1:5),c(1:(length(diam)-1)),r_names))
 
-    data.agg1<-data.agg[which(data.agg$SPECIE==1),]
+    data.agg1<-data.agg[which(data.agg$SPECIES==1),]
     Dclass1<-merge(head,data.agg1,by="Dclass",all=TRUE)
-    data.agg2<-data.agg[which(data.agg$SPECIE==2),]
+    data.agg2<-data.agg[which(data.agg$SPECIES==2),]
     Dclass2<-merge(head,data.agg2,by="Dclass",all=TRUE)
-    data.agg3<-data.agg[which(data.agg$SPECIE==3),]
+    data.agg3<-data.agg[which(data.agg$SPECIES==3),]
     Dclass3<-merge(head,data.agg3,by="Dclass",all=TRUE)
-    data.agg4<-data.agg[which(data.agg$SPECIE==4),]
+    data.agg4<-data.agg[which(data.agg$SPECIES==4),]
     Dclass4<-merge(head,data.agg4,by="Dclass",all=TRUE)
 
     Dclass1<-data.frame(head,HT=round(Dclass1[,5],2),N=round(Dclass1[,6],2),BA=round(Dclass1[,7],2),VT=round(Dclass1[,8],3))

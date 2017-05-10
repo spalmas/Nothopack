@@ -27,7 +27,7 @@ covariates<-function(ID=NA,Fa=NA,sp=NA,DBH=NA,ZONA=NA,Ss=NA){
   #require(dplyr)
   N <- length(ID)#Getting the number of trees in the plot
   NHA <- sum(Fa) #Getting the number of trees in the stand by hectare
-  BA =  sum(pi * (DBH/2/100)^2, na.rm = TRUE) * Fa #total basal area by hectare
+  BA =  sum(pi * (DBH/2/100)^2* Fa , na.rm = TRUE) #total basal area by hectare
   QD <-  (100*((4/pi)*(BA/NHA))^0.5)#total quadratic diameter,
   SDI<-NHA*((25.4/QD)^(-1.4112))#Stand density index
   SPZONA<-sp*10+ZONA
