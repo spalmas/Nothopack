@@ -16,7 +16,7 @@ shinyApp(
                    tabPanel("Tab 1",
                             h4("Table"),
                             tableOutput("table"),
-                            h4("Verbatim text output"),
+                            h4("Text try 1 "),
                             verbatimTextOutput("txtout"),
                             h1("Header 1"),
                             h2("Header 2"),
