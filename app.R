@@ -1,19 +1,15 @@
 shinyApp(
   ui = tagList(
-    shinythemes::themeSelector(),
     navbarPage(
-      # theme = "cerulean",  # <--- To use a theme, uncomment this
-      "shinythemes",
-      tabPanel("Navbar 1",
+      theme = "darkly",  # <--- To use a theme, uncomment this
+      "Nothofagus Simulator",
+      tabPanel("Simulator",
                sidebarPanel(
+                 h3("Input parameters"),
                  fileInput("file", "File input:"),
                  textInput("txt", "Text input:", "general"),
                  sliderInput("slider", "Slider input:", 1, 100, 30),
-                 tags$h5("Deafult actionButton:"),
-                 actionButton("action", "Search"),
-
-                 tags$h5("actionButton with CSS class:"),
-                 actionButton("action2", "Action button", class = "btn-primary")
+                 actionButton(inputId = "action2",label =  "Action button", class = "btn-primary")
                ),
                mainPanel(
                  tabsetPanel(
@@ -28,15 +24,15 @@ shinyApp(
                             h4("Header 4"),
                             h5("Header 5")
                    ),
-                   tabPanel("Tab 2"),
-                   tabPanel("Tab 3")
+                   tabPanel("Results")
                  )
                )
       ),
-      tabPanel("Navbar 2"),
-      tabPanel("Navbar 3")
+      tabPanel("Advanced"),
+      tabPanel("Contact")
     )
   ),
+
   server = function(input, output) {
     output$txtout <- renderText({
       paste(input$txt, input$slider, format(input$date), sep = ", ")
