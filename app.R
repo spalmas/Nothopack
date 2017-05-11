@@ -13,7 +13,7 @@ shinyApp(
                ),
                mainPanel(
                  tabsetPanel(
-                   tabPanel("Tab 1",
+                   tabPanel("Results",
                             h4("Table"),
                             tableOutput("table"),
                             h4("Text try 1 "),
@@ -24,7 +24,9 @@ shinyApp(
                             h4("Header 4"),
                             h5("Header 5")
                    ),
-                   tabPanel("Results")
+                   tabPanel("Rauli"),
+                   tabPanel("Roble"),
+                   tabPanel("Coigue")
                  )
                )
       ),
