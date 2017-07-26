@@ -23,8 +23,8 @@
 #'
 #' @examples
 #' # Example: Generation of distribution from stand-level input data
-#' BA<-c(36.5,2.8,0,2.4)
-#' N<-c(464,23,0,48)
+#' BA<-c(36.5,2.8,1.6,2.4)
+#' N<-c(464,23,16,48)
 #' plot<-inputmodule(type='stand',zone=2,AD=28,HD=23.5,N=N,BA=BA)
 #' Dd<-diam_dist(sp.table=plot$sp.table, HD=plot$HD,  
 #'               DOM.SP=plot$DOM.SP, zone=plot$zone)
@@ -81,6 +81,8 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
   b1_C_4 <-  0.29765454
   b2_C_4 <- -0.22722466
 
+  # Recover of diameter distribution parameters by species
+
   # Rauli
   B1 <- b0_B_1 + b1_B_1*vQD[1] + b2_B_1*PNHAN + b3_B_1/BA
   C1 <- b0_C_1 + b1_C_1*B1 + b2_C_1*vQD[1]
@@ -94,7 +96,7 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
   # Others
   B4 <- b0_B_4 + b1_B_4*vQD[4] + b2_B_4*NHAN
   C4 <- b0_C_4 + b1_C_4*B4 + b2_C_4*vQD[4]
-  
+
   # Calculation of the probability of NHA per diameter class, from 5 to 80 cm
 
   DBH_LL <- matrix(data=0,nrow=0,ncol=1)
@@ -112,8 +114,6 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
   Hclass4 <- matrix(data=0,nrow=0,ncol=1)
   Hclass5 <- matrix(data=0,nrow=0,ncol=1)
   
-  # Recover of diameter distribution parameters by species
-
   maxD <- 90/class
   diam <- seq(from=5,to=90,by=class)   # Diameter classes
 
@@ -132,30 +132,19 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
     if (Hclass3[j]<1.3) { Hclass3[j]<-1.3 }
     if (Hclass4[j]<1.3) { Hclass4[j]<-1.3 }
     
-    if (vNHA[1]==0) { 
-      Prob1[j]=0
-      Hclass1[j]=0
+    if (vNHA[1]==0) { Prob1[j]=0 
     } else { Prob1[j] <- exp(-((diam[j] - A)/B1)^C1) - exp(-((diam[j+1] - A)/B1)^C1) }
-    
-    if (vNHA[2]==0) { 
-      Prob2[j]=0 
-      Hclass2[j]=0
+    if (vNHA[2]==0) { Prob2[j]=0 
     } else { Prob2[j] <- exp(-((diam[j] - A)/B2)^C2) - exp(-((diam[j+1] - A)/B2)^C2) }
-    
-    if (vNHA[3]==0) { 
-      Prob3[j]=0 
-      Hclass3[j]=0
+    if (vNHA[3]==0) { Prob3[j]=0 
     } else { Prob3[j] <- exp(-((diam[j] - A)/B3)^C3) - exp(-((diam[j+1] - A)/B3)^C3) }
-    
-    if (vNHA[4]==0) { 
-      Prob4[j]=0 
-      Hclass4[j]=0
+    if (vNHA[4]==0) { Prob4[j]=0 
     } else { Prob4[j] <- exp(-((diam[j] - A)/B4)^C4) - exp(-((diam[j+1] - A)/B4)^C4) }
-    
-    if (is.na(Prob1[j])) {Prob1[j] = 0}
-    if (is.na(Prob2[j])) {Prob2[j] = 0}
-    if (is.na(Prob3[j])) {Prob3[j] = 0}
-    if (is.na(Prob4[j])) {Prob4[j] = 0}
+     
+    if (is.na(Prob1[j])) {Prob1[j] <- 0}
+    if (is.na(Prob2[j])) {Prob2[j] <- 0}
+    if (is.na(Prob3[j])) {Prob3[j] <- 0}
+    if (is.na(Prob4[j])) {Prob4[j] <- 0}
   }
 
   N.sp1 <- round(vNHA[1]*Prob1,2)
@@ -163,29 +152,16 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
   N.sp3 <- round(vNHA[3]*Prob3,2)
   N.sp4 <- round(vNHA[4]*Prob4,2)
   N.total <- N.sp1 + N.sp2 + N.sp3 + N.sp4 
-  
+
   # Adjusting N.total with NHA
-  if (vNHA[1]==0) { K1=0
-  } else { 
-    K1 <- sum(N.sp1)/vNHA[1]
-    N.sp1 <- round(N.sp1/K1,2)
-  }
-  if (vNHA[2]==0) { K2=0
-  } else { 
-    K2 <- sum(N.sp2)/vNHA[2] 
-    N.sp2 <- round(N.sp2/K2,2)
-  }
-  if (vNHA[3]==0) { K3=0
-  } else { 
-    K3 <- sum(N.sp3)/vNHA[3] 
-    N.sp3 <- round(N.sp3/K3,2)
-  }
-  if (vNHA[4]==0) { K4=0
-  } else { 
-    K4 <- sum(N.sp4)/vNHA[4] 
-    N.sp4 <- round(N.sp4/K4,2)
-  }
-  
+  K1 <- sum(N.sp1)/vNHA[1]
+  K2 <- sum(N.sp2)/vNHA[2]
+  K3 <- sum(N.sp3)/vNHA[3]
+  K4 <- sum(N.sp4)/vNHA[4]
+  N.sp1 <- round(N.sp1/K1,2)
+  N.sp2 <- round(N.sp2/K2,2)
+  N.sp3 <- round(N.sp3/K3,2)
+  N.sp4 <- round(N.sp4/K4,2)
   N.total <- N.sp1 + N.sp2 + N.sp3 + N.sp4 
 
   BA.sp1 <- round(BAclass*N.sp1/(100^2),2)  # cm2/ha
@@ -195,51 +171,21 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
   BA.total <- BA.sp1 + BA.sp2 + BA.sp3 + BA.sp4 
   
   # Adjusting BA.total with BA
-  if (vBA[1]==0) { K1=0
-  } else { 
-    K1 <- sum(BA.sp1)/vBA[1]
-    BA.sp1 <- round(BA.sp1/K1,2)
-  }
-  if (vBA[2]==0) { K2=0
-  } else { 
-    K2 <- sum(BA.sp2)/vBA[2] 
-    BA.sp2 <- round(BA.sp2/K2,2)
-  }
-  if (vBA[3]==0) { K3=0
-  } else { 
-    K3 <- sum(BA.sp3)/vBA[3] 
-    BA.sp3 <- round(BA.sp3/K3,2)
-  }
-  if (vBA[4]==0) { K4=0
-  } else { 
-    K4 <- sum(BA.sp4)/vBA[4] 
-    BA.sp4 <- round(BA.sp4/K4,2)
-  }
-  
+  K1 <- sum(BA.sp1)/vBA[1]
+  K2 <- sum(BA.sp2)/vBA[2]
+  K3 <- sum(BA.sp3)/vBA[3]
+  K4 <- sum(BA.sp4)/vBA[4]
+  BA.sp1 <- round(BA.sp1/K1,2)
+  BA.sp2 <- round(BA.sp2/K2,2)
+  BA.sp3 <- round(BA.sp3/K3,2)
+  BA.sp4 <- round(BA.sp4/K4,2)
   BA.total <- BA.sp1 + BA.sp2 + BA.sp3 + BA.sp4 
 
-  # Adjusting heights
-  
-  # Observed HD from estimated Hclass (for any specie using Hclass5)
-  Hclass5 <- (Hclass1*N.sp1 + Hclass2*N.sp2 + Hclass3*N.sp3 + Hclass4*N.sp4)/(N.total)
-  Temp.Prod <- Hclass5*N.total
-  Temp.Sum <- 0
-  Ncount <- 0
-  for (j in (length(diam)-1):1){
-    Ncount <- Ncount + N.total[j]
-    if (Ncount > 100) {
-      Htemp <- (Temp.Sum+(Hclass5[j]*(100-(Ncount-N.total[j]))))/100
-      break
-    } else { 
-      Temp.Sum <- Temp.Sum + Temp.Prod[j]
-    }
-  }
-
-  K <- HD/Htemp
-  Hclass1 <- round(K*Hclass1,2)
-  Hclass2 <- round(K*Hclass2,2)
-  Hclass3 <- round(K*Hclass3,2)
-  Hclass4 <- round(K*Hclass4,2)
+  # Generating heights
+  Hclass1 <- round(Hclass1,2)
+  Hclass2 <- round(Hclass2,2)
+  Hclass3 <- round(Hclass3,2)
+  Hclass4 <- round(Hclass4,2)
   
   Hclass5 <- (Hclass1*N.sp1 + Hclass2*N.sp2 + Hclass3*N.sp3 + Hclass4*N.sp4)/(N.total)
   Hclass5 <- round(Hclass5,2)
