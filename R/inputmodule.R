@@ -85,6 +85,11 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     }
 
     DOM.SP<-get_domsp(BA=BA[1:4])
+    if (DOM.SP==99) { warning("This stand is not dominated by Nothofagus",call. = FALSE)
+      #stop("This stand is not dominated by Nothofagus",call.= TRUE)
+      return()
+      }
+    
     if (is.na(AD)){
       (AD<-get_site(dom_sp=DOM.SP, zone=zone, HD=HD, SI=SI))
     }
