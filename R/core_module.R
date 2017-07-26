@@ -39,8 +39,8 @@
 #'
 #' @examples
 #' # Example 1: Input from stand-level data
-#' BA<-c(36.5,2.8,1.6,2.4)
-#' N<-c(464,23,16,48)
+#' BA<-c(36.5,2.8,0.0,2.4)
+#' N<-c(464,23,0,48)
 #' plot<-inputmodule(type='stand',zone=1,AD=28,AF=40,HD=23.5,N=N,BA=BA,V_model=2,ddiam=FALSE)
 #' # Without generation of stand-table
 #' core.stand<-core_module(input=plot$input)

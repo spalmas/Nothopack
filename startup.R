@@ -3,6 +3,8 @@ rm(list=ls()) # It removes ALL objects
 library(dplyr)
 library(grid)
 library(gridExtra)
+library(tidyverse)
+library(knitr)
 
 source('R/AIDBH_module.R')
 source('R/BAmodule.R')
@@ -32,6 +34,7 @@ source('R/Vmodule.R')
 source('R/Vmodule_individual.R')
 source('R/inputmodule.R')
 source('R/core_module.R')
+
 
 hd_coef      <- read.csv(file = 'data/hd_coef.csv')
 hparam_coef  <- read.csv(file = 'data/hparam_coef.csv')
