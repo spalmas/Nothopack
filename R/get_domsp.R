@@ -13,7 +13,8 @@
 #'
 #' @examples
 #' # Example
-#' BA<-c(36.5,12.8,1.6,2.4)
+#' DOM.SP<-0
+#' BA<-c(46.5,52.8,71.6,2.4)
 #' (DOM.SP<-get_domsp(BA))
 
 get_domsp <- function(BA=NA){
@@ -25,7 +26,8 @@ get_domsp <- function(BA=NA){
   PBA3 <- BA[3]/BA0   # Coigue
   PBA99 <- BA[4]/BA0   # Others  
   PBAN <- sum(BA[1:3])/BA0   # Proportion BA for all Nothofagus
-
+  Proportion<-c(PBA1,PBA2,PBA3)
+  
   # Obtaining dominant SPECIES.
   if (PBAN < 0.6 ){    # If BA Nothodagus represent less than 60% of the stand
     DOM.SP <- 99  # Others besides Nothofagus
@@ -37,8 +39,9 @@ get_domsp <- function(BA=NA){
     } else if (PBA3 >= 0.7){
       DOM.SP <- 3  # Coigue
     } else {
-      DOM.SP <- 4  # Mixed Nothofagus
-    }
+      POS.MAX  = which(order(Proportion,decreasing = TRUE)==1)[1]  #Position of the bigest condition
+      DOM.SP <- POS.MAX
+      }
   }
   
   return(DOM.SP)
