@@ -121,6 +121,23 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     colnames(plotdata)<-c('SPECIES','DBH','HT','FT')
     plotdata$FT<-plotdata$FT* (10000/area)
     params<-stand_parameters1(plotdata=plotdata,area=area)
+    
+    # ## Getting Individual heigths by linear regression
+    # # Linear Regression
+    # # model log(ht)=b0+b1/dbh
+    # plotdata$x<-1/plotdata$DBH
+    # plotdata$y<-log(plotdata$HT)
+    # modelo<-lm(y~x,data=plotdata)
+    # modelo
+    # plotdata$hest<-exp(modelo$coefficients[1]-modelo$coefficients[2]/plotdata$DBH)
+    # plotdata$htfin<-plotdata$HT
+    # 
+    # for (i in 1:(length(plotdata$HT))) {
+    #   if(is.na(plotdata$HT[i])) {
+    #     plotdata$htfin[i]<-plotdata$hest[i]
+    #   }
+    # }
+    # plotdata$HT<-plotdata$htfin
 
     DOM.SP<-get_domsp(BA=params$sd[1:4,3])
     if (is.na(AD)){
@@ -134,13 +151,13 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     }
 
     # Completing heights using parametrized height-dbh model
-    #QD0<-params$sd[5,4]
-    #n<-nrow(tree.list)
-    #for (i in (1:n)) {
-    #  if(is.na(tree.list$HT[i])) {
-    #    tree.list$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.list$DBH[i]),4)
-    #  }
-    #}
+    QD0<-params$sd[5,4]
+    n<-nrow(tree.list)
+    for (i in (1:n)) {
+     if(is.na(tree.list$HT[i])) {
+       tree.list$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.list$DBH[i]),4)
+     }
+    }
 
     # Ouput tree-list database
     FT<-rep(1,length(tree.list$ID))* (10000/area)
