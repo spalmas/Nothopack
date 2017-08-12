@@ -1,4 +1,6 @@
 #---------------IMPORTING PACKAGES----------------
+library(grid)     #For app
+library(gridExtra)     #For app
 library(shiny)     #For app
 library(tidyverse) #for data management
 
