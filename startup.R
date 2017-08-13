@@ -28,7 +28,7 @@ source('R/get_domsp.R')
 source('R/hd_coef.R')
 source('R/height_param.R')
 source('R/hparam_coef.R')
-source('R/Nmodule.R')
+source('R/NHAmodule.R')
 source('R/RECRUITmodule.R')
 source('R/report.R')
 source('R/report_plots.R')  #For multiplot of simulation results
