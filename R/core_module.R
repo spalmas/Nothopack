@@ -27,6 +27,8 @@
 #' @param ddiam Logical for requesting generation of diameter distribution (default=FALSE)
 #' @param comp Logical for requesting compatibility between stand- and tree-level simulations (default=FALSE)
 #' @param input List created by inputmodule, that is used to pass the variables as a list
+#' @param NHA_model
+#' @param V_model
 #' @param stand_simulation XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 #'
 #' @return A series of elements and parameters with updated tables (adding volume). The main output elmenets are:
@@ -34,7 +36,7 @@
 #'                 stand.tbale data feame with the complete stand table by specie in classes of 5 cm.
 #'                 tree.list   data frame with complete tree list
 #'                 input       list with all parameters of input and stand level statistics
-#'                             (zone, DOM.SP, AD, HD, SI, SDI, PBAN, PNHAN, AF, area, type, ddiam, comp, N_model,
+#'                             (zone, DOM.SP, AD, HD, SI, SDI, PBAN, PNHAN, AF, area, type, ddiam, comp, NHA_model,
 #'                             V_model,IADBH_model,start_time)
 #'
 #' @examples
@@ -64,7 +66,7 @@
 core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                         SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0,
                         type='stand', ddiam=TRUE, comp = FALSE,
-                        N_model=1, V_model=1, IADBH_model=1, input=NA,
+                        NHA_model=1, V_model=1, IADBH_model=1, input=NA,
                         stand_simulation=NA){
 
 
@@ -87,7 +89,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     type <- input$type
     ddiam <- input$ddiam
     comp <- input$comp
-    N_model <- input$N_model
+    NHA_model <- input$NHA_model
     V_model <- input$V_model
     IADBH_model <- input$IADBH_model
     start_time <- input$start_time
@@ -291,12 +293,12 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
   # List that is output from here input somewhere else
   input <- list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-                area=area, type=type, ddiam=ddiam, comp=comp, N_model=N_model, V_model=V_model,
+                area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
                 IADBH_model=IADBH_model, start_time=start_time, sp.table=sp.table, stand.table=DDist, tree.list=tree.list )
 
 
   return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-              area=area, type=type, ddiam=ddiam, comp=comp, N_model=N_model, V_model=V_model,
+              area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
               IADBH_model=IADBH_model, start_time = start_time,
               sp.table=sp.table, stand.table=DDist, tree.list=tree.list, input=input))
 }

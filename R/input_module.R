@@ -1,6 +1,6 @@
 #' Module that requests input information for all stand- or tree-level current calculations or simulations
 #'
-#' \code{inputmodule} Module that requests input information for all stand- or tree-level current
+#' \code{input_module} Module that requests input information for all stand- or tree-level current
 #' calculations or simulations from the user, and completes some of the missing information that is required later.
 #'
 #' @param zone Growth zone (1, 2, 3, 4).
@@ -21,7 +21,7 @@
 #' @param ddiam Logical for requesting generation of diameter distribution (default=FALSE)
 #' @param comp Logical for requesting compatibility between stand- and tree-level simulations (default=FALSE)
 #'
-#' @return Series of data input and parameters to be required for downstream modules. Particularly core module. The main 
+#' @return Series of data input and parameters to be required for downstream modules. Particularly core module. The main
 #' output elements are: sp.table    table with stand level summary by species (1,2,3,4) and total (0)
 #'                      tree.list   data frame with complete tree list with missing values completed (e.g. HT)
 #'                      input       list with all parameters of input and stand level statistics
@@ -32,20 +32,20 @@
 #' # Example 1: Input from stand-level data
 #' BA<-c(36.5,2.8,1.6,2.4)
 #' N<-c(464,23,16,48)
-#' input<-inputmodule(type='stand',zone=2,AD=28,HD=23.5,N=N,BA=BA)
+#' input<-input_module(type='stand',zone=2,AD=28,HD=23.5,N=N,BA=BA)
 #' input
 #' input$sp.table
 #'
 #' # Example 2: Input from tree-level data (or file)
 #' plot<- read.csv(file= 'data/Plot_example.csv')
 #' head(plot)
-#' plot<-inputmodule(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=plot)
+#' plot<-input_module(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=plot)
 #' attributes(plot)
 #' head(plot$tree.list)
 #' plot$sp.table
 #' plot$input
 
-inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
+input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                         SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0,
                         type='stand', ddiam=FALSE, comp=FALSE,
                         N_model=1, V_model=1, IADBH_model=1,
@@ -89,7 +89,7 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
       #stop("This stand is not dominated by Nothofagus",call.= TRUE)
       return()
       }
-    
+
     if (is.na(AD)){
       (AD<-get_site(dom_sp=DOM.SP, zone=zone, HD=HD, SI=SI))
     }
@@ -121,7 +121,7 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     colnames(plotdata)<-c('SPECIES','DBH','HT','FT')
     plotdata$FT<-plotdata$FT* (10000/area)
     params<-stand_parameters1(plotdata=plotdata,area=area)
-    
+
     # ## Getting Individual heigths by linear regression
     # # Linear Regression
     # # model log(ht)=b0+b1/dbh
@@ -131,7 +131,7 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     # modelo
     # plotdata$hest<-exp(modelo$coefficients[1]-modelo$coefficients[2]/plotdata$DBH)
     # plotdata$htfin<-plotdata$HT
-    # 
+    #
     # for (i in 1:(length(plotdata$HT))) {
     #   if(is.na(plotdata$HT[i])) {
     #     plotdata$htfin[i]<-plotdata$hest[i]
@@ -176,13 +176,16 @@ inputmodule <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
   input <- list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
                     area=area, type=type, ddiam=ddiam, comp=comp, N_model=N_model, V_model=V_model,
                     IADBH_model=IADBH_model,start_time=start_time, sp.table=sdmatrix, tree.list=tree.list)
-  
+
   return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
               area=area, type=type, ddiam=ddiam, comp=comp, N_model=N_model, V_model=V_model,
-              start_time=start_time,
-              IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list, input=input))
+              start_time=start_time, type=type,
+              IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list))
 
 }
+
+#needs to receive whatever information from the file read in the simulator and turn it into something that
+#core_module can use. Can this be done inside the core_module? I feel that these are very similar scripts.
 
 # Note, still to decide how to complete the PS (SS, from covariates code)
 # Note, SDI needs to be checked (also, should we put SDI%, depends on DOM.SP)

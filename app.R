@@ -26,7 +26,7 @@ shinyApp(
                sidebarPanel(width = 4,
                             h3("Input parameters"),
                             fileInput("treelist", "Tree list:"),
-                            sliderInput(inputId = "sy", label = "Years of Simulation:", min = 1, max = 25, value = 20),
+                            textInput(inputId = "AF", label = "Final Age of Simulation:", value = 70),
                             selectInput(inputId = 'ZONE', label = 'Growth Zone',choices = c(1,2,3,4),selected = '1'),
                             div(style="display:inline-block",textInput(inputId="AD", label="Dominant Age", value = 0.0)),
                             div(style="display:inline-block",textInput(inputId="HD", label="Dominant Height", value = 0.5)),
@@ -34,35 +34,35 @@ shinyApp(
                             div(style="display:inline-block",textInput(inputId="BA", label="BA", value = 0.0)),
                             div(style="display:inline-block",textInput(inputId="NHA", label="NHA", value = 0.5)),
                             div(style="display:inline-block",textInput(inputId="QD", label="QD", value = 12)),
+                            div(style="display:inline-block",textInput(inputId="area", label="Area (m^2)", value = 1000)),
                             actionButton(inputId = "run",label =  "Run!", class = "btn-primary")
                ),
 
-
+               ###---
+               # ** Results panel ----
+               ###---
                mainPanel(width = 7,
                          tabsetPanel(
                            ###---
-                           # ** Main results tab ----
+                           # *** Main results tab ----
                            ###---
                            tabPanel(title = "Results",
                                     h4("Table"),
-                                    tableOutput(outputId = "Results Table"),
-                                    h4("Text try 1 "),
-                                    h1("Header 1"),
-                                    h2("Header 2"),
-                                    h3("Header 3"),
-                                    h4("Header 4"),
-                                    h5("Header 5")
+                                    tableOutput("tab.sim.result"),
+                                    h4("Results"),
+                                    plotOutput("sim.results"),
+                                    h5("Alfuna funcion")
                            ),
                            ###---
-                           # ** RAULI RESULTS TAB: ONLY OUTPUT ----
+                           # *** Rauli tab ----
                            ###---
                            tabPanel("Rauli"),
                            ###---
-                           # ** ROBLE RESULTS TAB: ONLY OUTPUT ----
+                           # *** Roble tab ----
                            ###---
                            tabPanel("Roble"),
                            ###---
-                           #          COIGUE RESULTS TAB: ONLY OUTPUT
+                           # *** Coigue tab ----
                            ###---
                            tabPanel("Coigue")
                          )
@@ -78,9 +78,11 @@ shinyApp(
                             h5("This tab allows for more control of simulation parameters.
                                For more information on each parameter see Manual")
                ),
-               mainPanel(radioButtons(inputId = "NHAmodel", label = h4("Mortality model"), choices = list("Linear model" = 1, "Non-linear model" = 2), selected = 1),
+               mainPanel(radioButtons(inputId = "NHA_model", label = "Mortality model", choices = list("Linear model" = 1, "Non-linear model" = 2), selected = 1),
                          textInput(inputId="theta", label="theta", value = 0.0005),
-                         checkboxInput(inputId = 'ddiam', label = h4('Construct diametric distribution'), value = TRUE)
+                         radioButtons(inputId = "V_model", label = "Volume model", choices = list("With PNHAN" = 1, "Without PNHAN" = 2), selected = 1),
+                         checkboxInput(inputId = 'ddiam', label = 'Construct diametric distribution', value = TRUE),
+                         checkboxInput(inputId = 'comp', label = 'Make compatibility', value = TRUE)
                )
       ),
 
@@ -106,21 +108,25 @@ shinyApp(
 
     #If there is a tree list use that, if not use the plot.example data
     if(is.na(input$treelist)){
-      core.stand <-  core_module(input = plot.example)
+      stand_table<-inputmodule(type='tree',zone=1,AD=25,area = 1000,AF=40,tree.list=plot_roble)
+      stand_table<-inputmodule(type='tree',zone=input$ZONE,AD=input$AD,area=input$area,AF=input$AF,tree.list=plot)
     } else {
-        core.stand <- core_module(input = input$treelist)
+      core.stand <- core_module(input = input$treelist)
     }
 
-    stand.sim.results  <- eventReactive(input$run,{
+    #Run simulator and store results
+    tab.sim.results  <- eventReactive(eventExpr = input$run,{
       stand_simulator(core.stand)
     })
 
-    output$txtout <- renderText({
-      paste(input$txt, input$slider, format(input$date), sep = ", ")
+    #Function for plotting tab.sim.results
+    output$plot.sim.results <- renderPlot({
+      report_plots(SIM = tab.sim.results)
     })
 
-    output$table <- renderTable({
-      head(cars, 4)
+    #Output for length of simulation
+    output$txtout <- renderText({
+      paste(input$txt, input$slider, format(input$date), sep = ", ")
     })
 
   }
