@@ -1,10 +1,17 @@
 rm(list=ls()) # It removes ALL objects
+###---
+# IMPORTING PACKAGES ----------------------
+###---
 
-library(dplyr)
+library(shiny)
 library(grid)
 library(gridExtra)
 library(tidyverse)
 library(knitr)
+
+###---
+# IMPORTING FILES ----------------------
+###---
 
 source('R/AIDBH_module.R')
 source('R/BAmodule.R')
@@ -22,9 +29,9 @@ source('R/hd_coef.R')
 source('R/height_param.R')
 source('R/hparam_coef.R')
 source('R/Nmodule.R')
-source('R/plot_results.R')
 source('R/RECRUITmodule.R')
 source('R/report.R')
+source('R/report_plots.R')  #For multiplot of simulation results
 source('R/Social_Status.R')
 source('R/stand_parameters1.R')
 source('R/stand_randomizer.R')
@@ -34,6 +41,10 @@ source('R/Vmodule.R')
 source('R/Vmodule_individual.R')
 source('R/inputmodule.R')
 source('R/core_module.R')
+
+###---
+# IMPORTING DATA ----------------------
+###---
 
 
 hd_coef      <- read.csv(file = 'data/hd_coef.csv')

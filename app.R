@@ -1,24 +1,14 @@
 ###---
-# IMPORTING PACKAGES ----------------------
-###---
-library(shiny)     #For app
-library(tidyverse) #for data management
-
-###---
-# IMPORTING SOURCE FILESAPP DEFINITION ----
+# IMPORTING PACKAGES, FUNCTIONS AND DATA ----
 ###---
 
-file.sources = list.files(path = 'R/', pattern="*.R")
-sapply(paste0('R/',file.sources), source, .GlobalEnv)
-
-plot.example <- read.csv('data/Plot_example.csv', sep = ',')
+source('startup.R')
 
 ###---
 # APP DEFINITION --------------------------
 ###---
 
 shinyApp(
-
 
   ###---
   #  *USER INTERFACE ----------------
