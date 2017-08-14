@@ -48,10 +48,9 @@ shinyApp(
                            ###---
                            tabPanel(title = "Results",
                                     h4("Table"),
-                                    tableOutput("tab.sim.result"),
-                                    h4("Results"),
-                                    plotOutput("sim.results"),
-                                    h5("Alfuna funcion")
+                                    tableOutput(outputId = "tab_sim_results")# ,
+                                    #h4("Plot"),
+                                    #plotOutput(outputId = "plot_sim_results")
                            ),
                            ###---
                            # *** Rauli tab ----
@@ -79,7 +78,7 @@ shinyApp(
                                For more information on each parameter see Manual")
                ),
                mainPanel(radioButtons(inputId = "NHA_model", label = "Mortality model", choices = list("Linear model" = 1, "Non-linear model" = 2), selected = 1),
-                         textInput(inputId="theta", label="theta", value = 0.0005),
+                         textInput(inputId="theta", label="theta parameter", value = 0.0003),
                          radioButtons(inputId = "V_model", label = "Volume model", choices = list("With PNHAN" = 1, "Without PNHAN" = 2), selected = 1),
                          checkboxInput(inputId = 'ddiam', label = 'Construct diametric distribution', value = TRUE),
                          checkboxInput(inputId = 'comp', label = 'Make compatibility', value = TRUE)
@@ -106,28 +105,58 @@ shinyApp(
 
   server <- function(input, output) {
 
-    #If there is a tree list use that, if not use the plot.example data
-    if(is.na(input$treelist)){
-      stand_table<-inputmodule(type='tree',zone=1,AD=25,area = 1000,AF=40,tree.list=plot_roble)
-      stand_table<-inputmodule(type='tree',zone=input$ZONE,AD=input$AD,area=input$area,AF=input$AF,tree.list=plot)
-    } else {
-      core.stand <- core_module(input = input$treelist)
-    }
+    #Changing to core and
+    #core.stand <- core_module(input = input$treelist)
+    tab_sim_results  <- eventReactive(eventExpr = input$run,{
 
-    #Run simulator and store results
-    tab.sim.results  <- eventReactive(eventExpr = input$run,{
-      stand_simulator(core.stand)
+      #Starting time of simulation
+      start_time <- Sys.time()   #Useful to estimate time that the simulation takes
+
+      #Path of tree file
+      infile <- input$treelist
+
+      #Reading file or usign example
+      if(!is.null(infile)){
+        #Use the treelist or stand data
+        #stand_input<-input_module(type='tree',zone=input$ZONE,AD=input$AD,area=input$area,AF=input$AF,tree.list=plot)
+      } else {
+        #From plot_example. needs the details of the plot_example
+        stand_input<-input_module(N=stand_example$N,BA=stand_example$BA,
+                                  zone=2,AD=28,HD=15.5,AF=35)
+        #stand_input <- input_module(type='tree',zone=1,AD=20,area=500,AF=40,tree.list=plot_example)
+      }
+
+      #changing to core
+      core_stand <- core_module(input = stand_input)
+
+      #Run simulator and store results
+      tab_sim_results <- stand_simulator(core_stand)$results
+
+      #End time of simulation
+      processing_time <- start_time - Sys.time()   #Useful to estimate time that the simulation takes
+
+
+      return(tab_sim_results)
+
     })
+
+    ###---
+    # *Output functions ----
+    ###---
+    #Function for plotting tab.sim.results
+    output$tab_sim_results <- renderTable({ tab_sim_results() })
 
     #Function for plotting tab.sim.results
-    output$plot.sim.results <- renderPlot({
-      report_plots(SIM = tab.sim.results)
+    output$plot_sim_results <- renderPlot({
+      report_plots(SIM = tab_sim_results())
     })
+
 
     #Output for length of simulation
     output$txtout <- renderText({
       paste(input$txt, input$slider, format(input$date), sep = ", ")
     })
+
 
   }
 )

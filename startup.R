@@ -28,6 +28,7 @@ source('R/get_domsp.R')
 source('R/hd_coef.R')
 source('R/height_param.R')
 source('R/hparam_coef.R')
+source('R/input_module.R')
 source('R/NHAmodule.R')
 source('R/RECRUITmodule.R')
 source('R/report.R')
@@ -39,7 +40,6 @@ source('R/stand_simulator.R')     # This seems only projection
 source('R/tree_simulator1.R')    # until now only growth
 source('R/Vmodule.R')
 source('R/Vmodule_individual.R')
-source('R/inputmodule.R')
 source('R/core_module.R')
 
 ###---
@@ -51,11 +51,12 @@ hd_coef      <- read.csv(file = 'data/hd_coef.csv')
 hparam_coef  <- read.csv(file = 'data/hparam_coef.csv')
 ensayos.data <- read.csv(file = 'data/growth_ensayos.csv')
 taper_params <- read.csv(file = 'data/taper_parameters.csv')
-plot_roble   <- read.csv(file = 'data/Plot_example.csv')
+plot_example   <- read.csv(file = 'data/Plot_example.csv')
 products_setup <- read.csv(file = 'data/products_setup.csv')
+stand_example <- read.csv(file = 'data/stand_example.csv')
 
 # Name Variables
-# N, number of trees (trees/ha)
+# NHA, number of trees (trees/ha)
 # BA, basal area (m2/ha)
 # QD, quadratic diameter (cm)
 # SI, site index (m)

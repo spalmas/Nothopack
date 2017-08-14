@@ -12,20 +12,15 @@
 #'
 #' @examples
 #' #Example 1. Starting from known stand-level data
-#' BA<-c(1.09,38.92,0,0.31)
-#' N<-c(60,780,0,80)
-#' input<-inputmodule(type='stand',zone=2,AD=28,HD=15.5,N=N,BA=BA,AF=35,V_model=1)
-#' core.stand<-core_module(input = input)
-#' core.stand$sp
-#' core.stand$type
-#' stand<-stand_simulator(core.stand = core.stand)
-#' results.stand<-core_module(input = stand$input)
-#' results.stand$sp.table
+#' stand_input<-input_module(type='stand',zone=2,AD=28,HD=15.5,N=stand_example$N,BA=stand_example$BA,AF=35,V_model=1)
+#' core.stand<-core_module(input = stand_input)
+#' stand_simulator(core.stand = core.stand)
+#'
 #'
 #' #Example 2. Generating a diameter distribution  # Problems for generiting diameter distribution!!!
 #' BA<-c(1.09,38.92,0,0.31)
 #' N<-c(60,780,0,80)
-#' input<-inputmodule(type='stand',zone=2,AD=28,HD=15.5,N=N,BA=BA,AF=35,V_model=2,ddiam=TRUE)
+#' input<-input_module(type='stand',zone=2,AD=28,HD=15.5,N=N,BA=BA,AF=35,V_model=2,ddiam=TRUE)
 #' core.stand<-core_module(input = input)
 #' core.stand$sp
 #' core.stand$type
@@ -36,7 +31,7 @@
 #'
 #' #Example 3. Starting from known stand-level data
 #' head(plot_example)
-#' tree<-inputmodule(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=35,tree.list=plot_example)
+#' tree<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=35,tree.list=plot_example)
 #' core.tree<-core_module(input=tree)
 #' stand<-stand_simulator(core.stand = core.tree)
 #' results.stand<-core_module(input = stand$input)

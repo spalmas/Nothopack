@@ -48,7 +48,7 @@
 input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                         SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0,
                         type='stand', ddiam=FALSE, comp=FALSE,
-                        N_model=1, V_model=1, IADBH_model=1,
+                        NHA_model=1, V_model=1, IADBH_model=1,
                         N=NA, BA=NA, QD=NA){
 
   start_time <- Sys.time()   #Useful to estimate time that the simulation takes
@@ -58,9 +58,13 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
   # Gathering stand-level information
   if (type=='stand'){
 
+    N <- stand_example$N
+    BA <- stand_example$BA
+
     N[5]<-sum(N)
     BA[5]<-sum(BA)
-    QD[5]<-sum(QD)
+
+    QD <- 100 * sqrt(4*BA/ (pi*N))
 
     if (is.na(N[1])){
       (N[1]<-get_stand(QD=QD[1], BA=BA[1]))
@@ -174,12 +178,12 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
   # List that is output from here input somewhere else
   input <- list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-                    area=area, type=type, ddiam=ddiam, comp=comp, N_model=N_model, V_model=V_model,
-                    IADBH_model=IADBH_model,start_time=start_time, sp.table=sdmatrix, tree.list=tree.list)
+                    area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
+                    IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list)
 
   return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-              area=area, type=type, ddiam=ddiam, comp=comp, N_model=N_model, V_model=V_model,
-              start_time=start_time, type=type,
+              area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
+              type=type,
               IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list))
 
 }
