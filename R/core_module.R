@@ -43,7 +43,8 @@
 #' # Example 1: Input from stand-level data
 #' BA<-c(36.5,2.8,0.0,2.4)
 #' N<-c(464,23,0,48)
-#' plot<-inputmodule(type='stand',zone=1,AD=28,AF=40,HD=23.5,N=N,BA=BA,V_model=2,ddiam=FALSE)
+#' plot<-input_module(type='stand',zone=1,AD=28,AF=40,HD=23.5,N=N,BA=BA,V_model=2,ddiam=FALSE)
+#' plot$sp.table
 #' # Without generation of stand-table
 #' core.stand<-core_module(input=plot$input)
 #' core.stand$sp.table
@@ -55,7 +56,7 @@
 #'
 #' # Example 2: Input from tree-level data (or file)
 #' plot2<- read.csv(file= 'data/Plot_example.csv')
-#' plot2<-inputmodule(type='tree',zone=2,AD=28,HD=15.5,area=500,tree.list=plot2)
+#' plot2<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,tree.list=plot2)
 #' plot2$sp.table
 #' head(plot2$tree.list)
 #' core.tree<-core_module(input=plot2$input, type='tree')
@@ -92,6 +93,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     NHA_model <- input$NHA_model
     V_model <- input$V_model
     IADBH_model <- input$IADBH_model
+    stand_simulation <- input$stand_simulation
     start_time <- input$start_time
   }
 
@@ -103,8 +105,11 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
       # Calculating Stand-level volume (total)
       sp.table<-cbind.data.frame(sp.table,VTHA=c(1:5)*0)
-      if (V_model==1){ VTHA <- Vmodule(BA=sp.table$BA[5], HD=HD, PNHAN=PNHAN)
-      } else { VTHA <- Vmodule(BA=sp.table$BA[5], HD=HD) }
+      if (V_model==1){ 
+        VTHA <- Vmodule(BA=sp.table$BA[5], HD=HD, PNHAN=PNHAN)
+      } else {
+        VTHA <- Vmodule(BA=sp.table$BA[5], HD=HD) 
+      }
       sp.table[5,5]<-round(VTHA,3)
 
       # Assigning volume proportional to PBA
@@ -126,17 +131,18 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
       DDist<-array(data=NA, dim=c(5,m,7), dimnames=list(c(1:5),c(1:m),r_names))
       DDist[,,-7]<-stand.table
 
+      minN <- 0.1 # minimum Number of trees per diameter class to consider
       for (i in 1:m) {
-        if (stand.table[1,i,5] < 0.25){ Vi.sp1<-0
+        if (stand.table[1,i,5] < minN){ Vi.sp1<-0
         } else { Vi.sp1<-Vmodule_individual(SPECIES=1, zone=zone, DBH=stand.table[1,i,3],
                                             HT=stand.table[1,i,4], blength=stand.table[1,i,4]) }
-        if (stand.table[2,i,5] < 0.25){ Vi.sp2<-0
+        if (stand.table[2,i,5] < minN){ Vi.sp2<-0
         } else { Vi.sp2<-Vmodule_individual(SPECIES=2, zone=zone, DBH=stand.table[2,i,3],
                                             HT=stand.table[2,i,4], blength=stand.table[2,i,4]) }
-        if (stand.table[3,i,5] < 0.25){ Vi.sp3<-0
+        if (stand.table[3,i,5] < minN){ Vi.sp3<-0
         } else { Vi.sp3<-Vmodule_individual(SPECIES=3, zone=zone, DBH=stand.table[3,i,3],
                                             HT=stand.table[3,i,4], blength=stand.table[3,i,4]) }
-        if (stand.table[4,i,5] < 0.25){ Vi.sp4<-0
+        if (stand.table[4,i,5] < minN){ Vi.sp4<-0
         } else { Vi.sp4<-Vmodule_individual(SPECIES=DOM.SP, zone=zone, DBH=stand.table[4,i,3],
                                             HT=stand.table[4,i,4], blength=stand.table[4,i,4])}
         DDist[1,i,7]<-round(Vi.sp1*stand.table[1,i,5],3)

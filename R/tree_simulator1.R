@@ -52,7 +52,7 @@ tree_simulator <- function(core.tree = NULL){
   ADF<-core.tree$AF
   AD<-core.tree$AD
   AIDBH_model<-core.tree$IADBH_model
-  N_model<-core.tree$N_model
+  NHA_model<-core.tree$NHA_model
   area<-core.tree$area
   zone<-core.tree$zone
   SI<-core.tree$SI
@@ -97,7 +97,7 @@ tree_simulator <- function(core.tree = NULL){
       }
 
       #MORTALITY
-      N1<-NHAmodule(NHA0=NARBp,QD0=QDp,N_model=N_model)
+      N1<-NHAmodule(NHA0=NARBp,QD0=QDp,NHA_model=NHA_model)
       Mortality<-unique(NARBp)-N1
       BALr<-PSCALp/sum(PSCALp)
       Mi<-BALr*Mortality
@@ -142,7 +142,7 @@ tree_simulator <- function(core.tree = NULL){
 
     input <- list(zone=zone, DOM.SP=DOM.SP, AD=DAp[1], HD=HD, SI=SI, SDI=SDIp[1],
                   PBAN=core.tree$PBAN, PNHAN=core.tree$PNHAN, AF=DAp[1],
-                  area=core.tree$area, type=core.tree$type, ddiam=core.tree$ddiam, comp=core.tree$comp, N_model=core.tree$N_model,
+                  area=core.tree$area, type=core.tree$type, ddiam=core.tree$ddiam, comp=core.tree$comp, NHA_model=core.tree$NHA_model,
                   V_model=core.tree$V_model, IADBH_model=core.tree$IADBH_model, start_time=core.tree$start_time,
                   sp.table=NA, stand.table=NA, tree.list=treedata)
 

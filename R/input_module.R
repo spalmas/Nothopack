@@ -8,11 +8,9 @@
 #' @param AD Dominant age (years) of the stand.
 #' @param HD Dominant height (m) of the stand.
 #' @param SI Site index at reference dominant age of 20 (m) of the stand.
-#' @param N Vector of number of trees (trees/ha) of the stand (1: Rauli, 2: Roble, 3: Coigue, 4:Others, 0: Total)
-#' @param BA Vector of basal area (m2/ha) of the stand (1: Rauli, 2: Roble, 3: Coigue, 4:Others, 0: Total)
-#' @param QD Vector of quadratic diameters (cm) of the stand (1: Rauli, 2: Roble, 3: Coigue, 4:Others, 0: Total)
-#' @param PBAN Proportion of basal area in the stand that correspond to Nothofagus.
+#' @param sp.table 
 #' @param SDI Stand density index (trees/ha)
+#' @param PBAN Proportion of basal area in the stand that correspond to Nothofagus.
 #' @param PNHAN Proportion of number of trees per hectarea in the stand that correspond to Nothofagus.
 #' @param AF Final dominant age (years) for simulation
 #' @param tree.list Optional tree-list for a plot with columns: ID, SPECIE, DBH, HT, SS, FT)
@@ -20,13 +18,19 @@
 #' @param type Type of simulation required: stand: only stand-level, tree: only tree-level, both: both modules (default=stand)
 #' @param ddiam Logical for requesting generation of diameter distribution (default=FALSE)
 #' @param comp Logical for requesting compatibility between stand- and tree-level simulations (default=FALSE)
+#' @param NHA_model
+#' @param V_molel
+#' @param IADBH_model
+#' @param N Vector of number of trees (trees/ha) of the stand (1: Rauli, 2: Roble, 3: Coigue, 4:Others, 0: Total)
+#' @param BA Vector of basal area (m2/ha) of the stand (1: Rauli, 2: Roble, 3: Coigue, 4:Others, 0: Total)
+#' @param QD Vector of quadratic diameters (cm) of the stand (1: Rauli, 2: Roble, 3: Coigue, 4:Others, 0: Total)
 #'
-#' @return Series of data input and parameters to be required for downstream modules. Particularly core module. The main
+#'#' @return Series of data input and parameters to be required for downstream modules. Particularly core module. The main
 #' output elements are: sp.table    table with stand level summary by species (1,2,3,4) and total (0)
 #'                      tree.list   data frame with complete tree list with missing values completed (e.g. HT)
 #'                      input       list with all parameters of input and stand level statistics
-#'                                  (zone, DOM.SP, AD, HD, SI, SDI, PBAN, PNHAN, AF, area, type, ddiam, comp, N_model,
-#'                                  V_model,IADBH_model,start_time)
+#'                                  (zone, DOM.SP, AD, HD, SI, SDI, PBAN, PNHAN, AF, area, type, ddiam, comp, NHA_model,
+#'                                  V_model,type, IADBH_model, sp.table, tree.list)
 #'
 #' @examples
 #' # Example 1: Input from stand-level data
@@ -58,13 +62,8 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
   # Gathering stand-level information
   if (type=='stand'){
 
-    N <- stand_example$N
-    BA <- stand_example$BA
-
     N[5]<-sum(N)
     BA[5]<-sum(BA)
-
-    QD <- 100 * sqrt(4*BA/ (pi*N))
 
     if (is.na(N[1])){
       (N[1]<-get_stand(QD=QD[1], BA=BA[1]))
@@ -178,13 +177,13 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
   # List that is output from here input somewhere else
   input <- list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-                    area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
-                    IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list)
+                area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
+                IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list)
 
   return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
               area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
               type=type,
-              IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list))
+              IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list, input=input))
 
 }
 

@@ -162,6 +162,15 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
   N.sp2 <- round(vNHA[2]*Prob2,2)
   N.sp3 <- round(vNHA[3]*Prob3,2)
   N.sp4 <- round(vNHA[4]*Prob4,2)
+  
+  # Setting classes with 2 or less tress to zero
+  #for (j in 1:(length(diam)-1)){
+  #  if (N.sp1[j] < 0.71) {N.sp1[j] = 0}
+  #  if (N.sp2[j] < 0.71) {N.sp2[j] = 0}
+  #  if (N.sp3[j] < 0.71) {N.sp3[j] = 0}
+  #  if (N.sp4[j] < 0.71) {N.sp4[j] = 0}
+  #}
+  
   N.total <- N.sp1 + N.sp2 + N.sp3 + N.sp4 
   
   # Adjusting N.total with NHA
@@ -261,5 +270,5 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
 }
 
 # Note: - Need to check that PNHAN goes from 0 to 1, and not 0 to 100
-#'- Need to check that HD is Dominant height (m) of dominant specie in the stand
+# It will be good to set up a minimum numer of trees per class to make tail shorter...
 #' dom_sp and zone should be specified
