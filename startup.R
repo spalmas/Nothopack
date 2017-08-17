@@ -37,7 +37,7 @@ source('R/Social_Status.R')
 source('R/stand_parameters1.R')
 source('R/stand_randomizer.R')
 source('R/stand_simulator.R')     # This seems only projection
-source('R/tree_simulator1.R')    # until now only growth
+source('R/tree_simulator.R')    # until now only growth
 source('R/Vmodule.R')
 source('R/Vmodule_individual.R')
 source('R/core_module.R')

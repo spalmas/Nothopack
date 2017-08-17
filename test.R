@@ -36,8 +36,10 @@ tree<-input_module(type='tree',zone=3,AD=58.31,SI=22.91,area=500,AF=NA,tree.list
 head(tree$tree.list)
 tree$sp.table
 
+View(tree$tree.list)
 
 # No simulation - tree data
+tree$input$type<-"tree"
 tree$input$ddiam<-FALSE
 coret<-core_module(input=tree$input)
 coret$sp.table
@@ -60,6 +62,7 @@ coret$stand.table[5,,]
 coret$input$type<-'stand'
 stand<-stand_simulator(core.stand=coret)
 stand$input$type<-'stand'
+stand$input$ddiam<-TRUE
 stand$input$sp.table
 stand$results
 
@@ -79,6 +82,13 @@ head(treesim$input$tree.list)
 
 results.tree<-core_module(input=treesim$input)
 results.tree$sp.table
+results.tree$stand.table[5,,]
+
+# Compatibility (concept!)
+results.stand$input
+results.tree$input
+results.comp$input<-compatibilty_module(stand=results.stand$input,tree=results.tree$input)  
+results.comp.final<-core_module(input=reulsts.comp$input)
 
 
 ##############################
@@ -135,7 +145,7 @@ plot2$input$ddiam<-TRUE
 plot2$input$V_model<-2
 core2<-core_module(input=plot2$input)
 core2$sp.table
-core2$stand.table[2,,]
+core2$stand.table[4,,]
 
 #Option 3 - tree (ddiam from data) - Model 2
 plot2$input$type<-'tree'
@@ -152,3 +162,5 @@ core1<-core_module(input=plot2$input)
 core1$sp.table
 core1$stand.table[2,,]
 
+
+Vmodule(BA=40.31,HD=18.5,PNHAN=0.9130435)
