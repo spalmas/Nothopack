@@ -149,7 +149,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
         DDist[2,i,7]<-round(Vi.sp2*stand.table[2,i,5],3)
         DDist[3,i,7]<-round(Vi.sp3*stand.table[3,i,5],3)
         DDist[4,i,7]<-round(Vi.sp4*stand.table[4,i,5],3)
-        DDist[5,i,7]<-DDist[1,i,7]+DDist[2,i,7]+DDist[3,i,7]+DDist[3,i,7]
+        DDist[5,i,7]<-DDist[1,i,7]+DDist[2,i,7]+DDist[3,i,7]+DDist[4,i,7]
       }
 
       # Assigning volume from generated stand-table

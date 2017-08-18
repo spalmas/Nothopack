@@ -111,7 +111,7 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
   Hclass3 <- matrix(data=0,nrow=0,ncol=1)
   Hclass4 <- matrix(data=0,nrow=0,ncol=1)
   Hclass5 <- matrix(data=0,nrow=0,ncol=1)
-  
+
   # Recover of diameter distribution parameters by species
 
   maxD <- 90/class
@@ -127,6 +127,7 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
     Hclass2[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=2, zone=zone)
     Hclass3[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=3, zone=zone)
     Hclass4[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=DOM.SP, zone=zone)
+    
     if (Hclass1[j]<1.3) { Hclass1[j]<-1.3 }
     if (Hclass2[j]<1.3) { Hclass2[j]<-1.3 }
     if (Hclass3[j]<1.3) { Hclass3[j]<-1.3 }
@@ -156,73 +157,88 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
     if (is.na(Prob2[j])) {Prob2[j] = 0}
     if (is.na(Prob3[j])) {Prob3[j] = 0}
     if (is.na(Prob4[j])) {Prob4[j] = 0}
+
   }
 
-  N.sp1 <- round(vNHA[1]*Prob1,2)
-  N.sp2 <- round(vNHA[2]*Prob2,2)
-  N.sp3 <- round(vNHA[3]*Prob3,2)
-  N.sp4 <- round(vNHA[4]*Prob4,2)
+  # Adjust probabilities for truncation with p = 0.05 (p% on the upper tail is truncated)
+  p <- 0.05
+  CProb1 <- cumsum(Prob1)/(1-p)
+  CProb2 <- cumsum(Prob2)/(1-p)
+  CProb3 <- cumsum(Prob3)/(1-p)
+  CProb4 <- cumsum(Prob4)/(1-p)
   
-  # Setting classes with 2 or less tress to zero
-  #for (j in 1:(length(diam)-1)){
-  #  if (N.sp1[j] < 0.71) {N.sp1[j] = 0}
-  #  if (N.sp2[j] < 0.71) {N.sp2[j] = 0}
-  #  if (N.sp3[j] < 0.71) {N.sp3[j] = 0}
-  #  if (N.sp4[j] < 0.71) {N.sp4[j] = 0}
-  #}
+  Prob1[1] <- CProb1[1]
+  Prob2[1] <- CProb2[1]
+  Prob3[1] <- CProb3[1]
+  Prob4[1] <- CProb4[1]
   
+  for (j in 2:(length(Prob1))){
+    if (CProb1[j]>1) {CProb1[j]=1}
+    if (CProb2[j]>1) {CProb2[j]=1}
+    if (CProb3[j]>1) {CProb3[j]=1}
+    if (CProb4[j]>1) {CProb4[j]=1}
+    
+    Prob1[j] <- CProb1[j] - CProb1[j-1]
+    Prob2[j] <- CProb2[j] - CProb2[j-1]
+    Prob3[j] <- CProb3[j] - CProb3[j-1]
+    Prob4[j] <- CProb4[j] - CProb4[j-1]
+    
+  }
+        
+  N.sp1 <- round(vNHA[1]*Prob1,3)
+  N.sp2 <- round(vNHA[2]*Prob2,3)
+  N.sp3 <- round(vNHA[3]*Prob3,3)
+  N.sp4 <- round(vNHA[4]*Prob4,3)
   N.total <- N.sp1 + N.sp2 + N.sp3 + N.sp4 
   
   # Adjusting N.total with NHA
   if (vNHA[1]==0) { K1=0
   } else { 
     K1 <- sum(N.sp1)/vNHA[1]
-    N.sp1 <- round(N.sp1/K1,2)
+    N.sp1 <- round(N.sp1/K1,3)
   }
   if (vNHA[2]==0) { K2=0
   } else { 
     K2 <- sum(N.sp2)/vNHA[2] 
-    N.sp2 <- round(N.sp2/K2,2)
+    N.sp2 <- round(N.sp2/K2,3)
   }
   if (vNHA[3]==0) { K3=0
   } else { 
     K3 <- sum(N.sp3)/vNHA[3] 
-    N.sp3 <- round(N.sp3/K3,2)
+    N.sp3 <- round(N.sp3/K3,3)
   }
   if (vNHA[4]==0) { K4=0
   } else { 
     K4 <- sum(N.sp4)/vNHA[4] 
-    N.sp4 <- round(N.sp4/K4,2)
+    N.sp4 <- round(N.sp4/K4,3)
   }
   
-  N.total <- N.sp1 + N.sp2 + N.sp3 + N.sp4 
-
-  BA.sp1 <- round(BAclass*N.sp1/(100^2),2)  # cm2/ha
-  BA.sp2 <- round(BAclass*N.sp2/(100^2),2)  # cm2/ha
-  BA.sp3 <- round(BAclass*N.sp3/(100^2),2)  # cm2/ha
-  BA.sp4 <- round(BAclass*N.sp4/(100^2),2)  # cm2/ha
+  BA.sp1 <- round(BAclass*N.sp1/(100^2),3)  # cm2/ha
+  BA.sp2 <- round(BAclass*N.sp2/(100^2),3)  # cm2/ha
+  BA.sp3 <- round(BAclass*N.sp3/(100^2),3)  # cm2/ha
+  BA.sp4 <- round(BAclass*N.sp4/(100^2),3)  # cm2/ha
   BA.total <- BA.sp1 + BA.sp2 + BA.sp3 + BA.sp4 
   
   # Adjusting BA.total with BA
   if (vBA[1]==0) { K1=0
   } else { 
     K1 <- sum(BA.sp1)/vBA[1]
-    BA.sp1 <- round(BA.sp1/K1,2)
+    BA.sp1 <- round(BA.sp1/K1,3)
   }
   if (vBA[2]==0) { K2=0
   } else { 
     K2 <- sum(BA.sp2)/vBA[2] 
-    BA.sp2 <- round(BA.sp2/K2,2)
+    BA.sp2 <- round(BA.sp2/K2,3)
   }
   if (vBA[3]==0) { K3=0
   } else { 
     K3 <- sum(BA.sp3)/vBA[3] 
-    BA.sp3 <- round(BA.sp3/K3,2)
+    BA.sp3 <- round(BA.sp3/K3,3)
   }
   if (vBA[4]==0) { K4=0
   } else { 
     K4 <- sum(BA.sp4)/vBA[4] 
-    BA.sp4 <- round(BA.sp4/K4,2)
+    BA.sp4 <- round(BA.sp4/K4,3)
   }
   
   BA.total <- BA.sp1 + BA.sp2 + BA.sp3 + BA.sp4 
@@ -231,10 +247,11 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
   
   # Observed HD from estimated Hclass (for any specie using Hclass5)
   Hclass5 <- (Hclass1*N.sp1 + Hclass2*N.sp2 + Hclass3*N.sp3 + Hclass4*N.sp4)/(N.total)
+  Hclass5 <- replace(Hclass5, is.na(Hclass5), 0)
   Temp.Prod <- Hclass5*N.total
   Temp.Sum <- 0
   Ncount <- 0
-  for (j in (length(diam)-1):1){
+  for (j in (length(diam)-1):1) {
     Ncount <- Ncount + N.total[j]
     if (Ncount > 100) {
       Htemp <- (Temp.Sum+(Hclass5[j]*(100-(Ncount-N.total[j]))))/100
@@ -251,10 +268,7 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
   Hclass4 <- round(K*Hclass4,2)
   
   Hclass5 <- (Hclass1*N.sp1 + Hclass2*N.sp2 + Hclass3*N.sp3 + Hclass4*N.sp4)/(N.total)
-  Hclass5 <- round(Hclass5,2)
-  
-  #print(sum(BA.total))
-  #print(BA)
+  Hclass5 <- replace(Hclass5, is.na(Hclass5), 0)
   
   r_names<-c('DBH_ll','DBH_ul','D_class','H_class','N','BA')
   DDist<-array(data=NA, dim=c(5,(length(diam)-1),6),
