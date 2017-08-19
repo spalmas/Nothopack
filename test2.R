@@ -31,16 +31,14 @@ obs.t0$type<-'stand'
 obs.t0$ddiam<-TRUE
 sim.stand.t1<-stand_simulator(core.stand=obs.t0$input)
 head(sim.stand.t1$input$tree.list)
-sim.stand.t1$results
+sim.stand.t1$input$sp.table
+sim.stand.t1$input$sim.stand
 
 #sim.stand.t1$input$sp.table
-sim.stand.t1$input$type<-'stand'   # problem
-sim.stand.t1$input$ddiam<-TRUE     # problem
-sim.stand.t1$V_module<-2     # problem
+sim.stand.t1$input$type<-'stand'  
+sim.stand.t1$input$ddiam<-TRUE    
+sim.stand.t1$input$V_module<-2     
 est.stand.t1<-core_module(input=sim.stand.t1$input)
 est.stand.t1$sp.table
-est.stand.t1$stand.table[5,,]
-
-
-
+est.stand.t1$stand.table[2,,]
 
