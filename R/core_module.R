@@ -94,7 +94,6 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     V_model <- input$V_model
     IADBH_model <- input$IADBH_model
     stand_simulation <- input$stand_simulation
-    start_time <- input$start_time
   }
 
   stand.table <- NA
@@ -105,10 +104,10 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
       # Calculating Stand-level volume (total)
       sp.table<-cbind.data.frame(sp.table,VTHA=c(1:5)*0)
-      if (V_model==1){ 
+      if (V_model==1){
         VTHA <- Vmodule(BA=sp.table$BA[5], HD=HD, PNHAN=PNHAN)
       } else {
-        VTHA <- Vmodule(BA=sp.table$BA[5], HD=HD) 
+        VTHA <- Vmodule(BA=sp.table$BA[5], HD=HD)
       }
       sp.table[5,5]<-round(VTHA,3)
 
@@ -182,16 +181,32 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
       }
     }
 
+    #To which diameter class they belong
+    Dclass <- ceiling(tree.list$DBH/5)*5-2.5
+
     #if (is.na(area) ){ stop('Plot area must be provided') }
     #CF <- 10000 / area  # Correction factor
     #baind <- as.numeric(pi*(tree.list$DBH/2)^2/10000)  # Units: m2
     for (i in 1:n) {
       if (tree.list$SPECIES[i]==4) { SP<-DOM.SP
       } else { SP<-tree.list$SPECIES[i] }
+
       vind[i] <- Vmodule_individual(SPECIES=SP, zone=zone, DBH=tree.list$DBH[i],
                                     HT=tree.list$HT[i], blength=tree.list$HT[i])
+      if (tree.list$DBH[i] < 5.1) {
+        tree.list$DBH[i] <- 5
+        warning('Some trees are smaller than 5 cm DBH')
+        Dclass[i] <- 7.5
+      }
+
+      if (tree.list$DBH[i] >= 90) {
+        tree.list$DBH[i] <- (90)
+        warning('Some trees are larger than 90 cm DBH')
+        Dclass[i] <- 87.5
+      }
     }
-    Dclass <- ceiling(tree.list$DBH/5)*5-2.5
+
+
     N <- tree.list$FT
     BA <- params$BAind
     VT <- N*vind
@@ -300,13 +315,13 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
   # List that is output from here input somewhere else
   input <- list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
                 area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
-                IADBH_model=IADBH_model, start_time=start_time, sp.table=sp.table, stand.table=DDist, tree.list=tree.list )
+                IADBH_model=IADBH_model, sp.table=sp.table, DDdist=DDist, tree.list=tree.list )
 
 
   return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
               area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
-              IADBH_model=IADBH_model, start_time = start_time,
-              sp.table=sp.table, stand.table=DDist, tree.list=tree.list, input=input))
+              IADBH_model=IADBH_model,
+              sp.table=sp.table, DDist=DDist, tree.list=tree.list, input=input))
 }
 
 # Note: V_model=1 or anything else is always the same
