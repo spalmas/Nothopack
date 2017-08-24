@@ -8,7 +8,7 @@
 #' @param AD Dominant age (years) of the stand.
 #' @param HD Dominant height (m) of the stand.
 #' @param SI Site index at reference dominant age of 20 (m) of the stand.
-#' @param sp.table 
+#' @param sp.table
 #' @param SDI Stand density index (trees/ha)
 #' @param PBAN Proportion of basal area in the stand that correspond to Nothofagus.
 #' @param PNHAN Proportion of number of trees per hectarea in the stand that correspond to Nothofagus.
@@ -54,8 +54,6 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                         type='stand', ddiam=FALSE, comp=FALSE,
                         NHA_model=1, V_model=1, IADBH_model=1,
                         N=NA, BA=NA, QD=NA){
-
-  start_time <- Sys.time()   #Useful to estimate time that the simulation takes
 
   sdmatrix <- NA
 
@@ -159,7 +157,13 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     for (i in (1:n)) {
      if(is.na(tree.list$HT[i])) {
        tree.list$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.list$DBH[i]),4)
+
      }
+
+      if(tree.list$HT[i]<0){
+        tree.list$HT[i] <- 1.3
+        warning('An observed or estimated height (with the height_param model) was reported as negative.')
+      }
     }
 
     # Ouput tree-list database

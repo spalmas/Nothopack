@@ -129,7 +129,7 @@ stand_simulator <- function(core.stand = NULL){
   #list of return
   input <- list(zone=core.stand$zone, DOM.SP=core.stand$DOM.SP, AD=core.stand$AD,
                 HD=core.stand$HD, SI=core.stand$SI, PBAN=core.stand$PBAN, PNHAN=core.stand$PNHAN, AF=core.stand$AF,
-                area=core.stand$area, type=core.stand$type, ddiam=core.stand$ddiam, comp=core.stand$comp,
+                area=core.stand$area, type='stand', ddiam=core.stand$ddiam, comp=core.stand$comp,
                 NHA_model=core.stand$NHA_model, V_model=core.stand$V_model,
                 IADBH_model=core.stand$IADBH_model,
                 sp.table=sp.table, stand.table=NA, tree.list=NA,

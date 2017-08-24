@@ -18,19 +18,24 @@
 #' (DOM.SP<-get_domsp(BA))
 
 get_domsp <- function(BA=NA){
-  
+
   # Proportion of SPECIES by basal area
-  BA0 <- sum(BA)
-  PBA1 <- BA[1]/BA0   # Rauli
-  PBA2 <- BA[2]/BA0   # Roble
-  PBA3 <- BA[3]/BA0   # Coigue
-  PBA99 <- BA[4]/BA0   # Others  
-  PBAN <- sum(BA[1:3])/BA0   # Proportion BA for all Nothofagus
+  BA0 <- sum(BA, na.rm = TRUE)
+  BAN <- sum(BA[1:3], na.rm = TRUE)   # BA for all Nothofagus
+  PBAN <- BAN/BA0   # Proportion BA for all Nothofagus
+  PBA1 <- BA[1]/BAN   # Rauli
+  PBA2 <- BA[2]/BAN   # Roble
+  PBA3 <- BA[3]/BAN   # Coigue
+  PBA99 <- BA[4]/BA0   # Others
   Proportion<-c(PBA1,PBA2,PBA3)
-  
+
   # Obtaining dominant SPECIES.
   if (PBAN < 0.6 ){    # If BA Nothodagus represent less than 60% of the stand
-    DOM.SP <- 99  # Others besides Nothofagus
+    warning('Stand is not dominated by Nothofagus (PBAN<0.6). Returning plot with highest proportion of BA')
+    POS.MAX  = which(order(Proportion,decreasing = TRUE)==1)[1]  #Position of the bigest condition
+    DOM.SP <- POS.MAX
+
+    #DOM.SP <- 99  # Others besides Nothofagus
   } else {
     if (PBA1 >= 0.7){
       DOM.SP <- 1  # Rauli
@@ -39,11 +44,14 @@ get_domsp <- function(BA=NA){
     } else if (PBA3 >= 0.7){
       DOM.SP <- 3  # Coigue
     } else {
+      #If it is mixed, return the Nothofagus species with highest PBA
       POS.MAX  = which(order(Proportion,decreasing = TRUE)==1)[1]  #Position of the bigest condition
       DOM.SP <- POS.MAX
+      warning('There is no species with proportion of PBAN > 0.7')
+
       }
   }
-  
+
   return(DOM.SP)
 }
 
