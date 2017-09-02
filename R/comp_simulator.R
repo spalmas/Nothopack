@@ -73,10 +73,16 @@ comp_simulator <- function(core.tree = NULL){
 
     } else if (core.tree$comp == 'PG'){      #Proportional growth
       #Adjusted DBH1
-      DBH1.SIM.COMP <- sqrt(DBH0^2 + ((AREA.HA*BA.SIM/(pi/40000) - sum(p1.SIM*DBH0^2))/(sum(p1.SIM)*(DBH1.SIM^2-DBH0^2)) )*(DBH1.SIM^2-DBH0^2))
+      DBH1.SIM.COMP <- sqrt(DBH0^2 + ((AREA.HA*BA.SIM/(pi/40000) - sum(p1.SIM*DBH0^2))/(sum(p1.SIM)*(DBH1.SIM^2-DBH0^2)) )*(DBH1.SIM^2 - DBH0^2))
 
     } else if (core.tree$comp == 'DIS'){      #Dissagregation
       #p1.SIM.COMP <- function(p1, s, N1){ p1^m sum(p1) =s*N }
+
+      #m <- log(NHA1.SIM/FT)/sum(log(p1.SIM))
+      #FT*sum(p1.SIM)
+      #sum(p1.SIM*FT)
+
+
     }
 
     sim.tree$input$tree.list$DBH <- DBH1.SIM.COMP  #Update diameter

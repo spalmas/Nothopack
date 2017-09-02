@@ -56,6 +56,7 @@ covariates<-function(ID=NA,Fa=NA,sp=NA,DBH=NA,ZONE=NA,Ss=NA){
     }
   }
 
+  #needs to go back to original order of trees
   Temp.data<-arrange(Temp.data, ID)
   return(Temp.data)
 }
