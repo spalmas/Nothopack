@@ -83,7 +83,7 @@ shinyApp(
     })
 
     # *tree simulation ----
-    tab_sim_results  <- eventReactive(eventExpr = input$runtree,{
+    tab_sim_results2 <- eventReactive(eventExpr = input$runtree,{
       start_time <- Sys.time()   #Useful to estimate time that the simulation takes
       #From plot_example. needs the details of the plot_example
       stand_input<-input_module(type='stand',
