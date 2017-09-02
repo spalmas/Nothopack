@@ -51,7 +51,7 @@
 
 input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                         SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0,
-                        type='stand', ddiam=FALSE, comp=FALSE,
+                        type='stand', ddiam=FALSE, comp=NA,
                         NHA_model=1, V_model=1, IADBH_model=1,
                         N=NA, BA=NA, QD=NA){
 
