@@ -2,7 +2,7 @@
 #'
 #' @param ID Array of identification of each tree
 #' @param area Array of Area of the plot
-#' @param sp Array of sp of plot
+#' @param sp Array of species of plot
 #' @param DBH Array of DBHs
 #' @param ZONA Array of zona
 #'
@@ -30,7 +30,7 @@ covariates<-function(ID=NA,Fa=NA,sp=NA,DBH=NA,ZONE=NA,Ss=NA){
   BA <-   sum(pi * (DBH/2/100)^2* Fa , na.rm = TRUE) #total basal area by hectare
   QD <-  (100*((4/pi)*(BA/NHA))^0.5)#total quadratic diameter,
   SDI<-NHA*((25.4/QD)^(-1.4112))#Stand density index
-  SPZONA<-sp*10+ZONE
+  SPZONA<-sp*10+as.numeric(ZONE)   #Why times a zone?
   ###BAL & BALc Calculation
   ba<-pi*((DBH)^2)/40000 #in m2
   bac<-0

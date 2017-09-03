@@ -41,9 +41,9 @@
 #' input$sp.table
 #'
 #' # Example 2: Input from tree-level data (or file)
-#' plot<- read.csv(file= 'data/Plot_example.csv')
-#' head(plot)
-#' plot<-input_module(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=plot)
+#' tree.list<- read.csv(file= 'data/Plot_example.csv')
+#' head(tree.list)
+#' plot<-input_module(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=tree.list)
 #' attributes(plot)
 #' head(plot$tree.list)
 #' plot$sp.table
@@ -106,7 +106,7 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     v3 <- round(BA,6)
     v4 <- round(QD,6)
     sdmatrix <- data.frame(cbind(v1,v2,v3,v4))
-    names(sdmatrix) <- c('SPECIE','N','BA','QD')
+    names(sdmatrix) <- c('SPECIES','N','BA','QD')
 
     PBAN <- sum(BA[1:3])/(BA[5])
     PNHAN <- sum(N[1:3])/(N[5])
@@ -118,7 +118,7 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
   if (type=='tree'){
 
     # Getting stand level parms from tree-list
-    plotdata<-data.frame(tree.list$SPECIE, tree.list$DBH, tree.list$HT, tree.list$FT)
+    plotdata<-data.frame(tree.list$SPECIES, tree.list$DBH, tree.list$HT, tree.list$FT)
     colnames(plotdata)<-c('SPECIES','DBH','HT','FT')
     plotdata$FT<-plotdata$FT* (10000/area)
     params<-stand_parameters1(plotdata=plotdata,area=area)
@@ -140,7 +140,7 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     # }
     # plotdata$HT<-plotdata$htfin
 
-    DOM.SP<-get_domsp(BA=params$sd[1:4,3])
+    DOM.SP<-get_domsp(BA=params$sd$BA[1:4])
     if (is.na(AD)){
       (AD<-get_site(dom_sp=DOM.SP, zone=zone, HD=HD, SI=SI))
     }
@@ -166,9 +166,9 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
       }
     }
 
-    # Ouput tree-list database
+    # Output tree-list database
     FT<-rep(1,length(tree.list$ID))* (10000/area)
-    tree.list<-data.frame(tree.list$ID, tree.list$SPECIE, tree.list$DBH,
+    tree.list<-data.frame(tree.list$ID, tree.list$SPECIES, tree.list$DBH,
                           round(tree.list$HT,3), tree.list$SS, FT)
     colnames(tree.list)<-c('ID','SPECIES','DBH','HT','SS','FT')
 

@@ -37,8 +37,8 @@ source('R/report_plots.R')  #For multiplot of simulation results
 source('R/Social_Status.R')
 source('R/stand_parameters1.R')
 source('R/stand_randomizer.R')
-source('R/stand_simulator.R')     # This seems only projection
-source('R/tree_simulator.R')    # until now only growth
+source('R/stand_simulator.R')     #
+source('R/tree_simulator.R')    #
 source('R/Vmodule.R')
 source('R/Vmodule_individual.R')
 source('R/core_module.R')
@@ -54,7 +54,6 @@ ensayos.data <- read.csv(file = 'data/growth_ensayos.csv')
 taper_params <- read.csv(file = 'data/taper_parameters.csv')
 plot_example   <- read.csv(file = 'data/Plot_example.csv')
 products_setup <- read.csv(file = 'data/products_setup.csv')
-stand_example <- read.csv(file = 'data/stand_example.csv')
 
 # Name Variables
 # NHA, number of trees (trees/ha)
