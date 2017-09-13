@@ -193,7 +193,11 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
       vind[i] <- Vmodule_individual(SPECIES=SP, zone=zone, DBH=tree.list$DBH[i],
                                     HT=tree.list$HT[i], blength=tree.list$HT[i])
-      if (tree.list$DBH[i] < 5.1) {
+      if (tree.list$DBH[i] == 5) {
+        Dclass[i] <- 7.5
+      }
+      
+      if (tree.list$DBH[i] < 5) {
         tree.list$DBH[i] <- 5
         warning('Some trees are smaller than 5 cm DBH')
         Dclass[i] <- 7.5
