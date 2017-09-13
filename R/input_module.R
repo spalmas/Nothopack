@@ -121,7 +121,7 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     plotdata<-data.frame(tree.list$SPECIES, tree.list$DBH, tree.list$HT, tree.list$FT)
     colnames(plotdata)<-c('SPECIES','DBH','HT','FT')
     plotdata$FT<-plotdata$FT* (10000/area)
-    params<-stand_parameters1(plotdata=plotdata,area=area)
+    params<-stand_parameters(plotdata=plotdata,area=area)
 
     # ## Getting Individual heigths by linear regression
     # # Linear Regression
