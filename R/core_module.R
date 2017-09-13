@@ -164,7 +164,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
   if (type=='tree'){   # tree.list is provided
 
-    params<-stand_parameters1(plotdata=tree.list, area=area)
+    params<-stand_parameters(plotdata=tree.list, area=area)
     # Collecting final stand parameters
     sp.table <- params$sd
     PBAN <- sum(sp.table[1:3,3])/sum(sp.table[1:4,3])

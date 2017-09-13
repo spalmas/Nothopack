@@ -18,7 +18,7 @@
 #' plotdata<- read.csv(file= 'data/Plot_example.csv')
 #' stand_parameters1(plotdata=plotdata, area=500)
 #'
-stand_parameters1 <- function(plotdata=NA,area=area){
+stand_parameters <- function(plotdata=NA,area=area){
   CF <- 10000 / area  # Correction factor
 
   #Calculating invidual basal area
@@ -45,7 +45,7 @@ stand_parameters1 <- function(plotdata=NA,area=area){
   #proportion values
   PBAN <- sum(sd$BA[1:3])/sd$BA[5]
   PNHAN <- sum(sd$N[1:3])/sd$N[5]
-  DOM.SP<-get_domsp(BA=sd$BA)
+  DOM.SP<-get_domsp(BA=sd$BA[1:4])
 
   # Dominant Height - 100 trees with largest DBH
   # (this is for any of the SPECIES, not only dominant sp)

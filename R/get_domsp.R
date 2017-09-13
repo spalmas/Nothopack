@@ -14,7 +14,7 @@
 #' @examples
 #' # Example
 #' DOM.SP<-0
-#' BA<-c(46.5,52.8,71.6,2.4)
+#' BA<-c(4.5,2.8,41.6,2.4)
 #' (DOM.SP<-get_domsp(BA))
 
 get_domsp <- function(BA=NA){
