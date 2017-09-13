@@ -97,3 +97,20 @@ barplot(est.stand.t1$stand.table[2,,7], space=0, col=red)
 barplot(est.tree.t1$stand.table[2,,7], space=0, col=green, add=TRUE)
 barplot(obs.t1$stand.table[2,,7], space=0, col=blue, add=TRUE)
 
+
+
+
+# Plot 43 - it works
+plot.t0<-read.csv(file='D:/WORK_PARTIAL/SFRC/Students/PauloMoreno/Y2017/PlotsValidation/UACH_P43_M1.csv')
+p.t0<-input_module(type='tree',zone=2,AD=39.3,HD=24,SI=NA,area=500,AF=45.3,tree.list=plot.t0,V_model=2,ddiam=FALSE)
+
+obs.t0<-core_module(input=p.t0$input)
+obs.t0$sp.table
+
+obs.t0$type<-'stand'
+obs.t0$ddiam<-TRUE
+sim.stand.t1<-stand_simulator(core.stand=obs.t0$input)
+head(sim.stand.t1$input$tree.list)
+sim.stand.t1$input$sp.table
+sim.stand.t1$input$sim.stand
+
