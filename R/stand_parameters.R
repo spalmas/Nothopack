@@ -15,10 +15,12 @@
 #' and PropNN (proportion of number of trees of Nothofagus).
 #'
 #' @examples
-#' plotdata<- read.csv(file= 'data/Plot_example.csv')
-#' stand_parameters1(plotdata=plotdata, area=500)
-#'
-stand_parameters1 <- function(plotdata=NA,area=area){
+#' plot<- read.csv(file= 'data/Plot_example.csv')
+#' s <- Sys.time()
+#' stand_parameters(plotdata=plot, area=500)
+#' Sys.time() - s
+
+stand_parameters <- function(plotdata=NA,area=area){
   CF <- 10000 / area  # Correction factor
 
   #Calculating invidual basal area
@@ -42,20 +44,31 @@ stand_parameters1 <- function(plotdata=NA,area=area){
                  sum(sd$BA, na.rm = TRUE),
                  get_stand(BA = sum(sd$BA, na.rm = TRUE), N = sum(sd$N, na.rm = TRUE)))
 
-  #proportion values
-  PBAN <- sum(sd$BA[1:3])/sd$BA[5]
-  PNHAN <- sum(sd$N[1:3])/sd$N[5]
-  DOM.SP<-get_domsp(BA=sd$BA)
+
 
   # Dominant Height - 100 trees with largest DBH
   # (this is for any of the SPECIES, not only dominant sp)
   N.HD <- area/100   # Number of trees to consider for HD
-  HT.HD <- sort(plotdata$DBH, decreasing = TRUE) #sorting the diameters
-  FT <- rep(0,length(plotdata$DBH))
-  FT[1:ceiling(N.HD)] <- CF
-  FT[ceiling(N.HD)] <- 100 - (sum(FT)-CF)  #The remaining proportion
-  #HD <- sum(HT.HD*FT)/100   #DBH times CF
-  HD <- sum(HT.HD[1:ceiling(N.HD)]*FT[1:ceiling(N.HD)])/100   #DBH times CF
+  HT.HD <- plotdata[order(plotdata$DBH,decreasing=TRUE),3]
+  HDcalc <- matrix(data=0,nrow=nrow(plotdata),ncol=3)  # As long as trees in stand
+  nt <- 0
+  while (nt <= N.HD) {
+    HDcalc[nt+1,1] <- HT.HD[nt+1]
+    HDcalc[nt+1,2] <- CF
+    nt <- nt + 1
+  }
+  if (sum(HDcalc[,2])>100) {
+    HDcalc[nt,2] <- 100 - (sum(HDcalc[,2]) - CF)
+  }
+  HDcalc[,3] <- HDcalc[,1]*HDcalc[,2]
+  HD <- sum(HDcalc[,3])/100
 
-  return(list(sd=sd, DOM.SP=DOM.SP, HD=HD,PBAN=PBAN, PNHAN=PNHAN, BAind=plotdata$BAind))
+  PBAN <- sum(sd$BA[1:3])/sd$BA[5]
+  PNHAN <- sum(sd$N[1:3])/sd$N[5]
+  DOM.SP<-get_domsp(BA=sd$BA)
+
+  return(list(sd=sd, DOM.SP=DOM.SP, HD=HD,PBAN=PBAN, PNHAN=PNHAN, BAind=BAind))
 }
+
+#       - Change Otras DOM.SP to 9 to stop the process.
+#       - What to do with Mixed stand...
