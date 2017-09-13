@@ -10,9 +10,9 @@
 #' @param HT Total tree height (m)
 #' @param di Stem diameter (cm) at given stem height hi (m)
 #' @param hi Stem height (m) at given stem diameter (cm)
-#' @param d Vector of stem diameters (cm) 
+#' @param d Vector of stem diameters (cm)
 #' @param h Vector of stem heights (m) (starting in 0.01 until HT by 0.01)
-#' 
+#'
 #' @references
 #' Gezan, S.A. and Moreno, P. (2000b). ????????????.
 #' Reporte Interno. Projecto FONDEF D97I1065. Chile
@@ -32,12 +32,13 @@
 #'
 #' # Example 2: Unknown stem height
 #' tree<-get_taper(SPECIES=1, zone=2, DBH=12.1, HT=14.2, di=9.8)
-#' tree$hi 
+#' tree$hi
 #' plot(tree$h,tree$d)
 
 get_taper <- function(SPECIES = NA, zone='Todas', DBH=NA, HT=NA, di=NA, hi=NA){
   #Get parameters for that tree
   taper_params_tree <- taper_params %>% filter(SPECIES. == SPECIES & ZONE. == zone)
+  #This SPECIES. is with a dot. While the rest is without . is this confusing or can it cause errors?
 
   #taper_params_tree <- taper_params %>% filter(SPECIES == 2 & ZONE == 3)
 

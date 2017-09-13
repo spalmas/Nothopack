@@ -14,7 +14,7 @@
 #' @examples
 #' plot<- read.csv(file= 'data/Plot_example.csv')
 #' head(plot)
-#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=35,tree.list=plot)
+#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=29,tree.list=plot)
 #' attributes(input)
 #' head(input$tree.list)
 #' core.tree<-core_module(input=input$input)
@@ -140,9 +140,13 @@ tree_simulator <- function(core.tree = NULL){
 
   comp.list <- data.frame(prob.surv=Fap1/core.tree$tree.list$FT,PAI.HT=Dif.HT,PAI.DBH=Gest)
 
+  #ACtualizacoin de PBAN and PNHAN
+  updated_core <- input_module(type='tree',zone=core.tree$zone,AD=core.tree$AD,HD=HDp,area=core.tree$area,AF=NA, tree.list = treedata)
+  #
+
   input <- list(zone=core.tree$zone, DOM.SP=core.tree$DOM.SP, AD=core.tree$AD,
-                HD=core.tree$HD, SI=core.tree$SI, SDI=SDIp[1],
-                PBAN=core.tree$PBAN, PNHAN=core.tree$PNHAN, AF=DAp[1],
+                HD=HDp, SI=core.tree$SI, SDI=SDIp[1],
+                PBAN=updated_core$input$PBAN, PNHAN=updated_core$input$PNHAN, AF=DAp[1],
                 area=core.tree$area, type=core.tree$type, ddiam=core.tree$ddiam,
                 comp=core.tree$comp, NHA_model=core.tree$NHA_model,
                 V_model=core.tree$V_model, IADBH_model=core.tree$IADBH_model,

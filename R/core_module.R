@@ -67,7 +67,7 @@
 core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                         SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0,
                         type='stand', ddiam=FALSE, comp = NA,
-                        NHA_model=1, V_model=1, IADBH_model=1, input=NA,
+                        NHA_model=1, V_model=2, IADBH_model=1, input=NA,
                         stand_simulation=NA){
 
 
@@ -196,7 +196,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
       if (tree.list$DBH[i] == 5) {
         Dclass[i] <- 7.5
       }
-      
+
       if (tree.list$DBH[i] < 5) {
         tree.list$DBH[i] <- 5
         warning('Some trees are smaller than 5 cm DBH')

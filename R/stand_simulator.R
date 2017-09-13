@@ -82,6 +82,7 @@ stand_simulator <- function(core.stand = NULL){
     QD1 <- get_stand(BA=BA1, N=NHA1)   #New quadratic diameter
     HD1 <- get_site(dom_sp=core.stand$DOM.SP, zone=core.stand$zone, SI=core.stand$SI, AD=y)   #New dominant height
 
+    PBAN.New <- BAN1/BA1
     NHAN1 <- NHA1 * core.stand$PNHAN
     NHA991 <- NHA1 * (1-core.stand$PNHAN)
 
@@ -128,7 +129,7 @@ stand_simulator <- function(core.stand = NULL){
 
   #list of return
   input <- list(zone=core.stand$zone, DOM.SP=core.stand$DOM.SP, AD=core.stand$AD,
-                HD=core.stand$HD, SI=core.stand$SI, PBAN=core.stand$PBAN, PNHAN=core.stand$PNHAN, AF=core.stand$AF,
+                HD=HD1, SI=core.stand$SI, PBAN=PBAN.New, PNHAN=core.stand$PNHAN, AF=core.stand$AF,
                 area=core.stand$area, type='stand', ddiam=core.stand$ddiam, comp=core.stand$comp,
                 NHA_model=core.stand$NHA_model, V_model=core.stand$V_model,
                 IADBH_model=core.stand$IADBH_model,
