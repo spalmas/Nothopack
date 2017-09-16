@@ -22,6 +22,7 @@ source('R/covariates.R')
 source('R/diagnostics.R')
 source('R/diam_dist.R')
 source('R/fitness_stats.R')
+source('R/get_percentile.R')
 source('R/get_site.R')
 source('R/get_stand.R')
 source('R/get_taper.R')      # It calculates relevant variables for taper equations !INCOMPLETE missing models.

@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' tree.list<- read.csv(file= 'data/Plot_example.csv')
-#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=35,tree.list=tree.list, comp = 'PYD')
+#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=33,tree.list=tree.list, comp = 'PG')
 #' core.tree<-core_module(input=input$input)
 #' sim.tree<-comp_simulator(core.tree=core.tree$input)
 #' core_module(input = sim.tree)
@@ -44,51 +44,42 @@ comp_simulator <- function(core.tree = NULL){
   AF  <- core.tree$AF
 
   #FROM INITIAL AGE TO FINAL AGE
-  for (y in AD:(AF-1)) {
+  for (y in (AD):(AF-1)) {
     #y <- AD
     core.tree$AD <- y
     core.tree$AF <- y + 1
 
     #Simualtion
     sim.tree <- tree_simulator(core.tree = core.tree)  #tree simulator
-    #core_module(input = sim.tree$input)
     sim.stand <- stand_simulator(core.stand = core.tree) #stand simulator
 
     #Values needed for compatibility. Updated every year
-    p1.SIM <- sim.tree$comp.list$prob.surv   #Survival probability
+    #p1.SIM <- sim.tree$comp.list$prob.surv   #Survival probability
     NHA1.SIM <- sim.stand$input$sim.stand$NHA[2]   #From stand_simulation
-    AREA.HA <- sim.stand$input$area/10000    #plot area in hectares
-    FT <- 1/AREA.HA
     BA.SIM <- sim.stand$input$sim.stand$BA[2]    #simulated BA from stand_simulator
     DBH1.SIM <- sim.tree$input$tree.list$DBH    #simulated new diameter from tree_simulator
-    BA.SIM.TREE <- core_module(input = sim.tree$input)$input$sp.table$BA[5]
-
     DBH0 <- core.tree$tree.list$DBH     #original DBH
+    FT.SIM <- sim.tree$input$tree.list$FT   #From the tree_simulation
 
     if (core.tree$comp == 'PYD'){      #Proportional yield diameter
-      #Adjusted DBH1
-      DBH1.SIM.COMP <- sqrt((DBH1.SIM)^2*(AREA.HA*BA.SIM/(pi/40000))/(sum(p1.SIM*(DBH1.SIM)^2)))
-      #sim.tree$input$tree.list$FT <- FT  #change back expansion factor  ERROR PROBABLY HERE!!
-      #FT <- p1.SIM*NHA1.SIM/sum(p1.SIM)
+      DBH1.SIM.COMP <- sqrt(((DBH1.SIM)^2)*(BA.SIM/(pi/40000))/(sum(FT.SIM*(DBH1.SIM)^2)))  #adjusting diameter
+      FT.COMP <- FT.SIM*(NHA1.SIM/sum(FT.SIM))   #Adjusting FT
     } else if (core.tree$comp == 'PG'){      #Proportional growth
       #Adjusted DBH1
-      DBH1.SIM.COMP <- sqrt(DBH0^2 + ((AREA.HA*BA.SIM/(pi/40000) - sum(p1.SIM*DBH0^2))/(sum(p1.SIM)*(DBH1.SIM^2-DBH0^2)) )*(DBH1.SIM^2 - DBH0^2))
-      #It can return negative values and create errors when taking the square root
-      #plot(DBH1.SIM, DBH1.SIM.COMP)
-      #sim.tree$input$tree.list$FT <- FT  #change back expansion factor  ERROR PROBABLY HERE!!
-      #FT <- FT*sum(p1.SIM^m) == NHA1.SIM
+      Num<-(BA.SIM/(pi/40000))
+      Den<-sum(sim.tree$input$tree.list$FT*(DBH1.SIM)^2)
+      DBH1.SIM.COMP <- sqrt(DBH0^2 + (DBH1.SIM^2-DBH0^2)*(Num-Den)/(Den-sum(FT.SIM*DBH0^2)))
+      #m <- NHA1.SIM/sum(FT.SIM)/sum(FT.SIM/NHA1.SIM) #does not affect. The same as tree_simulator then
+      m <- log(NHA1.SIM)/sum(log(FT.SIM))
+      FT.COMP <- FT.SIM^m
+      #print(m)
     }
 
     sim.tree$input$tree.list$DBH <- DBH1.SIM.COMP  #Update diameter with compatibility results
-    sim.tree$input$AD <- AD  #Updating year
+    sim.tree$input$tree.list$FT <- FT.COMP  #Update
+    sim.tree$input$AD <- AD  #Updating year. Just important for final year.
 
     core.tree <- core_module(input = sim.tree$input)  #needs to be here because core.tree is used in the simulation
-    #core_module(input = sim.tree$input)
-    #print(y+1)
-    #print(paste0('BA.SIM = ', BA.SIM ))
-    #print(paste0('BA.SIM.TREE = ', BA.SIM.TREE ))
-    #print(paste0('BA.SIM.COMP = ', core.tree$sp.table$BA[5] ))
-    #print(core.tree$tree.list$DBH)   #To track results
   }
 
   return(sim.tree$input)
