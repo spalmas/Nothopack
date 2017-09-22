@@ -9,7 +9,7 @@
 #'
 #' @examples
 #' tree.list<- read.csv(file= 'data/Plot_example.csv')
-#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=33,tree.list=tree.list, comp = 'PG')
+#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=33,tree.list=tree.list, comp = 'Prop')
 #' core.tree<-core_module(input=input$input)
 #' sim.tree<-comp_simulator(core.tree=core.tree$input)
 #' core_module(input = sim.tree)
@@ -61,17 +61,17 @@ comp_simulator <- function(core.tree = NULL){
     DBH0 <- core.tree$tree.list$DBH     #original DBH
     FT.SIM <- sim.tree$input$tree.list$FT   #From the tree_simulation
 
-    if (core.tree$comp == 'PYD'){      #Proportional yield diameter
+    if (core.tree$comp == 'PY'){      #Proportional compatibility
       DBH1.SIM.COMP <- sqrt(((DBH1.SIM)^2)*(BA.SIM/(pi/40000))/(sum(FT.SIM*(DBH1.SIM)^2)))  #adjusting diameter
       FT.COMP <- FT.SIM*(NHA1.SIM/sum(FT.SIM))   #Adjusting FT
-    } else if (core.tree$comp == 'PG'){      #Proportional growth
+    } else if (core.tree$comp == 'PG'){      #Individual compatibility
       #Adjusted DBH1
       Num<-(BA.SIM/(pi/40000))
       Den<-sum(sim.tree$input$tree.list$FT*(DBH1.SIM)^2)
       DBH1.SIM.COMP <- sqrt(DBH0^2 + (DBH1.SIM^2-DBH0^2)*(Num-Den)/(Den-sum(FT.SIM*DBH0^2)))
       #m <- NHA1.SIM/sum(FT.SIM)/sum(FT.SIM/NHA1.SIM) #does not affect. The same as tree_simulator then
-      m <- log(NHA1.SIM)/sum(log(FT.SIM))
-      FT.COMP <- FT.SIM^m
+      #m <- log(NHA1.SIM)/sum(log(FT.SIM))
+      FT.COMP <- FT.SIM
       #print(m)
     }
 
