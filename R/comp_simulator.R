@@ -1,6 +1,7 @@
-#' Simulates both individual and stand simulations and makes them compatible
+#' General Compatibility/Tree Simulator.
 #'
-#' \code{comp_simulator} Simulates both individual and stand simulations and makes them compatible.
+#' \code{comp_simulator} General simulator for Tree simulations. It can run a tree simulator if core.tree$comp == 'None' or go
+#' to the PY or PG pathways. It could be improved by avoiding running stand_simulator if core.tree$comp == 'None'.
 #'
 #' @param core.stand a stand list corrected from core_module
 #'
@@ -8,11 +9,27 @@
 #' S.Gezan, S.Palmas and P.Moreno
 #'
 #' @examples
+#' # Example 1: Proportional Yield
 #' tree.list<- read.csv(file= 'data/Plot_example.csv')
-#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=33,tree.list=tree.list, comp = 'Prop')
+#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=33,tree.list=tree.list, comp = 'PY')
 #' core.tree<-core_module(input=input$input)
 #' sim.tree<-comp_simulator(core.tree=core.tree$input)
-#' core_module(input = sim.tree)
+#' core_module(input = sim.tree)$sp.table
+#'
+#' # Example 2: Proportional Growth
+#' tree.list<- read.csv(file= 'data/Plot_example.csv')
+#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=33,tree.list=tree.list, comp = 'PG')
+#' core.tree<-core_module(input=input$input)
+#' sim.tree<-comp_simulator(core.tree=core.tree$input)
+#' core_module(input = sim.tree)$sp.table
+#'
+#' # Example 3: No compatibility
+#' tree.list<- read.csv(file= 'data/Plot_example.csv')
+#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=33,tree.list=tree.list, comp = 'None')
+#' core.tree<-core_module(input=input$input)
+#' sim.tree<-comp_simulator(core.tree=core.tree$input)
+#' core_module(input = sim.tree)$sp.table
+
 comp_simulator <- function(core.tree = NULL){
 
   ### Initializations of variables
@@ -71,6 +88,11 @@ comp_simulator <- function(core.tree = NULL){
       DBH1.SIM.COMP <- sqrt(DBH0^2 + (DBH1.SIM^2-DBH0^2)*(Num-Den)/(Den-sum(FT.SIM*DBH0^2)))
       #m <- NHA1.SIM/sum(FT.SIM)/sum(FT.SIM/NHA1.SIM) #does not affect. The same as tree_simulator then
       #m <- log(NHA1.SIM)/sum(log(FT.SIM))
+      FT.COMP <- FT.SIM
+      #print(m)
+    } else if (core.tree$comp == 'None'){      #No compatibility. Just tree.simulator
+      #Unadjusted DBH1
+      DBH1.SIM.COMP <- DBH1.SIM
       FT.COMP <- FT.SIM
       #print(m)
     }
