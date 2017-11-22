@@ -9,11 +9,11 @@ shinyApp(
     navbarPage(
       theme = "darkly",  # <--- To use a theme, uncomment this
       "Nothofagus Simulator",
+
       ###---
       #  Simulator tab ----------------
       ###---
       tabPanel(title = "Simulator",
-
                fluidPage( titlePanel("Simulator"),
                           fluidRow(
                             column(1, wellPanel(selectInput(inputId = "type", label = "Simulation Type", choices = c("Tree", "Stand")))),
@@ -38,7 +38,7 @@ shinyApp(
                          fluidRow(
                            column(3, wellPanel(
                              selectInput(inputId = "NHA_model", label = "Mortality model",choices = c('Linear','Non-linear')),
-                             numericInput(inputId = 'theta', label = 'Theta', value = 0.0003),
+                             numericInput(inputId = 'theta', label = 'Theta', value = 0.003),
                              selectInput(inputId = "V_model", label = "Volume model",choices = c(1,2))
                            ))
                          )
@@ -84,7 +84,7 @@ shinyApp(
       return(tab_sim_results)
     })
 
-    # *Tree simulation ----
+    # *Tree and Compatibility simulation ----
     tab_sim_tree_results <- eventReactive(eventExpr = input$runtree,{
       start_time <- Sys.time()   #Useful to estimate time that the simulation takes
       if(is.null(input$tree.list.)){
@@ -92,31 +92,31 @@ shinyApp(
       } else {
         tree.list. <- read_csv(input$tree.list.$datapath)  #read csv data
       }
-      #input<-input_module(type='tree',zone=1,AD=20,HD=15,area=500,AF=30,tree.list=tree.list.)
-      input.list<-input_module(type='tree', zone=input$zone, area=input$area, HD=input$HD, AD=input$AD, AF=input$AF, tree.list=tree.list.)
-      core.tree<-core_module(input=input.list$input)
-      sim.tree<-tree_simulator(core.tree=core.tree$input)
-      tab_sim_tree_results<-core_module(input=sim.tree$input)$sp.table
+      #input.list<-input_module(type='tree',zone=1,AD=20,HD=15,area=500,AF=30,tree.list=plot_example, comp = 'None')
+      input.list<-input_module(type='tree', zone=input$zone, area=input$area, HD=input$HD, AD=input$AD, AF=input$AF, tree.list=tree.list., comp = input$comp, ddiam = TRUE)
+      core.tree<-core_module(input=input.list$input)      #Initial core_
+      sim.tree<-comp_simulator(core.tree=core.tree$input)   #Running simulation
+      tab_sim_tree_results<-core_module(input=sim.tree)$sp.table    #Obtaining results from simulation
       processing_time <- Sys.time() - start_time   #End time of simulation
-      #Return table of results, or maybe list?
       return(tab_sim_tree_results)
     })
 
     ###---
     #  Output definitions ----------------
     ###---
+
+    #  *Input UI ----------------
     output$ui <- renderUI({
       if (is.null(input$type)) return()
 
-      # Depending on input$input_type, we'll generate a different
-      # UI component and send it to the client.
+      # Depending on input$input_type, we'll generate a different UI component and send it to the client.
       switch(input$type,
              "Tree" = tagList(fileInput("tree.list.", "Tree list", accept = c("text/csv", "text/comma-separated-values,text/plain", ".csv")),
                               selectInput(inputId = 'zone', label = 'Zone',choices = c(1,2,3,4), selected = 1, width = '30%'),
-                              numericInput("area", "Plot area (m2)", value = 10000, width = '40%'),
+                              numericInput("area", "Plot area (m2)", value = 500, width = '40%'),
                               div(style="display:inline-block",numericInput("AD", "Dominant Age", value = 20, width = '30%')),
                               div(style="display:inline-block",numericInput("HD", "Dominant height", value = 20, width = '30%')),
-                              selectInput(inputId = 'comp', label = 'Compatibility', choices = c('None','PG','PYD'),selected = 'None', width = '50%'),
+                              selectInput(inputId = 'comp', label = 'Compatibility', choices = c('None','PG','PY'), selected = 'None', width = '50%'),
                               numericInput("AF", "Final Age", value = 30, width = '50%'),
                               actionButton(inputId = "runtree", label = "Run!", class = "btn-primary")
              ),

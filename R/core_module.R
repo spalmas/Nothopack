@@ -98,6 +98,9 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
   stand.table <- NA
 
+  #---===
+  # IF STAND ----
+  #---===
   if (type=='stand'){    # tree.list not provided then generate one - always
 
     if (ddiam==FALSE) {
@@ -162,7 +165,11 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     }
   }
 
-  if (type=='tree'){   # tree.list is provided
+  #---===
+  # IF A tree.list IS PROVIDED ----
+  #---===
+
+  if (type == 'tree'){
 
     params<-stand_parameters(plotdata=tree.list, area=area)
     # Collecting final stand parameters
@@ -172,9 +179,9 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
     n <- length(tree.list$ID)
     vind <- matrix(NA,nrow=n)
+    QD0<-params$sd[5,4]
 
     # Completing heights using parametrized height-dbh model
-    QD0<-params$sd[5,4]
     for (i in (1:n)) {
       if(is.na(tree.list$HT[i])) {
         tree.list$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.list$DBH[i]),4)
@@ -187,6 +194,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     #if (is.na(area) ){ stop('Plot area must be provided') }
     #CF <- 10000 / area  # Correction factor
     #baind <- as.numeric(pi*(tree.list$DBH/2)^2/10000)  # Units: m2
+    #Assigning Dominant Species and Dclass to each tree
     for (i in 1:n) {
       if (tree.list$SPECIES[i]==4) { SP<-DOM.SP
       } else { SP<-tree.list$SPECIES[i] }

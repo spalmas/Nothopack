@@ -91,10 +91,8 @@ comp_simulator <- function(core.tree = NULL){
       FT.COMP <- FT.SIM
       #print(m)
     } else if (core.tree$comp == 'None'){      #No compatibility. Just tree.simulator
-      #Unadjusted DBH1
-      DBH1.SIM.COMP <- DBH1.SIM
+      DBH1.SIM.COMP <- DBH1.SIM  #Unadjusted DBH1
       FT.COMP <- FT.SIM
-      #print(m)
     }
 
     sim.tree$input$tree.list$DBH <- DBH1.SIM.COMP  #Update diameter with compatibility results
