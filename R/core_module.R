@@ -316,14 +316,6 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
   # Need to add compatibility between tree and stand
 
-
-  # Special calculations if the input is in form stand_simulation
-  # (if the stand_simulation exists)
-  # Probably needs to be before to avoid some errors
-  if (is.list(stand_simulation)){
-
-  }
-
   # List that is output from here input somewhere else
   input <- list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
                 area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
