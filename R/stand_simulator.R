@@ -12,20 +12,15 @@
 #'
 #' @examples
 #' #Example 1. Starting from known stand-level data
-#' BA<-c(1.09,38.92,0,0.31)
-#' N<-c(60,780,0,80)
-#' input<-inputmodule(type='stand',zone=2,AD=28,HD=15.5,N=N,BA=BA,AF=35,V_model=1)
-#' core.stand<-core_module(input = input)
-#' core.stand$sp
-#' core.stand$type
-#' stand<-stand_simulator(core.stand = core.stand)
-#' results.stand<-core_module(input = stand$input)
-#' results.stand$sp.table
+#' stand_input<-input_module(type='stand',zone=2,AD=28,HD=15.5,N=stand_example$N,BA=stand_example$BA,AF=35,V_model=1)
+#' core.stand<-core_module(input = stand_input)
+#' stand_simulator(core.stand = core.stand)
+#'
 #'
 #' #Example 2. Generating a diameter distribution  # Problems for generiting diameter distribution!!!
 #' BA<-c(1.09,38.92,0,0.31)
 #' N<-c(60,780,0,80)
-#' input<-inputmodule(type='stand',zone=2,AD=28,HD=15.5,N=N,BA=BA,AF=35,V_model=2,ddiam=TRUE)
+#' input<-input_module(type='stand',zone=2,AD=28,HD=15.5,N=N,BA=BA,AF=35,V_model=2,ddiam=TRUE)
 #' core.stand<-core_module(input = input)
 #' core.stand$sp
 #' core.stand$type
@@ -33,16 +28,12 @@
 #' results.stand<-core_module(input = stand$input)
 #' results.stand$sp.table
 #' results.stand$stand.table[5,,]
+#' stand$input$sim.stand
 #'
 #' #Example 3. Starting from known stand-level data
-#' plot<- read.csv(file= 'data/Plot_example.csv')
-#' head(plot)
-#' tree<-inputmodule(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=35,tree.list=plot)
-#' attributes(tree)
-#' head(tree$tree.list)
-#' core.tree<-core_module(input=tree$input)
-#' core.tree$sp.table
-#' core.tree$type<-"stand"
+#' head(plot_example)
+#' tree<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=35,tree.list=plot_example)
+#' core.tree<-core_module(input=tree)
 #' stand<-stand_simulator(core.stand = core.tree)
 #' results.stand<-core_module(input = stand$input)
 #' results.stand$sp.table
@@ -70,7 +61,7 @@ stand_simulator <- function(core.stand = NULL){
   NHAN <- core.stand$sp.table$N[1:3] %>% sum(na.rm = TRUE)
 
   # Create a table to store results
-  results <- data.frame(Age = core.stand$AD,
+  sim.stand <- data.frame(Age = core.stand$AD,
                         QD = core.stand$sp.table$QD[5],
                         HD = core.stand$HD,
                         SI = core.stand$SI,
@@ -79,29 +70,27 @@ stand_simulator <- function(core.stand = NULL){
                         BA99 = core.stand$sp.table$BA[4],
                         NHA = core.stand$sp.table$N[5],
                         NHAN = NHAN,
-                        NHA99 = core.stand$sp.table$N[4],
-                        VOL=core.stand$sp.table$VTHA[5]
+                        NHA99 = core.stand$sp.table$N[4]
                         )
 
   #Yearly simulations
   for (y in (core.stand$AD + 1) : core.stand$AF){
-    NHA1 <- Nmodule(NHA0=core.stand$sp.table$N[5], QD0=core.stand$sp.table$QD[5], N_model=core.stand$N_model)   #Estimates new number of trees
+    NHA1 <- NHAmodule(NHA0=core.stand$sp.table$N[5], QD0=core.stand$sp.table$QD[5], NHA_model=core.stand$NHA_model)   #Estimates new number of trees
     BAN1 <- BANmodule(BAN0 = BAN0, AD0=y, SI=core.stand$SI, NHA0=core.stand$sp.table$N[5], NHA1=NHA1, PBAN0 = core.stand$PBAN, PBAN1 = core.stand$PBAN, projection=TRUE)$BAN1   #projects new basal area (needs to change)
     BA991 <- BA99module(BA990=core.stand$sp.table$BA[4], AD0=y, PNHAN0=core.stand$PNHAN, PNHAN1=core.stand$PNHAN, PBAN0 = core.stand$PBAN, PBAN1 = core.stand$PBAN, projection=TRUE)$BA991   #projects new basal area (needs to change)
     BA1 <- BAN1 + BA991 #Finds total new Basal Area
     QD1 <- get_stand(BA=BA1, N=NHA1)   #New quadratic diameter
     HD1 <- get_site(dom_sp=core.stand$DOM.SP, zone=core.stand$zone, SI=core.stand$SI, AD=y)   #New dominant height
 
-    NHAN1 <- NHA1 - core.stand$sp.table$N[4]    #If the NHA99 do not change over time
+    PBAN.New <- BAN1/BA1
+    NHAN1 <- NHA1 * core.stand$PNHAN
     NHA991 <- NHA1 * (1-core.stand$PNHAN)
 
     #Update the Number and BA vectors
     #Update proportion of Nothofagus
 
     # Adds simulation results to table  # in the same order as dataframe above!
-    results <- rbind(results, c(y, QD1, HD1, core.stand$SI,
-                                BA1, BAN1, BA991,
-                                NHA1, NHAN1, NHA991))
+    sim.stand <- sim.stand %>% rbind(c(y, QD1, HD1, core.stand$SI,BA1, BAN1, BA991,NHA1, NHAN1, NHA991))
 
     #Variable replacement
     core.stand$sp.table$N[5] <- NHA1
@@ -112,9 +101,7 @@ stand_simulator <- function(core.stand = NULL){
     HD0 <- core.stand$HD
   }
 
-  #Estiamting time that the simulation took
-  sim_time <- Sys.time() - core.stand$start_time
-
+  #sp.table is the final stand values. At the end of the simulation
   # print(results) # might be interesting
   sp.table<-matrix(data=0,nrow=5,ncol=4)
   sp.table[,1]<-c(seq(1:4),0)
@@ -140,14 +127,16 @@ stand_simulator <- function(core.stand = NULL){
   colnames(sp.table)<-c('SPECIE','N','BA','QD')
   #print(sp.table)
 
-  input <- list(zone=core.stand$zone, DOM.SP=core.stand$DOM.SP, AD=y,
-                HD=HD1, SI=core.stand$SI, PBAN=core.stand$PBAN, PNHAN=core.stand$PNHAN, AF=y,
-                area=core.stand$area, type=core.stand$type, ddiam=core.stand$ddiam, comp=core.stand$comp,
-                N_model=core.stand$N_model, V_model=core.stand$V_model,
-                IADBH_model=core.stand$IADBH_model, start_time=core.stand$start_time,
-                sp.table=sp.table, stand.table=NA, tree.list=NA)
+  #list of return
+  input <- list(zone=core.stand$zone, DOM.SP=core.stand$DOM.SP, AD=core.stand$AD,
+                HD=HD1, SI=core.stand$SI, PBAN=PBAN.New, PNHAN=core.stand$PNHAN, AF=core.stand$AF,
+                area=core.stand$area, type='stand', ddiam=core.stand$ddiam, comp=core.stand$comp,
+                NHA_model=core.stand$NHA_model, V_model=core.stand$V_model,
+                IADBH_model=core.stand$IADBH_model,
+                sp.table=sp.table, stand.table=NA, tree.list=NA,
+                sim.stand = sim.stand)
 
-  return(list(input=input,results=results))
+  return(list(input=input))
 
 }
 
@@ -159,3 +148,4 @@ stand_simulator <- function(core.stand = NULL){
 # - There is a strong assumption that PropNN and PropBA stays fixed
 # - The plot for volume increments to much (it is unrealistic, probably projection BA is wrong!)
 # - There needs to be a match when converting back to diameter distribution and when the BA is predicted
+

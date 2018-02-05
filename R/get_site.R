@@ -38,8 +38,9 @@ get_site <- function(dom_sp, zone, AD=NA, HD=NA, SI=NA){
   coef.list <- subset(hd_coef, hd_coef_zone == zone & hd_coef_sp_code == dom_sp,
                       select = c(hd_coef_a, hd_coef_b0, hd_coef_b1) )
 
-  if (sum(is.na(c(AD, HD, SI))) > 2 ){
-    stop('There must be at least two stand parameters provided')
+  if (sum(is.na(c(AD, HD, SI))) >= 2 ){
+    parm<-NA
+    warning('There must be at least two stand parameters provided')
 
   } else if ( sum(is.na(c(AD, HD, SI))) == 0 ){
     warning('Why would you use this calculation? You have already have the three variables')
@@ -78,6 +79,7 @@ get_site <- function(dom_sp, zone, AD=NA, HD=NA, SI=NA){
     parm <- seqX[posit]
   }
   return(parm)
+  
 }
 
 # Note
