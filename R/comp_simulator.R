@@ -66,7 +66,7 @@ comp_simulator <- function(core.tree = NULL){
     core.tree$AD <- y
     core.tree$AF <- y + 1
 
-    #Simualtion
+    #Simulation
     sim.tree <- tree_simulator(core.tree = core.tree)  #tree simulator
     sim.stand <- stand_simulator(core.stand = core.tree) #stand simulator
 

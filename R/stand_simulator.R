@@ -17,7 +17,7 @@
 #' stand_simulator(core.stand = core.stand)
 #'
 #'
-#' #Example 2. Generating a diameter distribution  # Problems for generiting diameter distribution!!!
+#' #Example 2. Generating a diameter distribution 
 #' BA<-c(1.09,38.92,0,0.31)
 #' N<-c(60,780,0,80)
 #' input<-input_module(type='stand',zone=2,AD=28,HD=15.5,N=N,BA=BA,AF=35,V_model=2,ddiam=TRUE)
@@ -27,7 +27,7 @@
 #' stand<-stand_simulator(core.stand = core.stand)
 #' results.stand<-core_module(input = stand$input)
 #' results.stand$sp.table
-#' results.stand$stand.table[5,,]
+#' results.stand$DDist[5,,]
 #' stand$input$sim.stand
 #'
 #' #Example 3. Starting from known stand-level data
@@ -48,9 +48,9 @@ stand_simulator <- function(core.stand = NULL){
 
   #Errors with Age
   if(is.na(core.stand$AF)){
-    print('There is no Final Age for simulation ')
+    print('There is no Final Age (AF) for simulation ')
   }  else if (core.stand$AD >= core.stand$AF){
-    print('The Final age of simulation should be larger than the Initial Age')
+    print('The Final age (AF) of simulation should be larger than the Initial Age (AD)')
   }
 
   core.stand$sp.table$PSP.NHA<-core.stand$sp.table[,2]/sum(core.stand$sp.table[1:3,2])

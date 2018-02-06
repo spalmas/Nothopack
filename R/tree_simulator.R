@@ -7,6 +7,10 @@
 #'
 #'
 #' @param core.stand a stand list corrected from core_module
+#' 
+#' @references
+#' Moreno, P.; Palmas, S.; Escobedo, F.; Cropper, W.; Gezan, S. Individual-tree diameter growth models 
+#' for mixed nothofagus second growth forests in southern chile. Forests 2017, 8, 506, http://www.mdpi.com/1999-4907/8/12/506.
 #'
 #' @author
 #' S.Gezan, S.Palmas and P.Moreno
@@ -14,24 +18,23 @@
 #' @examples
 #' plot<- read.csv(file= 'data/Plot_example.csv')
 #' head(plot)
-#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=29,tree.list=plot)
-#' attributes(input)
+#' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=49,tree.list=plot)## To complete info
 #' head(input$tree.list)
-#' core.tree<-core_module(input=input$input)
+#' core.tree<-core_module(input=input$input)## To incorporate volume, BA and Dclass
 #' head(core.tree$tree.list)
-#' sim.tree<-tree_simulator(core.tree=core.tree$input)
-#' head(sim.tree$input) ###
+#' sim.tree<-tree_simulator(core.tree=core.tree$input)## Tree simulator
 #' result.tree<-core_module(input=sim.tree$input)
 #' result.tree$sp.table
-#' result.tree$stand.table[5,,]
+#' result.tree$DDist[5,,]
 #' head(result.tree$tree.list)
+
 
 tree_simulator <- function(core.tree = NULL){
 
   ### Initializations of variables
   HT<-core.tree$tree.list$HT   #list heights
   #Ss<-core.tree$tree.list$SS   #list sociological status NA
-  FTv<-rep(1,length(core.tree$tree.list$ID))    #expansion factor for volume?
+  FTv<-rep(1,length(core.tree$tree.list$ID))    #expansion factor vector
   input.data1<-covariates(ID=core.tree$tree.list$ID,
                           Fa=core.tree$tree.list$FT,    #list of expansion factors
                           sp=core.tree$tree.list$SPECIES,
@@ -54,9 +57,8 @@ tree_simulator <- function(core.tree = NULL){
   PSCALp<-input.data1$PScal
 
   #FROM INITIAL AGE TO FINAL AGE (LOOP 1)
-  #for (k in core.tree$AD:core.tree$AF) {   #Original version. Is it simulating one more year?
   for (k in core.tree$AD:(core.tree$AF-1)) {
-      #BY TREE (LOOP 2)
+    #BY TREE (LOOP 2)
 
     #ANNUAL INCREMENT
     Gest<-AIDBH_module(BALc=BALcp,
@@ -140,7 +142,7 @@ tree_simulator <- function(core.tree = NULL){
 
   comp.list <- data.frame(prob.surv=Fap1/core.tree$tree.list$FT,PAI.HT=Dif.HT,PAI.DBH=Gest)
 
-  #ACtualizacoin de PBAN and PNHAN
+  #Actualization of PBAN and PNHAN
   updated_core <- input_module(type='tree',zone=core.tree$zone,AD=core.tree$AD,HD=HDp,area=core.tree$area,AF=NA, tree.list = treedata)
   #
 

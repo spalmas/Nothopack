@@ -14,7 +14,7 @@
 #' @param h Vector of stem heights (m) (starting in 0.01 until HT by 0.01)
 #'
 #' @references
-#' Gezan, S.A. and Moreno, P. (2000b). ????????????.
+#' Gezan, S.A. and Moreno, P. (2000). INFORME PROCEDIMIENTOS Y RESULTADOS MODELOS DE AHUSAMIENTO.
 #' Reporte Interno. Projecto FONDEF D97I1065. Chile
 #'
 #' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para

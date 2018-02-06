@@ -8,6 +8,7 @@ library(grid)
 library(gridExtra)
 library(tidyverse)
 library(knitr)
+library(pracma)
 
 ###---
 # IMPORTING FILES ----------------------

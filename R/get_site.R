@@ -1,6 +1,6 @@
 #' Calculates remaining stand level variable from the set: AD, HD, SI
 #'
-#' \code{get_site} When two of stand level variebles: dominat age (AD, year), dominant height (HD, m) and site index (SI, m)
+#' \code{get_site} When two of stand level variables: dominat age (AD, year), dominant height (HD, m) and site index (SI, m)
 #' are given, it returns the value of the remaining stand level parameter.
 #' Note: The coefficients for the site index curves come from Gezan and Ortega (2001).
 #'

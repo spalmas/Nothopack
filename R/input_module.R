@@ -140,7 +140,9 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     # }
     # plotdata$HT<-plotdata$htfin
 
-    DOM.SP<-get_domsp(BA=params$sd$BA[1:4])
+    #DOM.SP<-get_domsp(BA=params$sd$BA[1:4])
+    DOM.SP<-params$DOM.SP
+    
     if (is.na(AD)){
       (AD<-get_site(dom_sp=DOM.SP, zone=zone, HD=HD, SI=SI))
     }
@@ -186,7 +188,6 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
   return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
               area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
-              type=type,
               IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list, input=input))
 
 }

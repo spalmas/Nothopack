@@ -6,9 +6,10 @@
 #' @param DBH Array of DBHs
 #' @param ZONA Array of zona
 #'
-#' @return 8 different predictors ID, DBH, ba (basal area individual, m2/ha), bac (basal area individual cohorte, m2/ha),
+#' @return 8 different predictors ID, DBH, ba (basal area individual, m2/ha), bac (basal area individual cohorte (Nothofagus), m2/ha),
 #' SPZONA (concatenation), N (number of trees per ha), BA (basal area, m2/ha), QD (quadratic diameter, cm),
-#' SDI (Stand Density Index), BAL (Basal Area Larges trees, m2/ha), BALc (Basal Area Larges trees, m2/ha), PSCAL (BAL/BA)
+#' SDI (Stand Density Index), BAL (Basal Area Larges trees, m2/ha), BALc (Basal Area Larges trees cohorte (Nothofagus), m2/ha),
+#' PSCAL (BAL/BA)
 #'
 #' @examples
 #' ID<-c(1,2,3,4)
@@ -16,7 +17,7 @@
 #' sp<-c(1,1,2,4)
 #' DBH<-c(15,25,37, 20)
 #' ZONE<-1
-#' Ss<-c(1,2,2,2)
+#' Ss<-c(NA,2,NA,2)
 #' covariates(ID,Fa,sp,DBH,ZONE,Ss)
 
 

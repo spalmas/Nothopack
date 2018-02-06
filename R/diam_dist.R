@@ -29,7 +29,7 @@
 #' Dd<-diam_dist(sp.table=plot$sp.table, HD=plot$HD,
 #'               DOM.SP=plot$DOM.SP, zone=plot$zone)
 #' Dd[5,,]  # Total diameter distribution
-#' # Ploting distribution for each specie
+#' # Ploting distribution for all species
 #' barplot(as.matrix(Dd[5,,5]), main='Diameter Distribution all species', xlab='DBH Class', beside=TRUE, col=4)
 
 diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){

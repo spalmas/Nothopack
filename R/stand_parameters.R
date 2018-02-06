@@ -16,7 +16,7 @@
 #'
 #' @examples
 #' plotdata<- read.csv(file= 'data/Plot_example.csv')
-#' stand_parameters1(plotdata=plotdata, area=500)
+#' stand_parameters(plotdata=plotdata, area=500)
 #'
 stand_parameters <- function(plotdata=NA,area=area){
   CF <- 10000 / area  # Correction factor
@@ -49,13 +49,13 @@ stand_parameters <- function(plotdata=NA,area=area){
 
   # Dominant Height - 100 trees with largest DBH
   # (this is for any of the SPECIES, not only dominant sp)
-  N.HD <- area/100   # Number of trees to consider for HD
-  HT.HD <- sort(plotdata$DBH, decreasing = TRUE) #sorting the diameters
-  FT <- rep(0,length(plotdata$DBH))
-  FT[1:ceiling(N.HD)] <- CF
-  FT[ceiling(N.HD)] <- 100 - (sum(FT)-CF)  #The remaining proportion
-  #HD <- sum(HT.HD*FT)/100   #DBH times CF
-  HD <- sum(HT.HD[1:ceiling(N.HD)]*FT[1:ceiling(N.HD)])/100   #DBH times CF
+  # N.HD <- area/100   # Number of trees to consider for HD
+  # HT.HD <- sort(plotdata$DBH, decreasing = TRUE) #sorting the diameters
+  # FT <- rep(0,length(plotdata$DBH))
+  # FT[1:ceiling(N.HD)] <- CF
+  # FT[ceiling(N.HD)] <- 100 - (sum(FT)-CF)  #The remaining proportion
+  # #HD <- sum(HT.HD*FT)/100   #DBH times CF
+  # HD <- sum(HT.HD[1:ceiling(N.HD)]*FT[1:ceiling(N.HD)])/100   #DBH times CF
 
-  return(list(sd=sd, DOM.SP=DOM.SP, HD=HD,PBAN=PBAN, PNHAN=PNHAN, BAind=plotdata$BAind))
+  return(list(sd=sd, DOM.SP=DOM.SP,PBAN=PBAN, PNHAN=PNHAN, BAind=plotdata$BAind))
 }

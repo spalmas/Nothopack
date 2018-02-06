@@ -13,7 +13,7 @@
 #' # Example 1: From stand_simulator
 #' BA<-c(1.09,38.92,0,0.31)
 #' N<-c(60,780,0,80)
-#' input<-inputmodule(type='stand',zone=2,AD=28,HD=15.5,N=N,BA=BA,AF=35,V_model=1)
+#' input<-input_module(type='stand',zone=2,AD=28,HD=15.5,N=N,BA=BA,AF=35,V_model=1)
 #' core.stand<-core_module(input = input)
 #' stand_simulation<-stand_simulator(core.stand = core.stand)
 #' report(core.stand = stand_simulation)

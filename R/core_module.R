@@ -33,7 +33,7 @@
 #'
 #' @return A series of elements and parameters with updated tables (adding volume). The main output elmenets are:
 #'                 sp.table    table with stand level summary by species (1,2,3,4) and total (0), and volume
-#'                 stand.tbale data feame with the complete stand table by specie in classes of 5 cm.
+#'                 stand.table data frame with the complete stand table by specie in classes of 5 cm.
 #'                 tree.list   data frame with complete tree list
 #'                 input       list with all parameters of input and stand level statistics
 #'                             (zone, DOM.SP, AD, HD, SI, SDI, PBAN, PNHAN, AF, area, type, ddiam, comp, NHA_model,
@@ -51,7 +51,7 @@
 #' # With generation of stand-table
 #' plot$input$ddiam<-TRUE
 #' core.stand<-core_module(input=plot$input)
-#' core.stand$stand.table[5,,]
+#' core.stand$DDist[5,,]
 #' core.stand$input
 #'
 #' # Example 2: Input from tree-level data (or file)
@@ -61,8 +61,10 @@
 #' head(plot2$tree.list)
 #' core.tree<-core_module(input=plot2$input, type='tree')
 #' core.tree$sp.table
-#' core.tree$stand.table[5,,]
+#' core.tree$DDist[5,,]
 #' head(core.tree$tree.list)
+#' # Ploting distribution for all species
+#' barplot(as.matrix(core.tree$DDist[5,,5]), main='Diameter Distribution all species', xlab='DBH Class', beside=TRUE, col=4)
 
 core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                         SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0,
@@ -181,7 +183,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     vind <- matrix(NA,nrow=n)
     QD0<-params$sd[5,4]
 
-    # Completing heights using parametrized height-dbh model
+  # Completing heights using parametrized height-dbh model
     for (i in (1:n)) {
       if(is.na(tree.list$HT[i])) {
         tree.list$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.list$DBH[i]),4)
@@ -194,6 +196,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     #if (is.na(area) ){ stop('Plot area must be provided') }
     #CF <- 10000 / area  # Correction factor
     #baind <- as.numeric(pi*(tree.list$DBH/2)^2/10000)  # Units: m2
+    
     #Assigning Dominant Species and Dclass to each tree
     for (i in 1:n) {
       if (tree.list$SPECIES[i]==4) { SP<-DOM.SP
@@ -204,6 +207,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
       if (tree.list$DBH[i] == 5) {
         Dclass[i] <- 7.5
       }
+      
 
       if (tree.list$DBH[i] < 5) {
         tree.list$DBH[i] <- 5

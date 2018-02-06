@@ -16,11 +16,11 @@
 #' Renovales de Roble, Rauli y Coigue. Reporte Interno. Projecto FONDEF D97I1065. Chile
 #' @examples
 #' # Example 1: Predicts Basal Area
-#' BA99est<-BA99module(EDOM0=19, PNHAN0=.8, PBAN0 = 0.91, projection=FALSE)
+#' BA99est<-BA99module(AD0=19, PNHAN0=.8, PBAN0 = 0.91, projection=FALSE)
 #' BA99est$BA990
 #'
 #' # Example 2: Projects Basal Area
-#' BA99est<-BA99module(BA990 = 3.2, EDOM0=19, PNHAN0=0.81, PNHAN1=0.81, PBAN0 = 0.91 , PBAN1 = 0.91, projection=TRUE)
+#' BA99est<-BA99module(BA990 = 3.2, AD0=19, PNHAN0=0.81, PNHAN1=0.81, PBAN0 = 0.91 , PBAN1 = 0.91, projection=TRUE)
 #' BA99est$BA991
 
 BA99module <- function(BA990=NA, AD0=NA, PNHAN0=NA, PNHAN1=NA, PBAN0 = NA, PBAN1=NA, projection=FALSE){

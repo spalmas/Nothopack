@@ -12,12 +12,15 @@
 #' @references
 #' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para
 #' Renovales de Roble, Rauli y Coigue. Reporte Interno. Projecto FONDEF D97I1065. Chile
+#' 
+#' Gezan, S.A.; Ortega, A.; Andenmatten, E. (2007). Diagramas de manejo de densidad para renovales
+#'  de roble, raulí y coigüe en chile. Bosque (Valdivia) 28, 97-105, doi:10.4067/s0717-92002007000200002.
 #'
 #' @examples
-#' (N1<-NHAmodule(N0=2730,QD0=12.43,model=1))
-#' (N1<-NHAmodule(N0=2730,QD0=12.43,model=2))
-#' (N1<-NHAmodule(N0=2730,QD0=12.43,model=3))
-#' (N1<-NHAmodule(N0=2730,QD0=12.43,model=3))
+#' (N1<-NHAmodule(NHA0=2730,QD0=12.43,NHA_model=1))
+#' (N1<-NHAmodule(NHA0=2730,QD0=12.43,NHA_model=2))
+#' (N1<-NHAmodule(NHA0=2730,QD0=12.43,NHA_model=3))
+
 
 NHAmodule <- function(NHA0=NA, QD0=NA, NHA_model=1, EDOM = 1, return.DQmax = FALSE){
   #NHA0=3500, EDOM = 4, return.QDmax = TRUE
