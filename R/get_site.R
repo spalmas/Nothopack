@@ -4,8 +4,8 @@
 #' are given, it returns the value of the remaining stand level parameter.
 #' Note: The coefficients for the site index curves come from Gezan and Ortega (2001).
 #'
-#' @param dom_sp Dominant species (1: Rauli, 2: Roble, 3: Coigue)
-#' @param zone Growth zone (1, 2, 3, 4)
+#' @param DOM.SP Dominant species (1: Rauli, 2: Roble, 3: Coigue)
+#' @param ZONE Growth zone (1, 2, 3, 4)
 #' @param AD Dominant age (year)
 #' @param HD Dominant height (m)
 #' @param SI Site index at reference dominant age of 20 (m)
@@ -23,19 +23,19 @@
 #'
 #' @examples
 #' # Example 1: Obtain Dominant Age
-#' (AD<-get_site(dom_sp=1, zone=2, HD=14, SI=10))
+#' (AD<-get_site(DOM.SP=1, ZONE=2, HD=14, SI=10))
 #' round(AD,0)  # Rounded
 #' # Example 2: Obtain Dominant Height
-#' (HD<-get_site(dom_sp=1, zone=2, AD=25, SI=10))
+#' (HD<-get_site(DOM.SP=1, ZONE=2, AD=25, SI=10))
 #' # Example 3: Obtain Site Index
-#' (SI<-get_site(dom_sp=1, zone=2, AD=19, HD=13.5))
+#' (SI<-get_site(DOM.SP=1, ZONE=2, AD=19, HD=13.5))
 
-get_site <- function(dom_sp, zone, AD=NA, HD=NA, SI=NA){
+get_site <- function(DOM.SP, ZONE, AD=NA, HD=NA, SI=NA){
 
   # Correct Model is: HD = a [1 – {1 – (IS / a) c } ((E - 2) / (20 - 2)] 1/c
   #                   c = b0 + b1 IS
 
-  coef.list <- subset(hd_coef, hd_coef_zone == zone & hd_coef_sp_code == dom_sp,
+  coef.list <- subset(hd_coef, hd_coef_zone == ZONE & hd_coef_sp_code == DOM.SP,
                       select = c(hd_coef_a, hd_coef_b0, hd_coef_b1) )
 
   if (sum(is.na(c(AD, HD, SI))) >= 2 ){

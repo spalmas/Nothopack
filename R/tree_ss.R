@@ -8,7 +8,7 @@
 #' PS<-SS(PScal=1);PS
 #'
 
-SS<-function(PScal){
+tree.SS<-function(PScal){
   PS <- 1+ PScal*3#New Sociologic Status
   return(PS)
 }

@@ -3,7 +3,7 @@
 #' \code{input_module} Module that requests input information for all stand- or tree-level current
 #' calculations or simulations from the user, and completes some of the missing information that is required later.
 #'
-#' @param zone Growth zone (1, 2, 3, 4).
+#' @param ZONE Growth zone (1, 2, 3, 4).
 #' @param DOM.SP The dominant specie (1: Rauli, 2: Roble, 3: Coigue, 4:Mixed)
 #' @param AD Dominant age (years) of the stand.
 #' @param HD Dominant height (m) of the stand.
@@ -29,37 +29,60 @@
 #' output elements are: sp.table    table with stand level summary by species (1,2,3,4) and total (0)
 #'                      tree.list   data frame with complete tree list with missing values completed (e.g. HT)
 #'                      input       list with all parameters of input and stand level statistics
-#'                                  (zone, DOM.SP, AD, HD, SI, SDI, PBAN, PNHAN, AF, area, type, ddiam, comp, NHA_model,
+#'                                  (ZONE, DOM.SP, AD, HD, SI, SDI, PBAN, PNHAN, AF, area, type, ddiam, comp, NHA_model,
 #'                                  V_model,type, IADBH_model, sp.table, tree.list)
 #'
 #' @examples
 #' # Example 1: Input from stand-level data
 #' BA<-c(36.5,2.8,1.6,2.4)
 #' N<-c(464,23,16,48)
-#' input<-input_module(type='stand',zone=2,AD=28,HD=23.5,N=N,BA=BA)
+#' input<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, N=N, BA=BA, type='stand')
 #' input
 #' input$sp.table
 #'
 #' # Example 2: Input from tree-level data (or file)
-#' tree.list<- read.csv(file= 'data/Plot_example.csv')
+#' tree.list<-read.csv(file= 'data/Plot_example.csv')
 #' head(tree.list)
-#' plot<-input_module(type='tree',zone=2,AD=28,HD=23.5,area=500,tree.list=tree.list)
-#' attributes(plot)
+#' plot<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, type='tree', area=500, tree.list=tree.list, Hest_method=1)
 #' head(plot$tree.list)
 #' plot$sp.table
-#' plot$input
 
-input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
-                        SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0,
-                        type='stand', ddiam=FALSE, comp=NA,
-                        NHA_model=1, V_model=1, IADBH_model=1,
-                        N=NA, BA=NA, QD=NA){
+input_module <- function(ZONE=NA,  
+                         AD=NA, HD=NA, SI=NA, 
+                         N=NA, BA=NA, QD=NA,
+                         AF=NA, ddiam=FALSE, comp=FALSE, thinning=FALSE,
+                         type='stand',
+                         tree.list=NA, area=NA,
+                         NHA_model=1, V_model=1, IADBH_model=1,
+                         Hest_method=1){
 
+  DOM.SP <- NA
+  SDIP <- NA
+  PBAN <- NA
+  PNHAN <- NA
   sdmatrix <- NA
-
-  # Gathering stand-level information
+  plotdata <- NA
+  
+  ## Basic traps for simulations (all types)
+  # Errors with Age
+  if(is.na(AF)){
+    stop('There is no final age for simulation ')
+  } 
+  # Need for at least two of AD, HD, SI
+  if(is.na(AD)==T && is.na(HD)==T && is.na(SI)==T | 
+     is.na(AD)==F && is.na(HD)==T && is.na(SI)==T |
+     is.na(AD)==T && is.na(HD)==F && is.na(SI)==T |
+     is.na(AD)==T && is.na(HD)==T && is.na(SI)==F){
+    stop("Warning - Please provide information for AD, HD or SI.")
+  } 
+  
+  # Processing stand-level information
   if (type=='stand'){
 
+    if(is.na(N)==T && is.na(BA)==T && is.na()==T){
+      stop('There is no enough information for simulations')
+    }
+    
     N[5]<-sum(N)
     BA[5]<-sum(BA)
 
@@ -85,22 +108,29 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
       (QD[5]<-get_stand(BA=BA[5], N=N[5]))
     }
 
+    # Basic checking for dominant sp
     DOM.SP<-get_domsp(BA=BA[1:4])
-    if (DOM.SP==99) { warning("This stand is not dominated by Nothofagus",call. = FALSE)
-      #stop("This stand is not dominated by Nothofagus",call.= TRUE)
-      return()
-      }
+    if (DOM.SP==99) { 
+      stop("This stand is not dominated by Nothofagus")
+    }
 
+    # Completing AD, HD or SI
     if (is.na(AD)){
-      (AD<-get_site(dom_sp=DOM.SP, zone=zone, HD=HD, SI=SI))
+      (AD<-get_site(DOM.SP=DOM.SP, ZONE=ZONE, HD=HD, SI=SI))
     }
     if (is.na(HD)){
-      (HD<-get_site(dom_sp=DOM.SP, zone=zone, AD=AD, SI=SI))
+      (HD<-get_site(DOM.SP=DOM.SP, ZONE=ZONE, AD=AD, SI=SI))
     }
     if (is.na(SI)){
-      (SI<-get_site(dom_sp=DOM.SP, zone=zone, AD=AD, HD=HD))
+      (SI<-get_site(DOM.SP=DOM.SP, ZONE=ZONE, AD=AD, HD=HD))
     }
-
+  
+    # Check for AGE
+    if(AD >= AF){
+      stop('The Final age of simulation should be larger than the Initial Age')
+    }
+    
+    # Completing the data frame for stand-table
     v1 <- c((1:4),0)
     v2 <- round(N,6)
     v3 <- round(BA,6)
@@ -110,92 +140,105 @@ input_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
 
     PBAN <- sum(BA[1:3])/(BA[5])
     PNHAN <- sum(N[1:3])/(N[5])
-    SDI <- N[5]*(25.4/QD[5])^-1.4112   # This needs to be checked for model selected
+    
+    # Calculation of SDI_percentage
+    b1 <- 1.4112
+    SDI <- N[5]*(QD[5]/25.4)^b1  # Good for all DOM.SP
+    if (DOM.SP==1 | DOM.SP==4) { 
+      SDIMax <- 1155.0 # Rauli and Mixed
+    }
+    if (DOM.SP==2) { 
+      SDIMax <- 908.8 # Roble
+    }
+    if (DOM.SP==2) { 
+      SDIMax <- 1336.9   # Coigue
+    }
+    SDIP <- round(100*SDI/SDIMax,6) 
 
   }
 
+
   # Gathering tree-level information
   if (type=='tree'){
-
+    
+    # Some checks from input
+    if(nrow(tree.list)==0){
+      stop('There is no tree data for type=TREE')
+    } 
+    if(is.na(area)){
+      stop('The plot area is not provided for type=TREE')
+    } 
+    
     # Getting stand level parms from tree-list
-    plotdata<-data.frame(tree.list$SPECIES, tree.list$DBH, tree.list$HT, tree.list$FT)
-    colnames(plotdata)<-c('SPECIES','DBH','HT','FT')
-    plotdata$FT<-plotdata$FT* (10000/area)
+    FT<-matrix(1,nrow=nrow(tree.list),ncol=1)
+    plotdata<-data.frame(tree.list$ID, tree.list$SPECIES, tree.list$DBH, tree.list$HT, tree.list$SS, FT)
+    colnames(plotdata)<-c('ID','SPECIES','DBH','HT','SS','FT')
+    plotdata$FT<-plotdata$FT*(10000/area)
     params<-stand_parameters(plotdata=plotdata,area=area)
 
-    # ## Getting Individual heigths by linear regression
-    # # Linear Regression
-    # # model log(ht)=b0+b1/dbh
-    # plotdata$x<-1/plotdata$DBH
-    # plotdata$y<-log(plotdata$HT)
-    # modelo<-lm(y~x,data=plotdata)
-    # modelo
-    # plotdata$hest<-exp(modelo$coefficients[1]-modelo$coefficients[2]/plotdata$DBH)
-    # plotdata$htfin<-plotdata$HT
-    #
-    # for (i in 1:(length(plotdata$HT))) {
-    #   if(is.na(plotdata$HT[i])) {
-    #     plotdata$htfin[i]<-plotdata$hest[i]
-    #   }
-    # }
-    # plotdata$HT<-plotdata$htfin
+    # Completing SS
+    if (sum(is.na(plotdata$SS))>0){
+      plotdata$SS<-tree_covariates(ID=plotdata$ID,FT=plotdata$FT,SPECIES=plotdata$SPECIES,DBH=plotdata$DBH,ZONE=ZONE)$SS
+    }
 
-    #DOM.SP<-get_domsp(BA=params$sd$BA[1:4])
+    # Basic checking for dominant sp
     DOM.SP<-params$DOM.SP
+    if (DOM.SP==99) { 
+      stop("This stand is not dominated by Nothofagus")
+    }
     
+    # Completing AD, HD or SI
     if (is.na(AD)){
-      (AD<-get_site(dom_sp=DOM.SP, zone=zone, HD=HD, SI=SI))
+      (AD<-get_site(DOM.SP=DOM.SP, ZONE=ZONE, HD=HD, SI=SI))
     }
     if (is.na(HD)){
-      (HD<-get_site(dom_sp=DOM.SP, zone=zone, AD=AD, SI=SI))
+      (HD<-get_site(DOM.SP=DOM.SP, ZONE=ZONE, AD=AD, SI=SI))
     }
     if (is.na(SI)){
-      (SI<-get_site(dom_sp=DOM.SP, zone=zone, AD=AD, HD=HD))
+      (SI<-get_site(DOM.SP=DOM.SP, ZONE=ZONE, AD=AD, HD=HD))
     }
 
     # Completing heights using parametrized height-dbh model
-    QD0<-params$sd[5,4]
-    n<-nrow(tree.list)
-    for (i in (1:n)) {
-     if(is.na(tree.list$HT[i])) {
-       tree.list$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.list$DBH[i]),4)
-
-     }
-
-      if(tree.list$HT[i]<0){
-        tree.list$HT[i] <- 1.3
-        warning('An observed or estimated height (with the height_param model) was reported as negative.')
-      }
-    }
-
-    # Output tree-list database
-    FT<-rep(1,length(tree.list$ID))* (10000/area)
-    tree.list<-data.frame(tree.list$ID, tree.list$SPECIES, tree.list$DBH,
-                          round(tree.list$HT,3), tree.list$SS, FT)
-    colnames(tree.list)<-c('ID','SPECIES','DBH','HT','SS','FT')
+    QD<-params$sd[5,4]
+    plotdata$HT<-tree.HT(DBH=plotdata$DBH, HT=plotdata$HT, 
+                         DOM.SP=DOM.SP, ZONE=ZONE, HD=HD, QD=QD, method=Hest_method)$HTFIN
 
     # Collecting final stand parameters
     sdmatrix <- params$sd
-    PBAN <- sum(sdmatrix[1:3,3])/sum(sdmatrix[1:4,3])
-    PNHAN <- sum(sdmatrix[1:3,2])/sum(sdmatrix[1:4,2])
+    
+    PBAN <- sum(sdmatrix[1:3,3])/sdmatrix[5,3]
+    PNHAN <- sum(sdmatrix[1:3,2])/sdmatrix[5,2]
 
+    # Calculation of SDI_percentage
+    b1 <- 1.4112
+    SDI <- sdmatrix[5,2]*(sdmatrix[5,4]/25.4)^b1  # Good for all DOM.SP
+    if (DOM.SP==1 | DOM.SP==4) { 
+      SDIMax <- 1155.0 # Rauli and Mixed
     }
+    if (DOM.SP==2) { 
+      SDIMax <- 908.8 # Roble
+    }
+    if (DOM.SP==2) { 
+      SDIMax <- 1336.9   # Coigue
+    }
+    SDIP <- round(100*SDI/SDIMax,6) 
+    
+  }
 
   # List that is output from here input somewhere else
-  input <- list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
+  input <- list(ZONE=ZONE, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDIP=SDIP, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
                 area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
-                IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list)
+                IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=plotdata)
 
-  return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-              area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
-              IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=tree.list, input=input))
+  return(input=input)
 
 }
 
 #needs to receive whatever information from the file read in the simulator and turn it into something that
 #core_module can use. Can this be done inside the core_module? I feel that these are very similar scripts.
 
-# Note, still to decide how to complete the PS (SS, from covariates code)
-# Note, SDI needs to be checked (also, should we put SDI%, depends on DOM.SP)
-# Note, what happens if the user wants to calculate HD form tree.data.
+# Note, what happens if the user wants to calculate HD form tree.data - it uses other routines.
+# Note, need to make sure that the parametriz height-DBH yields to the same HD as in the input.
+# Note: SS is completed if missing
+# Note: the only thing no traspased in the retunr(input) is the Hest_method
 

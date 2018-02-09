@@ -5,7 +5,6 @@
 #' models starting from intial age (AD0) until final age (ADF) in increments of 1 year.
 #' The model of mortality is the same as whole-stand
 #'
-#'
 #' @param core.stand a stand list corrected from core_module
 #' 
 #' @references
@@ -16,6 +15,15 @@
 #' S.Gezan, S.Palmas and P.Moreno
 #'
 #' @examples
+#' New Example 1
+#' tree.list<-read.csv(file= 'data/Plot_example.csv')
+#' head(tree.list)
+#' plot<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, type='tree', area=500, tree.list=tree.list, Hest_method=1)
+#' head(plot$tree.list)
+#' plot$sp.table
+#' ..... first fix core_module
+#' 
+#' Original Example
 #' plot<- read.csv(file= 'data/Plot_example.csv')
 #' head(plot)
 #' input<-input_module(type='tree',zone=2,AD=28,HD=15.5,area=500,AF=49,tree.list=plot)## To complete info

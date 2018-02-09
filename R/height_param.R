@@ -9,8 +9,8 @@
 #' Gezan, S.A. and Ortega, A. (2001). Desarrollo de un Simulador de Rendimiento para
 #' Renovales de Roble, Rauli y Coigue. Reporte Interno. Projecto FONDEF D97I1065. Chile
 #'
-#' @param dom_sp Dominant species (1: Rauli, 2: Roble, 3: Coigue)
-#' @param zone Growth zone (1, 2, 3, 4)
+#' @param DOM.SP Dominant species (1: Rauli, 2: Roble, 3: Coigue)
+#' @param ZONE Growth zone (1, 2, 3, 4)
 #' @param HD Dominant height (m).
 #' @param QD Quadratic diameter (cm) of the stand.
 #' @param DBH Diameter at breast height (cm) of tree.
@@ -18,11 +18,11 @@
 #' @return Individual total tree height (m)
 #'
 #' @examples
-#' (HT<-height_param(dom_sp=2, zone=2, HD=15, QD=12, DBH=24))
+#' (HT<-height_param(DOM.SP=2, ZONE=2, HD=15, QD=12, DBH=24))
 
 
-height_param <- function(dom_sp, zone, HD=NA, QD=NA, DBH=NA){
-  coef.list <- subset(hparam_coef, hparam_zone == zone & hparam_dom_sp_code == dom_sp,
+height_param <- function(DOM.SP, ZONE, HD=NA, QD=NA, DBH=NA){
+  coef.list <- subset(hparam_coef, hparam_zone == ZONE & hparam_dom_sp_code == DOM.SP,
                       select = c(hparam_b0, hparam_b1, hparam_b2, hparam_b3, hparam_b4, hparam_b5))
 
   hest <-(coef.list$hparam_b0 + coef.list$hparam_b1*HD + coef.list$hparam_b2*(QD^0.95)

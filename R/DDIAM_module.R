@@ -123,11 +123,18 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
     Dclass[j] <- (diam[j]+diam[j+1])/2   # cm
     BAclass[j] <- (pi/4)*((Dclass[j])^2) # cm2
 
-    Hclass1[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=1, zone=zone)
-    Hclass2[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=2, zone=zone)
-    Hclass3[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=3, zone=zone)
-    Hclass4[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=DOM.SP, zone=zone)
+    #Hclass1[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=1, zone=zone)
+    #Hclass2[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=2, zone=zone)
+    #Hclass3[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=3, zone=zone)
+    #Hclass4[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=DOM.SP, zone=zone)
 
+    Hclass1[j] <- height_param(DOM.SP=1, ZONE=zone, HD=HD, QD=QD, DBH=Dclass[j])
+    Hclass2[j] <- height_param(DOM.SP=2, ZONE=zone, HD=HD, QD=QD, DBH=Dclass[j])
+    Hclass3[j] <- height_param(DOM.SP=3, ZONE=zone, HD=HD, QD=QD, DBH=Dclass[j])
+    Hclass4[j] <- height_param(DOM.SP=DOM.SP, ZONE=zone, HD=HD, QD=QD, DBH=Dclass[j])
+
+    height_param(DOM.SP=2, ZONE=2, HD=15, QD=12, DBH=24)
+    
     if (Hclass1[j]<1.3) { Hclass1[j]<-1.3 }
     if (Hclass2[j]<1.3) { Hclass2[j]<-1.3 }
     if (Hclass3[j]<1.3) { Hclass3[j]<-1.3 }

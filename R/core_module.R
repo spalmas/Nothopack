@@ -65,29 +65,37 @@
 #' head(core.tree$tree.list)
 #' # Ploting distribution for all species
 #' barplot(as.matrix(core.tree$DDist[5,,5]), main='Diameter Distribution all species', xlab='DBH Class', beside=TRUE, col=4)
+#' 
+#' New Example - Input from stand-level data
+#' BA<-c(36.5,2.8,1.6,2.4)
+#' N<-c(464,23,16,48)
+#' input<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, N=N, BA=BA, type='stand')
+#' input$sp.table
+#' input$ddiam<-TRUE # Requesting diameter distribution
+#' core_module(input=input)$DDist[5,,]
+#' core_module(input=input)
+#' 
+#' New Example - Input from stand-level data
+#' BA<-c(36.5,2.8,1.6,2.4)
+#' N<-c(464,23,16,48)
+#' input<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, N=N, BA=BA, type='stand', comp=FALSE, ddiam=FALSE)
+#' input$sp.table
+#' core_module(input=input)
 
-core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
-                        SDI=NA, PBAN=NA, PNHAN=NA, AF=NA, tree.list=NA, area=0,
-                        type='stand', ddiam=FALSE, comp = NA,
-                        NHA_model=1, V_model=2, IADBH_model=1, input=NA,
-                        stand_simulation=NA){
+core_module <- function(input=NULL){
 
-
-  # this is in case input is the only variable.
   # We can delete all variables in function definition
   # core module only adds volume?
-  if (is.list(input)){
-    zone <- input$zone
+  
+    zone <- input$ZONE
     DOM.SP <- input$DOM.SP
     AD <- input$AD
     HD <- input$HD
     SI <- input$SI
-    sp.table <- input$sp.table
-    SDI <- input$SDI
+    SDI <- input$SDIP  # Fix is now SDIP
     PBAN <- input$PBAN
     PNHAN <- input$PNHAN
     AF <- input$AF
-    tree.list <- input$tree.list
     area <- input$area
     type <- input$type
     ddiam <- input$ddiam
@@ -95,15 +103,54 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
     NHA_model <- input$NHA_model
     V_model <- input$V_model
     IADBH_model <- input$IADBH_model
-    stand_simulation <- input$stand_simulation
+    sp.table <- input$sp.table
+    tree.list <- input$tree.list
+    
+    stand.table <- NA
+
+  # Flow with options: type (stand, tree), ddiam (TRUE, FALSE), comp (TRUE, FALSE)   
+    
+  # No compatibility 
+  if (comp==FALSE) {
+    
+    # STAND simulation (no comp.)
+    if (type=='stand') {
+      
+      # Perform simulations form AD to AF
+      
+      
+      
+      # Calculates Stand-level volume for simulations (by stand-level equations)
+      if (ddiam=FALSE) {
+        
+      }
+      # Calculates Stand-level volume for simulations (by generating diameter distributions)
+      if (ddiam=TRUE) {
+        
+      }
+      
+        
+    }
+    
+    # TREE simulation (no comp.)
+    if (type=='tree') {
+      
+    }
+    
+    
   }
-
-  stand.table <- NA
-
+  
+  # Using compatibility
+  if (comp==TRUE) {
+    # call type = STAND
+    # call type = TREE
+    # call comp.simulation
+  }
+    
   #---===
   # IF STAND ----
   #---===
-  if (type=='stand'){    # tree.list not provided then generate one - always
+  if (type=='stand.old'){    # tree.list not provided then generate one - always
 
     if (ddiam==FALSE) {
 
@@ -120,7 +167,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
       PBA<-sp.table[1:4,3]/sp.table[5,3]
       sp.table[1:4,5]<-round(VTHA*PBA,3)
 
-      DDist=NA
+      DDist<-NA
 
     }
 
@@ -171,7 +218,7 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
   # IF A tree.list IS PROVIDED ----
   #---===
 
-  if (type == 'tree'){
+  if (type == 'tree.old'){
 
     params<-stand_parameters(plotdata=tree.list, area=area)
     # Collecting final stand parameters
@@ -325,11 +372,8 @@ core_module <- function(zone=NA, DOM.SP=NA, AD=NA, HD=NA, SI=NA, sp.table=NA,
                 area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
                 IADBH_model=IADBH_model, sp.table=sp.table, DDdist=DDist, tree.list=tree.list )
 
-
-  return(list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-              area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
-              IADBH_model=IADBH_model,
-              sp.table=sp.table, DDist=DDist, tree.list=tree.list, input=input))
+  return(input=input)
+  
 }
 
 # Note: V_model=1 or anything else is always the same
