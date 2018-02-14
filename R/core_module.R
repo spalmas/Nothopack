@@ -40,7 +40,25 @@
 #'                             V_model,IADBH_model,start_time)
 #'
 #' @examples
-#' # Example 1: Input from stand-level data
+#' Temp-Example 1: Input from stand-level data
+#' BA<-c(36.5,2.8,1.6,2.4)
+#' N<-c(464,23,16,48)
+#' stand.input<-input_module(ZONE=2, AD=28, HD=18.5, AF=35, N=N, BA=BA, type='stand', ddiam=FALSE, comp=FALSE)
+#' sims.stand<-core_module(input=stand.input)
+#' sims.stand
+#' stand.input$ddiam=TRUE
+#' 
+#' Temp-Example 2: Input from tree-level data
+#' tree.list<-read.csv(file= 'data/Plot_example.csv')
+#' plot<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, type='tree', area=500, tree.list=tree.list, Hest_method=1, ddiam=FALSE)
+#' sims.tree<-core_module(input=plot)
+#' head(plot$tree.list)
+#' head(sims.tree$tree.list)
+#' plot$sp.table
+#' sims.tree$sp.table
+
+
+# Example 1: Input from stand-level data
 #' BA<-c(36.5,2.8,0.0,2.4)
 #' N<-c(464,23,0,48)
 #' plot<-input_module(type='stand',zone=1,AD=28,AF=40,HD=23.5,N=N,BA=BA,V_model=2,ddiam=FALSE)
@@ -82,6 +100,7 @@
 #' input$sp.table
 #' core_module(input=input)
 
+
 core_module <- function(input=NULL){
 
   # We can delete all variables in function definition
@@ -92,7 +111,7 @@ core_module <- function(input=NULL){
     AD <- input$AD
     HD <- input$HD
     SI <- input$SI
-    SDI <- input$SDIP  # Fix is now SDIP
+    SDIP <- input$SDIP  # Fix is now SDIP
     PBAN <- input$PBAN
     PNHAN <- input$PNHAN
     AF <- input$AF
@@ -117,103 +136,124 @@ core_module <- function(input=NULL){
     if (type=='stand') {
       
       # Perform simulations form AD to AF
-      
-      
-      
+      sims <- stand_simulator(core.stand=input)
+
       # Calculates Stand-level volume for simulations (by stand-level equations)
-      if (ddiam=FALSE) {
+      if (ddiam==FALSE) {
         
+        # Calculating Stand-level volume (total)
+        sims$sp.table<-cbind(sims$sp.table,VTHA=c(1:5)*0)
+        if (V_model==1){
+          VTHA <- Vmodule(BA=sims$sp.table$BA[5], HD=sims$HD, PNHAN=sims$PNHAN)
+        } else {
+          VTHA <- Vmodule(BA=sims$sp.table$BA[5], HD=sims$HD)
+        }
+        sims$sp.table[5,5]<-round(VTHA,6)
+        
+        # Assigning volume proportional to PBA
+        PBA<-sims$sp.table[1:4,3]/sims$sp.table[5,3]
+        sims$sp.table[1:4,5]<-round(VTHA*PBA,6)
+        
+        sims$DDdist<-NA
+  
       }
       # Calculates Stand-level volume for simulations (by generating diameter distributions)
-      if (ddiam=TRUE) {
-        
+      if (ddiam==TRUE) {
+          
+        # Generate stand-table from diameter distibution (does not contain volumes)
+        stand.table<-diam_dist(sp.table=sims$sp.table, HD=HD, DOM.SP=DOM.SP, zone=zone)
+        m <- length(stand.table[1,,1])
+          
+        # Calculating class-level volume (total) by specie and class
+        r_names<-c('DBH_ll','DBH_ul','D_class','H_class','N','BA','VT')
+        DDist<-array(data=NA, dim=c(5,m,7), dimnames=list(c(1:5),c(1:m),r_names))
+        DDist[,,-7]<-stand.table
+          
+        minN <- 0.1 # minimum Number of trees per diameter class to consider
+        for (i in 1:m) {
+          if (stand.table[1,i,5] < minN){ Vi.sp1<-0
+          } else { Vi.sp1<-Vmodule_individual(SPECIES=1, zone=zone, DBH=stand.table[1,i,3],
+                                              HT=stand.table[1,i,4], blength=stand.table[1,i,4]) }
+          if (stand.table[2,i,5] < minN){ Vi.sp2<-0
+          } else { Vi.sp2<-Vmodule_individual(SPECIES=2, zone=zone, DBH=stand.table[2,i,3],
+                                              HT=stand.table[2,i,4], blength=stand.table[2,i,4]) }
+          if (stand.table[3,i,5] < minN){ Vi.sp3<-0
+          } else { Vi.sp3<-Vmodule_individual(SPECIES=3, zone=zone, DBH=stand.table[3,i,3],
+                                              HT=stand.table[3,i,4], blength=stand.table[3,i,4]) }
+          if (stand.table[4,i,5] < minN){ Vi.sp4<-0
+          } else { Vi.sp4<-Vmodule_individual(SPECIES=DOM.SP, zone=zone, DBH=stand.table[4,i,3],
+                                              HT=stand.table[4,i,4], blength=stand.table[4,i,4])}
+          DDist[1,i,7]<-round(Vi.sp1*stand.table[1,i,5],3)
+          DDist[2,i,7]<-round(Vi.sp2*stand.table[2,i,5],3)
+          DDist[3,i,7]<-round(Vi.sp3*stand.table[3,i,5],3)
+          DDist[4,i,7]<-round(Vi.sp4*stand.table[4,i,5],3)
+          DDist[5,i,7]<-DDist[1,i,7]+DDist[2,i,7]+DDist[3,i,7]+DDist[4,i,7]
+        }
+          
+        # Assigning volume from generated stand-table
+        sims$sp.table<-cbind(sims$sp.table,VTHA=c(1:5)*0)
+        sims$sp.table[1,5]<-round(sum(DDist[1,,7]),3)
+        sims$sp.table[2,5]<-round(sum(DDist[2,,7]),3)
+        sims$sp.table[3,5]<-round(sum(DDist[3,,7]),3)
+        sims$sp.table[4,5]<-round(sum(DDist[4,,7]),3)
+        sims$sp.table[5,5]<-round(sum(DDist[5,,7]),3)
+          
+        sims$DDdist<-DDist
       }
-      
         
     }
+    
     
     # TREE simulation (no comp.)
     if (type=='tree') {
       
-    }
-    
-    
-  }
-  
-  # Using compatibility
-  if (comp==TRUE) {
-    # call type = STAND
-    # call type = TREE
-    # call comp.simulation
-  }
-    
-  #---===
-  # IF STAND ----
-  #---===
-  if (type=='stand.old'){    # tree.list not provided then generate one - always
+      sims<-tree_simulator(core.tree=input)
+      sims$DDdist<-NA
 
-    if (ddiam==FALSE) {
-
-      # Calculating Stand-level volume (total)
-      sp.table<-cbind.data.frame(sp.table,VTHA=c(1:5)*0)
-      if (V_model==1){
-        VTHA <- Vmodule(BA=sp.table$BA[5], HD=HD, PNHAN=PNHAN)
-      } else {
-        VTHA <- Vmodule(BA=sp.table$BA[5], HD=HD)
-      }
-      sp.table[5,5]<-round(VTHA,3)
-
-      # Assigning volume proportional to PBA
-      PBA<-sp.table[1:4,3]/sp.table[5,3]
-      sp.table[1:4,5]<-round(VTHA*PBA,3)
-
-      DDist<-NA
-
-    }
-
-    if (ddiam==TRUE) {
-
-      # Generate stand-table from diameter distibution (does not contain volumes)
-      stand.table<-diam_dist(sp.table=sp.table, HD=HD, DOM.SP=DOM.SP, zone=zone)
-      m <- length(stand.table[1,,1])
-
-      # Calculating class-level volume (total) by specie and class
-      r_names<-c('DBH_ll','DBH_ul','D_class','H_class','N','BA','VT')
-      DDist<-array(data=NA, dim=c(5,m,7), dimnames=list(c(1:5),c(1:m),r_names))
-      DDist[,,-7]<-stand.table
-
-      minN <- 0.1 # minimum Number of trees per diameter class to consider
+      m <- length(sims$tree.list$ID)
+      sims$tree.list$Vi <- matrix(0,nrow=m,ncol=1)
       for (i in 1:m) {
-        if (stand.table[1,i,5] < minN){ Vi.sp1<-0
-        } else { Vi.sp1<-Vmodule_individual(SPECIES=1, zone=zone, DBH=stand.table[1,i,3],
-                                            HT=stand.table[1,i,4], blength=stand.table[1,i,4]) }
-        if (stand.table[2,i,5] < minN){ Vi.sp2<-0
-        } else { Vi.sp2<-Vmodule_individual(SPECIES=2, zone=zone, DBH=stand.table[2,i,3],
-                                            HT=stand.table[2,i,4], blength=stand.table[2,i,4]) }
-        if (stand.table[3,i,5] < minN){ Vi.sp3<-0
-        } else { Vi.sp3<-Vmodule_individual(SPECIES=3, zone=zone, DBH=stand.table[3,i,3],
-                                            HT=stand.table[3,i,4], blength=stand.table[3,i,4]) }
-        if (stand.table[4,i,5] < minN){ Vi.sp4<-0
-        } else { Vi.sp4<-Vmodule_individual(SPECIES=DOM.SP, zone=zone, DBH=stand.table[4,i,3],
-                                            HT=stand.table[4,i,4], blength=stand.table[4,i,4])}
-        DDist[1,i,7]<-round(Vi.sp1*stand.table[1,i,5],3)
-        DDist[2,i,7]<-round(Vi.sp2*stand.table[2,i,5],3)
-        DDist[3,i,7]<-round(Vi.sp3*stand.table[3,i,5],3)
-        DDist[4,i,7]<-round(Vi.sp4*stand.table[4,i,5],3)
-        DDist[5,i,7]<-DDist[1,i,7]+DDist[2,i,7]+DDist[3,i,7]+DDist[4,i,7]
+         sims$tree.list$Vi[i] <- Vmodule_individual(SPECIES=sims$tree.list$SPECIES[i],
+                                              zone=sims$ZONE, DBH=sims$tree.list$DBH[i],
+                                              HT=sims$tree.list$HT[i], blength=sims$tree.list$HT[i]) 
       }
-
-      # Assigning volume from generated stand-table
-      sp.table<-cbind.data.frame(sp.table,VTHA=c(1:5)*0)
-      sp.table[1,5]<-round(sum(DDist[1,,7]),3)
-      sp.table[2,5]<-round(sum(DDist[2,,7]),3)
-      sp.table[3,5]<-round(sum(DDist[3,,7]),3)
-      sp.table[4,5]<-round(sum(DDist[4,,7]),3)
-      sp.table[5,5]<-round(sum(DDist[5,,7]),3)
-
+      
+      
+      # From here we need: 1) completing for each tree volume (tree.list), 2) summarize for sp.table, 3) Ddiam??? (hard work)
+      # (modify in sims)
+      #
+      #
+      #
+            
     }
+    
   }
+   
+   # Using compatibility
+   if (comp==TRUE) {
+     
+     # call type = STAND
+     # call type = TREE
+     # call comp.simulation
+     
+   }
 
+    # List that is output from here input somewhere else
+    #input <- list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
+    #              area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
+    #              IADBH_model=IADBH_model, sp.table=sp.table, DDdist=DDist, tree.list=tree.list )
+    
+    return(output=sims)
+
+
+} 
+    
+
+
+#############################
+
+
+    
   #---===
   # IF A tree.list IS PROVIDED ----
   #---===
@@ -380,3 +420,6 @@ core_module <- function(input=NULL){
 # Note: it needs some standarization on output of sp.table and stand.table between stand and tree-level (e.g. SPECIE or SPECIES)
 # Deifnition of stand simulation is not incorporated
 # This module should now separate VT for all products(additional columns)
+
+# Note: this module should story the sp.table for each simulated year.
+# Volume is calculated after each simulation...(maybe not... need to decide.)

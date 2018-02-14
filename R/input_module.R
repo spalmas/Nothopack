@@ -170,10 +170,14 @@ input_module <- function(ZONE=NA,
     } 
     
     # Getting stand level parms from tree-list
-    FT<-matrix(1,nrow=nrow(tree.list),ncol=1)
+    if (sum(is.na(tree.list$FT))>0) {
+       FT<-matrix(1,nrow=nrow(tree.list),ncol=1)
+       FT<-FT*(10000/area)
+    } else {
+       FT<-tree.list$FT
+    }
     plotdata<-data.frame(tree.list$ID, tree.list$SPECIES, tree.list$DBH, tree.list$HT, tree.list$SS, FT)
     colnames(plotdata)<-c('ID','SPECIES','DBH','HT','SS','FT')
-    plotdata$FT<-plotdata$FT*(10000/area)
     params<-stand_parameters(plotdata=plotdata,area=area)
 
     # Completing SS

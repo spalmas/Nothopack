@@ -19,9 +19,11 @@
 #' tree.list<-read.csv(file= 'data/Plot_example.csv')
 #' head(tree.list)
 #' plot<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, type='tree', area=500, tree.list=tree.list, Hest_method=1)
+#' sims<-tree_simulator(core.tree=plot)
 #' head(plot$tree.list)
+#' head(sims$tree.list)
 #' plot$sp.table
-#' ..... first fix core_module
+#' sims$sp.table
 #' 
 #' Original Example
 #' plot<- read.csv(file= 'data/Plot_example.csv')
@@ -40,132 +42,120 @@
 tree_simulator <- function(core.tree = NULL){
 
   ### Initializations of variables
-  HT<-core.tree$tree.list$HT   #list heights
-  #Ss<-core.tree$tree.list$SS   #list sociological status NA
+  HT <- core.tree$tree.list$HT   #list heights
+  ZONE <- core.tree$ZONE
+  DOM.SP <- core.tree$DOM.SP
+  SI <- core.tree$SI
+  HD <- core.tree$HD
+  
   FTv<-rep(1,length(core.tree$tree.list$ID))    #expansion factor vector
-  input.data1<-covariates(ID=core.tree$tree.list$ID,
-                          Fa=core.tree$tree.list$FT,    #list of expansion factors
-                          sp=core.tree$tree.list$SPECIES,
-                          DBH=core.tree$tree.list$DBH,      #list dbh
-                          ZONE = core.tree$zone)   #estimating stand and individual variables
-
-  #---===
-  # SIMULATION ----
-  #---===
+  input.data1<-tree_covariates(ID=core.tree$tree.list$ID, FT=core.tree$tree.list$FT,    
+                               SPECIES=core.tree$tree.list$SPECIES, DBH=core.tree$tree.list$DBH,     
+                               ZONE=ZONE, SS=core.tree$tree.list$SS)   #estimating stand and individual variables
 
   # Initial variables. This are updated every year.
-  Fap<-core.tree$tree.list$FT
-  QDp<-input.data1$QD
-  DBHp<-input.data1$DBH
-  BALcp<-input.data1$BALc
-  SDIp<-input.data1$SDI
-  Ap<-FTv*core.tree$AD
-  SSp<-input.data1$Ss
-  DAp<-FTv*core.tree$AD
-  PSCALp<-input.data1$PScal
-
-  #FROM INITIAL AGE TO FINAL AGE (LOOP 1)
+  Fap <- input.data1$FT
+  QDp <- input.data1$QD
+  DBHp <- input.data1$DBH
+  BALcp <- input.data1$BALc
+  SDIp <- input.data1$SDI  # Not sure if this is % or trees/ha
+  Ap <- FTv*core.tree$AD
+  SSp <- input.data1$SS
+  DAp <- FTv*core.tree$AD
+  PSCALp <- input.data1$PScal
+  SP <- input.data1$SPECIES
+  
+  # FROM INITIAL AGE TO FINAL AGE (LOOP 1)
   for (k in core.tree$AD:(core.tree$AF-1)) {
     #BY TREE (LOOP 2)
 
-    #ANNUAL INCREMENT
-    Gest<-AIDBH_module(BALc=BALcp,
-                       SDI=SDIp,
-                       DBH=DBHp,
-                       A=Ap,
-                       Ss=SSp,
-                       DA=DAp,
-                       PSCAL = PSCALp,
-                       SP=input.data1$sp,
-                       ZONE=input.data1$ZONE,
+    # ANNUAL INCREMENT
+    Gest <- AIDBH_module(BALc=BALcp, SDI=SDIp, DBH=DBHp, A=Ap, Ss=SSp,
+                       DA=DAp, PSCAL = PSCALp, SP=SP, ZONE=ZONE,
                        Model=core.tree$IADBH_model)
-    DBHp1<-DBHp+(Gest/10)
+    DBHp1 <- DBHp+(Gest/10)
+    # Dif.DBH <- Gest/10
 
-    #Dif.DBH <- Gest/10
+    # MORTALITY
+    N1 <- NHAmodule(NHA0=input.data1$NHA,QD0=QDp,NHA_model=core.tree$NHA_model)   # How many survive (done as vector)
+    Mortality <- unique(input.data1$NHA)-N1    #How many should die
+    BALr <- PSCALp/sum(PSCALp)    #Some BAL for each tree
+    Mi <- BALr*Mortality     #Correct mortality based on BAL
+    Fap1 <- Fap-Mi     #Corrected expansion factor. The sum is equal to N1.
 
-    #MORTALITY
-    N1<-NHAmodule(NHA0=input.data1$NHA,QD0=QDp,NHA_model=core.tree$NHA_model)   #How many survive
-    Mortality<-unique(input.data1$NHA)-N1    #How many should die
-    BALr<-PSCALp/sum(PSCALp)    #Some BAL for each tree
-    Mi<-BALr*Mortality     #Correct mortality based on BAL
-    Fap1<-Fap-Mi     #Corrected expansion factor. The sum is equal to N1.
-
-    #NEW PREDICTORS
-    data.temp<-covariates(ID=core.tree$tree.list$ID, Fa=Fap1, sp=input.data1$sp,DBH=DBHp1, ZONE=input.data1$ZONE, Ss=SSp)
-
+    # NEW COVARIATES
+    #data.temp<-covariates(ID=core.tree$tree.list$ID, Fa=Fap1, sp=input.data1$sp,DBH=DBHp1, ZONE=input.data1$ZONE, Ss=SSp)
+    data.temp <- tree_covariates(ID=core.tree$tree.list$ID, FT=Fap1, SPECIES=SP, DBH=DBHp1, ZONE=ZONE, SS=SSp)
+    
     #UPDATE VALUES
-    DBHp<-data.temp$DBH
-    Fap<-data.temp$Fa
-    BALcp<-data.temp$BALc
-    SDIp<-data.temp$SDI
-    Ap<-Ap+1# new age
-    DAp<-DAp+1# new dominant age
-    PSCALp<-data.temp$PScal
-    NHAp<-data.temp$NHA
-    BAp<-data.temp$BA
-    QDp<-data.temp$QD
-    SSp<-data.temp$Ss
+    DBHp <- data.temp$DBH
+    Fap <- data.temp$FT
+    BALcp <- data.temp$BALc
+    SDIp <- data.temp$SDI
+    Ap <- Ap+1    # new age
+    DAp <- DAp+1  # new dominant age
+    PSCALp <- data.temp$PScal
+    NHAp <- data.temp$NHA
+    BAp <- data.temp$BA
+    QDp <- data.temp$QD
+    SSp <- data.temp$SS
+    
   }
-  plot.proy<-data.frame(data.temp,HT,Fap,Ap,DAp)
+  
+  plot.proy <- data.frame(data.temp,HT,Fap,Ap,DAp)
 
 
   # Height Increment Module
-  HT0<-HT
-  m<-length(HT0)
+  HT0 <- HT
+  m <- length(HT0)
   HTparam.0 <- matrix(data=0,nrow=m,ncol=1)
   HTparam.n <- matrix(data=0,nrow=m,ncol=1)
   Dif.HT <- matrix(data=0,nrow=m,ncol=1)
-  HDp<-get_site(dom_sp=core.tree$DOM.SP, zone=core.tree$zone, AD=DAp[1], SI=core.tree$SI)
+  HDp <- get_site(DOM.SP=DOM.SP, ZONE=ZONE, AD=DAp[1], SI=SI)
 
-  #predicted height at the start (AD)
-  HTparam.0<-height_param(dom_sp=core.tree$DOM.SP,
-                             zone=core.tree$zone,
-                             HD=core.tree$HD,
-                             QD=input.data1$QD[1],
-                             DBH=input.data1$DBH)
+  
+  (HT<-height_param(DOM.SP=2, ZONE=2, HD=15, QD=12, DBH=24))
+  
+  # predicted height at the start (AD)
+  HTparam.0 <- height_param(DOM.SP=DOM.SP, ZONE=ZONE,
+                            HD=HD, QD=input.data1$QD[1],
+                            DBH=input.data1$DBH)
 
-  #predicted height at the end (AF)
-  HTparam.n<-height_param(dom_sp=core.tree$DOM.SP,
-                             zone=core.tree$zone,
-                             HD=HDp,
-                             QD=QDp[1],
-                             DBH=DBHp)
+  # predicted height at the end (AF)
+  HTparam.n <- height_param(DOM.SP=DOM.SP, ZONE=ZONE,
+                            HD=HDp, QD=QDp[1],
+                            DBH=DBHp)
 
-  #Difference in height growth
+  # Difference in height growth
   Dif.HT <- HTparam.n-HTparam.0
   Dif.HT <-  Dif.HT %>% replace(.<0, 0)
 
-  #assigning new height
-  HTn<-HT0+Dif.HT
+  # Assigning new height
+  HTn <- HT0+Dif.HT
   #print(data.frame(HT0,HTparam.0,HTparam.n,HTn,Dif.HT))
 
-  #obtaining tree.list
+  # Generating new tree.list
   treedata<-data.frame(plot.proy$ID,
-                       plot.proy$sp,
-                       round(plot.proy$DBH,2),
-                       round(HTn,2),
-                       round(plot.proy$Ss,1),
-                       round(plot.proy$Fap,3))
+                       plot.proy$SPECIES,
+                       round(plot.proy$DBH,6),
+                       round(HTn,6),
+                       round(plot.proy$SS,6),
+                       round(plot.proy$FT,6))
   colnames(treedata)<-c('ID','SPECIES','DBH','HT','SS','FT')
 
-  comp.list <- data.frame(prob.surv=Fap1/core.tree$tree.list$FT,PAI.HT=Dif.HT,PAI.DBH=Gest)
+  # What is this for???????
+  #comp.list <- data.frame(prob.surv=Fap1/core.tree$tree.list$FT,PAI.HT=Dif.HT,PAI.DBH=Gest)
 
-  #Actualization of PBAN and PNHAN
-  updated_core <- input_module(type='tree',zone=core.tree$zone,AD=core.tree$AD,HD=HDp,area=core.tree$area,AF=NA, tree.list = treedata)
-  #
+  # Actualization of many things
+  updated.plot<-input_module(ZONE=ZONE, AD=core.tree$AF, HD=HDp, SI=SI, AF=core.tree$AF,
+                             ddiam=core.tree$ddiam, comp=core.tree$ddiam, thinning=core.tree$thinning,
+                             type=core.tree$type, tree.list=treedata, area=core.tree$area,
+                             NHA_model=core.tree$NHA_model, V_model=core.tree$V_model, IADBH_model=core.tree$IADBH_model,
+                             Hest_method=2)
+  
+  return(output=updated.plot)
+  
+  #return(list(input=input, comp.list =  comp.list))
 
-  input <- list(zone=core.tree$zone, DOM.SP=core.tree$DOM.SP, AD=core.tree$AD,
-                HD=HDp, SI=core.tree$SI, SDI=SDIp[1],
-                PBAN=updated_core$input$PBAN, PNHAN=updated_core$input$PNHAN, AF=DAp[1],
-                area=core.tree$area, type=core.tree$type, ddiam=core.tree$ddiam,
-                comp=core.tree$comp, NHA_model=core.tree$NHA_model,
-                V_model=core.tree$V_model, IADBH_model=core.tree$IADBH_model,
-                sp.table=NA, stand.table=NA, tree.list=treedata)
-
-  #
-  # input <- list(tree.list=treedata, zone=zone, DOM.SP=DOM.SP, AD=DAp[1], SI=SI, HD=HD,
-  #                    SDI=unique(SDIp), area=area,type='tree')
-  #
-  return(list(input=input, comp.list =  comp.list))
 }
 
