@@ -38,7 +38,7 @@
 #' tree.HT(DBH=DBH, HT=HT, method=2)
 
 
-tree.HT  <-  function(DBH, HT, DOM.SP=NA, ZONE=NA, HD=NA, QD=NA, method=1){
+tree.ht  <-  function(DBH, HT, DOM.SP=NA, ZONE=NA, HD=NA, QD=NA, method=1){
 
                         if(length(DBH)==length(HT) & sum(is.na(DBH))==0){
 

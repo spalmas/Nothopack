@@ -204,7 +204,7 @@ input_module <- function(ZONE=NA,
 
     # Completing heights using parametrized height-dbh model
     QD<-params$sd[5,4]
-    plotdata$HT<-tree.HT(DBH=plotdata$DBH, HT=plotdata$HT, 
+    plotdata$HT<-tree.ht(DBH=plotdata$DBH, HT=plotdata$HT, 
                          DOM.SP=DOM.SP, ZONE=ZONE, HD=HD, QD=QD, method=Hest_method)$HTFIN
 
     # Collecting final stand parameters

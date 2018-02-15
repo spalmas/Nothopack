@@ -36,6 +36,7 @@ source('R/RECRUIT_module.R')
 source('R/report.R')
 source('R/report_plots.R')  #For multiplot of simulation results
 source('R/tree_ss.R')
+source('R/tree.ht.R')
 source('R/stand_parameters.R')
 source('R/stand_simulator.R') 
 source('R/tree_simulator.R')  

@@ -50,13 +50,16 @@
 #' 
 #' Temp-Example 2: Input from tree-level data
 #' tree.list<-read.csv(file= 'data/Plot_example.csv')
+#' plot1<-input_module(ZONE=2, AD=28, HD=23.5, AF=28, type='tree', area=500, tree.list=tree.list, Hest_method=1, ddiam=FALSE)
 #' plot<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, type='tree', area=500, tree.list=tree.list, Hest_method=1, ddiam=FALSE)
+#' sims.tree1<-core_module(input=plot1)
 #' sims.tree<-core_module(input=plot)
-#' head(plot$tree.list)
+#' head(sims.tree1$tree.list)
 #' head(sims.tree$tree.list)
 #' plot$sp.table
+#' sims.tree1$sp.table
 #' sims.tree$sp.table
-
+#' sims.tree$DDdist[5,,]
 
 # Example 1: Input from stand-level data
 #' BA<-c(36.5,2.8,0.0,2.4)
@@ -129,9 +132,11 @@ core_module <- function(input=NULL){
 
   # Flow with options: type (stand, tree), ddiam (TRUE, FALSE), comp (TRUE, FALSE)   
     
+  ###################  
   # No compatibility 
   if (comp==FALSE) {
     
+    #############################
     # STAND simulation (no comp.)
     if (type=='stand') {
       
@@ -203,27 +208,139 @@ core_module <- function(input=NULL){
         
     }
     
-    
+    #############################
     # TREE simulation (no comp.)
     if (type=='tree') {
       
       sims<-tree_simulator(core.tree=input)
       sims$DDdist<-NA
-
       m <- length(sims$tree.list$ID)
-      sims$tree.list$Vi <- matrix(0,nrow=m,ncol=1)
+      
+      # Estimating individual volume for each tree
+      sims$tree.list$VOL <- matrix(0,nrow=m,ncol=1)
       for (i in 1:m) {
-         sims$tree.list$Vi[i] <- Vmodule_individual(SPECIES=sims$tree.list$SPECIES[i],
+         sims$tree.list$VOL[i] <- Vmodule_individual(SPECIES=sims$tree.list$SPECIES[i],
                                               zone=sims$ZONE, DBH=sims$tree.list$DBH[i],
                                               HT=sims$tree.list$HT[i], blength=sims$tree.list$HT[i]) 
       }
       
+      # Assigning trees to each diameter class (Dclass)
+      sims$tree.list$Dclass <- ceiling(sims$tree.list$DBH/5)*5-2.5
+      for (i in 1:m) {
+        if (sims$tree.list$DBH[i] == 5) {
+          Dclass[i] <- 7.5
+        }
+        if (sims$tree.list$DBH[i] < 5) {
+          sims$tree.list$DBH[i] <- 5
+          warning('Some trees are smaller than 5 cm DBH')
+          Dclass[i] <- 7.5
+        }
+        if (sims$tree.list$DBH[i] >= 90) {
+          sims$tree.list$DBH[i] <- (90)
+          warning('Some trees are larger than 90 cm DBH')
+          Dclass[i] <- 87.5
+        }
+      }
       
-      # From here we need: 1) completing for each tree volume (tree.list), 2) summarize for sp.table, 3) Ddiam??? (hard work)
-      # (modify in sims)
-      #
-      #
-      #
+      head(sims$tree.list)
+      sims$sp.table
+      
+      sims$tree.list$Nst <- sims$tree.list$FT
+      sims$tree.list$BAst <- sims$tree.list$FT*(pi/4)*(sims$tree.list$DBH^2/10000)
+      sims$tree.list$VOLst <- sims$tree.list$FT*sims$tree.list$VOL
+      
+      HT.agg <-aggregate(HT~Dclass+SPECIES,FUN=mean,data=sims$tree.list)
+      N.agg  <-aggregate(Nst~Dclass+SPECIES,FUN=sum,data=sims$tree.list)
+      BA.agg <-aggregate(BAst~Dclass+SPECIES,FUN=sum,data=sims$tree.list)
+      VT.agg <-aggregate(VOLst~Dclass+SPECIES,FUN=sum,data=sims$tree.list)
+      data.agg<-data.frame(HT.agg,N.agg[3],BA.agg[3],VT.agg[3])
+      
+      class <- 5
+      diam <- seq(from=5,to=90,by=class)   # Diameter classes
+      nclass <- length(diam)-1
+      DBH_LL <- matrix(data=0,nrow=nclass,ncol=1)
+      DBH_UL <- matrix(data=0,nrow=nclass,ncol=1)
+      Dclass <- matrix(data=0,nrow=nclass,ncol=1)
+      BAclass <- matrix(data=0,nrow=nclass,ncol=1)
+      Hclass <- matrix(data=0,nrow=nclass,ncol=1)
+      Vclass <- matrix(data=0,nrow=nclass,ncol=1)
+      
+      
+      for (j in 1:(nclass)){
+        DBH_LL[j] <- diam[j]                 # cm
+        DBH_UL[j] <- diam[j+1]               # cm
+        Dclass[j] <- (diam[j]+diam[j+1])/2   # cm
+      }
+      head<-data.frame(DBH_LL,DBH_UL,Dclass)
+      
+      r_names<-c('DBH_ll','DBH_ul','D_class','H_class','N','BA','VT')
+      DDist<-array(data=0, dim=c(5,(length(diam)-1),7),
+                   dimnames=list(c(1:5),c(1:(length(diam)-1)),r_names))
+      
+      data.agg1<-data.agg[which(data.agg$SPECIES==1),]
+      Dclass1<-merge(head,data.agg1,by="Dclass",all=TRUE)
+      data.agg2<-data.agg[which(data.agg$SPECIES==2),]
+      Dclass2<-merge(head,data.agg2,by="Dclass",all=TRUE)
+      data.agg3<-data.agg[which(data.agg$SPECIES==3),]
+      Dclass3<-merge(head,data.agg3,by="Dclass",all=TRUE)
+      data.agg4<-data.agg[which(data.agg$SPECIES==4),]
+      Dclass4<-merge(head,data.agg4,by="Dclass",all=TRUE)
+      
+      Dclass1<-data.frame(head,HT=round(Dclass1[,5],2),N=round(Dclass1[,6],2),BA=round(Dclass1[,7],2),VT=round(Dclass1[,8],3))
+      Dclass2<-data.frame(head,HT=round(Dclass2[,5],2),N=round(Dclass2[,6],2),BA=round(Dclass2[,7],2),VT=round(Dclass2[,8],3))
+      Dclass3<-data.frame(head,HT=round(Dclass3[,5],2),N=round(Dclass3[,6],2),BA=round(Dclass3[,7],2),VT=round(Dclass3[,8],3))
+      Dclass4<-data.frame(head,HT=round(Dclass4[,5],2),N=round(Dclass4[,6],2),BA=round(Dclass4[,7],2),VT=round(Dclass4[,8],3))
+      Dclass5<-Dclass4
+      
+      for (j in 1:(nclass)){
+        if (is.na(Dclass1$HT[j])) {
+          Dclass1$HT[j]=0
+          Dclass1$N[j]=0
+          Dclass1$BA[j]=0
+          Dclass1$VT[j]=0
+        }
+        if (is.na(Dclass2$HT[j])) {
+          Dclass2$HT[j]=0
+          Dclass2$N[j]=0
+          Dclass2$BA[j]=0
+          Dclass2$VT[j]=0
+        }
+        if (is.na(Dclass3$HT[j])) {
+          Dclass3$HT[j]=0
+          Dclass3$N[j]=0
+          Dclass3$BA[j]=0
+          Dclass3$VT[j]=0
+        }
+        if (is.na(Dclass4$HT[j])) {
+          Dclass4$HT[j]=0
+          Dclass4$N[j]=0
+          Dclass4$BA[j]=0
+          Dclass4$VT[j]=0
+        }
+        
+      }
+      
+      Dclass5$N=Dclass1$N+Dclass2$N+Dclass3$N+Dclass4$N
+      Dclass5$BA=Dclass1$BA+Dclass2$BA+Dclass3$BA+Dclass4$BA
+      Dclass5$VT=Dclass1$VT+Dclass2$VT+Dclass3$VT+Dclass4$VT
+      Dclass5$HT=round((Dclass1$N*Dclass1$HT+Dclass2$N*Dclass2$HT+Dclass3$N*Dclass3$HT+Dclass4$N*Dclass4$HT)/Dclass5$N,2)
+      
+      DDist[1,,]<-as.matrix(Dclass1)  #1: Rauli
+      DDist[2,,]<-as.matrix(Dclass2)  #2: Roble
+      DDist[3,,]<-as.matrix(Dclass3)  #3: Coigue
+      DDist[4,,]<-as.matrix(Dclass4)  #4: Others
+      DDist[5,,]<-as.matrix(Dclass5)  #0: Total
+      
+      # Assigning volume from generated stand-table
+      sims$sp.table<-cbind(sims$sp.table,VTHA=c(1:5)*0)
+      sims$sp.table[1,5]<-round(sum(DDist[1,,7]),6)
+      sims$sp.table[2,5]<-round(sum(DDist[2,,7]),6)
+      sims$sp.table[3,5]<-round(sum(DDist[3,,7]),6)
+      sims$sp.table[4,5]<-round(sum(DDist[4,,7]),6)
+      sims$sp.table[5,5]<-round(sum(DDist[5,,7]),6)
+      
+      sims$tree.list<-sims$tree.list[,c(1:7)]
+      sims$DDdist<-DDist
             
     }
     
@@ -231,6 +348,7 @@ core_module <- function(input=NULL){
    
    # Using compatibility
    if (comp==TRUE) {
+     
      
      # call type = STAND
      # call type = TREE
@@ -245,181 +363,10 @@ core_module <- function(input=NULL){
     
     return(output=sims)
 
-
 } 
     
 
-
-#############################
-
-
-    
-  #---===
-  # IF A tree.list IS PROVIDED ----
-  #---===
-
-  if (type == 'tree.old'){
-
-    params<-stand_parameters(plotdata=tree.list, area=area)
-    # Collecting final stand parameters
-    sp.table <- params$sd
-    PBAN <- sum(sp.table[1:3,3])/sum(sp.table[1:4,3])
-    PNHAN <- sum(sp.table[1:3,2])/sum(sp.table[1:4,2])
-
-    n <- length(tree.list$ID)
-    vind <- matrix(NA,nrow=n)
-    QD0<-params$sd[5,4]
-
-  # Completing heights using parametrized height-dbh model
-    for (i in (1:n)) {
-      if(is.na(tree.list$HT[i])) {
-        tree.list$HT[i]<-round(height_param(dom_sp=DOM.SP, zone=zone, HD=HD, QD=QD0, DBH=tree.list$DBH[i]),4)
-      }
-    }
-
-    #To which diameter class they belong
-    Dclass <- ceiling(tree.list$DBH/5)*5-2.5
-
-    #if (is.na(area) ){ stop('Plot area must be provided') }
-    #CF <- 10000 / area  # Correction factor
-    #baind <- as.numeric(pi*(tree.list$DBH/2)^2/10000)  # Units: m2
-    
-    #Assigning Dominant Species and Dclass to each tree
-    for (i in 1:n) {
-      if (tree.list$SPECIES[i]==4) { SP<-DOM.SP
-      } else { SP<-tree.list$SPECIES[i] }
-
-      vind[i] <- Vmodule_individual(SPECIES=SP, zone=zone, DBH=tree.list$DBH[i],
-                                    HT=tree.list$HT[i], blength=tree.list$HT[i])
-      if (tree.list$DBH[i] == 5) {
-        Dclass[i] <- 7.5
-      }
-      
-
-      if (tree.list$DBH[i] < 5) {
-        tree.list$DBH[i] <- 5
-        warning('Some trees are smaller than 5 cm DBH')
-        Dclass[i] <- 7.5
-      }
-
-      if (tree.list$DBH[i] >= 90) {
-        tree.list$DBH[i] <- (90)
-        warning('Some trees are larger than 90 cm DBH')
-        Dclass[i] <- 87.5
-      }
-    }
-
-
-    N <- tree.list$FT
-    BA <- params$BAind
-    VT <- N*vind
-    tree.list<-data.frame(tree.list,BA,VT,Dclass)
-    HT.agg<-aggregate(HT~Dclass+SPECIES,FUN=mean,data=tree.list)
-    N.agg<-aggregate(N~Dclass+SPECIES,FUN=sum,data=tree.list)
-    BA.agg<-aggregate(BA~Dclass+SPECIES,FUN=sum,data=tree.list)
-    VT.agg<-aggregate(VT~Dclass+SPECIES,FUN=sum,data=tree.list)
-    data.agg<-data.frame(HT.agg,N.agg[3],BA.agg[3],VT.agg[3])
-
-    class <- 5
-    diam <- seq(from=5,to=90,by=class)   # Diameter classes
-    nclass <- length(diam)-1
-    DBH_LL <- matrix(data=0,nrow=nclass,ncol=1)
-    DBH_UL <- matrix(data=0,nrow=nclass,ncol=1)
-    Dclass <- matrix(data=0,nrow=nclass,ncol=1)
-    BAclass <- matrix(data=0,nrow=nclass,ncol=1)
-    Hclass <- matrix(data=0,nrow=nclass,ncol=1)
-    Vclass <- matrix(data=0,nrow=nclass,ncol=1)
-
-    for (j in 1:(nclass)){
-      DBH_LL[j] <- diam[j]                 # cm
-      DBH_UL[j] <- diam[j+1]               # cm
-      Dclass[j] <- (diam[j]+diam[j+1])/2   # cm
-    }
-    head<-data.frame(DBH_LL,DBH_UL,Dclass)
-
-    r_names<-c('DBH_ll','DBH_ul','D_class','H_class','N','BA','VT')
-    DDist<-array(data=NA, dim=c(5,(length(diam)-1),7),
-                 dimnames=list(c(1:5),c(1:(length(diam)-1)),r_names))
-
-    data.agg1<-data.agg[which(data.agg$SPECIES==1),]
-    Dclass1<-merge(head,data.agg1,by="Dclass",all=TRUE)
-    data.agg2<-data.agg[which(data.agg$SPECIES==2),]
-    Dclass2<-merge(head,data.agg2,by="Dclass",all=TRUE)
-    data.agg3<-data.agg[which(data.agg$SPECIES==3),]
-    Dclass3<-merge(head,data.agg3,by="Dclass",all=TRUE)
-    data.agg4<-data.agg[which(data.agg$SPECIES==4),]
-    Dclass4<-merge(head,data.agg4,by="Dclass",all=TRUE)
-
-    Dclass1<-data.frame(head,HT=round(Dclass1[,5],2),N=round(Dclass1[,6],2),BA=round(Dclass1[,7],2),VT=round(Dclass1[,8],3))
-    Dclass2<-data.frame(head,HT=round(Dclass2[,5],2),N=round(Dclass2[,6],2),BA=round(Dclass2[,7],2),VT=round(Dclass2[,8],3))
-    Dclass3<-data.frame(head,HT=round(Dclass3[,5],2),N=round(Dclass3[,6],2),BA=round(Dclass3[,7],2),VT=round(Dclass3[,8],3))
-    Dclass4<-data.frame(head,HT=round(Dclass4[,5],2),N=round(Dclass4[,6],2),BA=round(Dclass4[,7],2),VT=round(Dclass4[,8],3))
-    Dclass5<-Dclass4
-
-    for (j in 1:(nclass)){
-      if (is.na(Dclass1$HT[j])) {
-        Dclass1$HT[j]=0
-        Dclass1$N[j]=0
-        Dclass1$BA[j]=0
-        Dclass1$VT[j]=0
-      }
-      if (is.na(Dclass2$HT[j])) {
-        Dclass2$HT[j]=0
-        Dclass2$N[j]=0
-        Dclass2$BA[j]=0
-        Dclass2$VT[j]=0
-      }
-      if (is.na(Dclass3$HT[j])) {
-        Dclass3$HT[j]=0
-        Dclass3$N[j]=0
-        Dclass3$BA[j]=0
-        Dclass3$VT[j]=0
-      }
-      if (is.na(Dclass4$HT[j])) {
-        Dclass4$HT[j]=0
-        Dclass4$N[j]=0
-        Dclass4$BA[j]=0
-        Dclass4$VT[j]=0
-      }
-
-    }
-
-    Dclass5$N=Dclass1$N+Dclass2$N+Dclass3$N+Dclass4$N
-    Dclass5$BA=Dclass1$BA+Dclass2$BA+Dclass3$BA+Dclass4$BA
-    Dclass5$VT=Dclass1$VT+Dclass2$VT+Dclass3$VT+Dclass4$VT
-    Dclass5$HT=round((Dclass1$N*Dclass1$HT+Dclass2$N*Dclass2$HT+Dclass3$N*Dclass3$HT+Dclass4$N*Dclass4$HT)/Dclass5$N,2)
-
-    DDist[1,,]<-as.matrix(Dclass1)  #1: Rauli
-    DDist[2,,]<-as.matrix(Dclass2)  #2: Roble
-    DDist[3,,]<-as.matrix(Dclass3)  #3: Coigue
-    DDist[4,,]<-as.matrix(Dclass4)  #4: Others
-    DDist[5,,]<-as.matrix(Dclass5)  #0: Total
-
-    # Assigning volume from generated stand-table
-    sp.table<-cbind.data.frame(sp.table,VTHA=c(1:5)*0)
-    sp.table[1,5]<-round(sum(DDist[1,,7]),3)
-    sp.table[2,5]<-round(sum(DDist[2,,7]),3)
-    sp.table[3,5]<-round(sum(DDist[3,,7]),3)
-    sp.table[4,5]<-round(sum(DDist[4,,7]),3)
-    sp.table[5,5]<-round(sum(DDist[5,,7]),3)
-
-  }
-
-  # Need to add compatibility between tree and stand
-
-  # List that is output from here input somewhere else
-  input <- list(zone=zone, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-                area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
-                IADBH_model=IADBH_model, sp.table=sp.table, DDdist=DDist, tree.list=tree.list )
-
-  return(input=input)
-  
-}
-
 # Note: V_model=1 or anything else is always the same
-# Note: it needs some standarization on output of sp.table and stand.table between stand and tree-level (e.g. SPECIE or SPECIES)
-# Deifnition of stand simulation is not incorporated
 # This module should now separate VT for all products(additional columns)
-
-# Note: this module should story the sp.table for each simulated year.
-# Volume is calculated after each simulation...(maybe not... need to decide.)
+# Note: this module could store the sp.table for each simulated year.
+# Volume is calculated after each simulation???(maybe not... need to decide.)
