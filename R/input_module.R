@@ -47,8 +47,8 @@
 #' head(plot$tree.list)
 #' plot$sp.table
 
-input_module <- function(ZONE=NA,  
-                         AD=NA, HD=NA, SI=NA, 
+input_module <- function(ZONE=NA,
+                         AD=NA, HD=NA, SI=NA,
                          N=NA, BA=NA, QD=NA,
                          AF=NA, ddiam=FALSE, comp=FALSE, thinning=FALSE,
                          type='stand',
@@ -62,27 +62,27 @@ input_module <- function(ZONE=NA,
   PNHAN <- NA
   sdmatrix <- NA
   plotdata <- NA
-  
+
   ## Basic traps for simulations (all types)
   # Errors with Age
   if(is.na(AF)){
     stop('There is no final age for simulation ')
-  } 
+  }
   # Need for at least two of AD, HD, SI
-  if(is.na(AD)==T && is.na(HD)==T && is.na(SI)==T | 
+  if(is.na(AD)==T && is.na(HD)==T && is.na(SI)==T |
      is.na(AD)==F && is.na(HD)==T && is.na(SI)==T |
      is.na(AD)==T && is.na(HD)==F && is.na(SI)==T |
      is.na(AD)==T && is.na(HD)==T && is.na(SI)==F){
     stop("Warning - Please provide information for AD, HD or SI.")
-  } 
-  
+  }
+
   # Processing stand-level information
   if (type=='stand'){
 
     if(is.na(N)==T && is.na(BA)==T && is.na()==T){
       stop('There is no enough information for simulations')
     }
-    
+
     N[5]<-sum(N)
     BA[5]<-sum(BA)
 
@@ -110,7 +110,7 @@ input_module <- function(ZONE=NA,
 
     # Basic checking for dominant sp
     DOM.SP<-get_domsp(BA=BA[1:4])
-    if (DOM.SP==99) { 
+    if (DOM.SP==99) {
       stop("This stand is not dominated by Nothofagus")
     }
 
@@ -124,12 +124,12 @@ input_module <- function(ZONE=NA,
     if (is.na(SI)){
       (SI<-get_site(DOM.SP=DOM.SP, ZONE=ZONE, AD=AD, HD=HD))
     }
-  
+
     # Check for AGE
     if(AD >= AF){
       stop('The Final age of simulation should be larger than the Initial Age')
     }
-    
+
     # Completing the data frame for stand-table
     v1 <- c((1:4),0)
     v2 <- round(N,6)
@@ -140,35 +140,35 @@ input_module <- function(ZONE=NA,
 
     PBAN <- sum(BA[1:3])/(BA[5])
     PNHAN <- sum(N[1:3])/(N[5])
-    
+
     # Calculation of SDI_percentage
     b1 <- 1.4112
     SDI <- N[5]*(QD[5]/25.4)^b1  # Good for all DOM.SP
-    if (DOM.SP==1 | DOM.SP==4) { 
+    if (DOM.SP==1 | DOM.SP==4) {
       SDIMax <- 1155.0 # Rauli and Mixed
     }
-    if (DOM.SP==2) { 
+    if (DOM.SP==2) {
       SDIMax <- 908.8 # Roble
     }
-    if (DOM.SP==2) { 
+    if (DOM.SP==2) {
       SDIMax <- 1336.9   # Coigue
     }
-    SDIP <- round(100*SDI/SDIMax,6) 
+    SDIP <- round(100*SDI/SDIMax,6)
 
   }
 
 
   # Gathering tree-level information
   if (type=='tree'){
-    
+
     # Some checks from input
     if(nrow(tree.list)==0){
       stop('There is no tree data for type=TREE')
-    } 
+    }
     if(is.na(area)){
       stop('The plot area is not provided for type=TREE')
-    } 
-    
+    }
+
     # Getting stand level parms from tree-list
     if (sum(is.na(tree.list$FT))>0) {
        FT<-matrix(1,nrow=nrow(tree.list),ncol=1)
@@ -187,10 +187,10 @@ input_module <- function(ZONE=NA,
 
     # Basic checking for dominant sp
     DOM.SP<-params$DOM.SP
-    if (DOM.SP==99) { 
+    if (DOM.SP==99) {
       stop("This stand is not dominated by Nothofagus")
     }
-    
+
     # Completing AD, HD or SI
     if (is.na(AD)){
       (AD<-get_site(DOM.SP=DOM.SP, ZONE=ZONE, HD=HD, SI=SI))
@@ -204,29 +204,29 @@ input_module <- function(ZONE=NA,
 
     # Completing heights using parametrized height-dbh model
     QD<-params$sd[5,4]
-    plotdata$HT<-tree.ht(DBH=plotdata$DBH, HT=plotdata$HT, 
+    plotdata$HT<-tree.ht(DBH=plotdata$DBH, HT=plotdata$HT,
                          DOM.SP=DOM.SP, ZONE=ZONE, HD=HD, QD=QD, method=Hest_method)$HTFIN
 
     # Collecting final stand parameters
     sdmatrix <- params$sd
-    
+
     PBAN <- sum(sdmatrix[1:3,3])/sdmatrix[5,3]
     PNHAN <- sum(sdmatrix[1:3,2])/sdmatrix[5,2]
 
     # Calculation of SDI_percentage
     b1 <- 1.4112
     SDI <- sdmatrix[5,2]*(sdmatrix[5,4]/25.4)^b1  # Good for all DOM.SP
-    if (DOM.SP==1 | DOM.SP==4) { 
+    if (DOM.SP==1 | DOM.SP==4) {
       SDIMax <- 1155.0 # Rauli and Mixed
     }
-    if (DOM.SP==2) { 
+    if (DOM.SP==2) {
       SDIMax <- 908.8 # Roble
     }
-    if (DOM.SP==2) { 
+    if (DOM.SP==2) {
       SDIMax <- 1336.9   # Coigue
     }
-    SDIP <- round(100*SDI/SDIMax,6) 
-    
+    SDIP <- round(100*SDI/SDIMax,6)
+
   }
 
   # List that is output from here input somewhere else
@@ -240,7 +240,7 @@ input_module <- function(ZONE=NA,
 
 #needs to receive whatever information from the file read in the simulator and turn it into something that
 #core_module can use. Can this be done inside the core_module? I feel that these are very similar scripts.
-
+# Note: What if we don't want a simulation? Can it accept AF==AF?
 # Note, what happens if the user wants to calculate HD form tree.data - it uses other routines.
 # Note, need to make sure that the parametriz height-DBH yields to the same HD as in the input.
 # Note: SS is completed if missing

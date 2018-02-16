@@ -8,7 +8,7 @@
 #' SPECIES, N, BA, QD. Groups in SPECIES are  1:Rauli, 2:Roble, 3:Coigue, 4:Others, 0:Total.
 #' @param HD Dominant height (m) of dominant specie in the current stand
 #' @param DOM.SP The dominant specie (1: Rauli, 2: Roble, 3: Coigue, 4:Mixed)
-#' @param zone Growth zone (1, 2, 3, 4).
+#' @param ZONE Growth zone (1, 2, 3, 4).
 #' @param class Diameter class width (cm)
 #'
 #' @references
@@ -25,14 +25,14 @@
 #' # Example: Generation of distribution from stand-level input data
 #' BA<-c(36.5,2.8,0,2.4)
 #' N<-c(464,23,0,48)
-#' plot<-input_module(type='stand',zone=2,AD=28,HD=23.5,N=N,BA=BA)
+#' plot<-input_module(type='stand',ZONE=2,AD=28,AF=28,HD=23.5,N=N,BA=BA)
 #' Dd<-diam_dist(sp.table=plot$sp.table, HD=plot$HD,
-#'               DOM.SP=plot$DOM.SP, zone=plot$zone)
+#'               DOM.SP=plot$DOM.SP, ZONE=plot$ZONE)
 #' Dd[5,,]  # Total diameter distribution
 #' # Ploting distribution for all species
 #' barplot(as.matrix(Dd[5,,5]), main='Diameter Distribution all species', xlab='DBH Class', beside=TRUE, col=4)
 
-diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
+diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, ZONE=NA, class=5){
 
   vNHA <- sp.table$N
   vBA <- sp.table$BA
@@ -128,13 +128,13 @@ diam_dist <- function(sp.table=NA, HD=NA, DOM.SP=NA, zone=NA, class=5){
     #Hclass3[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=3, zone=zone)
     #Hclass4[j] <- height_param(HD=HD, QD=QD, DBH=Dclass[j], dom_sp=DOM.SP, zone=zone)
 
-    Hclass1[j] <- height_param(DOM.SP=1, ZONE=zone, HD=HD, QD=QD, DBH=Dclass[j])
-    Hclass2[j] <- height_param(DOM.SP=2, ZONE=zone, HD=HD, QD=QD, DBH=Dclass[j])
-    Hclass3[j] <- height_param(DOM.SP=3, ZONE=zone, HD=HD, QD=QD, DBH=Dclass[j])
-    Hclass4[j] <- height_param(DOM.SP=DOM.SP, ZONE=zone, HD=HD, QD=QD, DBH=Dclass[j])
+    Hclass1[j] <- height_param(DOM.SP=1, ZONE=ZONE, HD=HD, QD=QD, DBH=Dclass[j])
+    Hclass2[j] <- height_param(DOM.SP=2, ZONE=ZONE, HD=HD, QD=QD, DBH=Dclass[j])
+    Hclass3[j] <- height_param(DOM.SP=3, ZONE=ZONE, HD=HD, QD=QD, DBH=Dclass[j])
+    Hclass4[j] <- height_param(DOM.SP=DOM.SP, ZONE=ZONE, HD=HD, QD=QD, DBH=Dclass[j])
 
     height_param(DOM.SP=2, ZONE=2, HD=15, QD=12, DBH=24)
-    
+
     if (Hclass1[j]<1.3) { Hclass1[j]<-1.3 }
     if (Hclass2[j]<1.3) { Hclass2[j]<-1.3 }
     if (Hclass3[j]<1.3) { Hclass3[j]<-1.3 }

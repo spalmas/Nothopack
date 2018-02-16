@@ -5,7 +5,7 @@
 #' different fitted taper equation models.
 #
 #' @param dom_sp Dominant specie (1:Rauli, 2:Roble, 3:Coigue, 4:Others or Mixed)
-#' @param zone Growth zone of the corresponding stand
+#' @param ZONE Growth zone of the corresponding stand
 #' @param DBH Diameter at breast height (cm)
 #' @param HT Total tree height (m)
 #' @param di Stem diameter (cm) at given stem height hi (m)
@@ -28,16 +28,16 @@
 #'
 #' @examples
 #' # Example 1: Unknown diameter inside bark stem diameter
-#' get_taper(SPECIES=1, zone=2, DBH=12.1, HT=14.2, hi=4.3)$di
+#' get_taper(SPECIES=1, ZONE=2, DBH=12.1, HT=14.2, hi=4.3)$di
 #'
 #' # Example 2: Unknown stem height
-#' tree<-get_taper(SPECIES=1, zone=2, DBH=12.1, HT=14.2, di=9.8)
+#' tree<-get_taper(SPECIES=1, ZONE=2, DBH=12.1, HT=14.2, di=9.8)
 #' tree$hi
 #' plot(tree$h,tree$d)
 
-get_taper <- function(SPECIES = NA, zone='Todas', DBH=NA, HT=NA, di=NA, hi=NA){
+get_taper <- function(SPECIES = NA, ZONE='Todas', DBH=NA, HT=NA, di=NA, hi=NA){
   #Get parameters for that tree
-  taper_params_tree <- taper_params %>% filter(SPECIES. == SPECIES & ZONE. == zone)
+  taper_params_tree <- taper_params %>% filter(SPECIES. == SPECIES & ZONE. == ZONE)
   #This SPECIES. is with a dot. While the rest is without . is this confusing or can it cause errors?
 
   #taper_params_tree <- taper_params %>% filter(SPECIES == 2 & ZONE == 3)

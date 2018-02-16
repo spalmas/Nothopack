@@ -17,10 +17,10 @@
 #' stand.input<-input_module(ZONE=2, AD=28, HD=18.5, AF=35, N=N, BA=BA, type='stand')
 #' stand_simulator(core.stand=stand.input)
 #'
-#' #Example 2. Generating a diameter distribution 
+#' #Example 2. Generating a diameter distribution
 #' BA<-c(1.09,38.92,0,0.31)
 #' N<-c(60,780,0,80)
-#' input<-input_module(type='stand',zone=2,AD=28,HD=15.5,N=N,BA=BA,AF=35,V_model=2,ddiam=TRUE)
+#' input<-input_module(type='stand',ZONE=2,AD=28,HD=15.5,N=N,BA=BA,AF=35,V_model=2,ddiam=TRUE, comp=FALSE)
 #' core.stand<-core_module(input = input)
 #' core.stand$sp
 #' core.stand$type
@@ -61,26 +61,26 @@ stand_simulator <- function(core.stand=NULL){
   DOM.SP <- core.stand$DOM.SP
   ZONE <- core.stand$ZONE
   HD0 <- core.stand$HD
-  
+
   NHAN0 <- core.stand$sp.table$N[1:3] %>% sum(na.rm = TRUE)
   NHA0 <- core.stand$sp.table$N[5]
   NHA990 <- NHA0-NHAN0
   QD0 <- core.stand$sp.table$QD[5]
   BAN0 <- core.stand$sp.table$BA[1:3] %>% sum(na.rm = TRUE)
   BA990 <- core.stand$sp.table$BA[4]
-  
+
   PBAN0 <- core.stand$PBAN
   PBAN1 <- PBAN0
   PNHAN0 <- core.stand$PNHAN
   PNHAN1 <- PNHAN0
-  
+
   # Storing (internally) some output
   BA0 <- BAN0+BA990
   data.sim<-data.frame(AGE=core.stand$AF,HD0,NHA0,QD0,BA0,NHAN0,NHA990,BAN0,BA990,PBAN0,PNHAN0,SI)
-  
+
   #Yearly simulations
   for (y in (core.stand$AD + 1):core.stand$AF){
-    
+
     NHA1 <- NHAmodule(NHA0=NHA0, QD0=QD0, NHA_model=core.stand$NHA_model)   #Estimates new number of trees
     BAN1 <- BANmodule(BAN0 = BAN0, AD0=y, SI=SI, NHA0=NHA0, NHA1=NHA1, PBAN0=PBAN0, PBAN1=PBAN1, projection=TRUE)$BAN1   #projects new basal area (needs to change)
     PNHAN1 <- exp(-7.13684+10.29084*PBAN1-0.01404*y)/(1+exp(-7.13684+10.29084*PBAN1-0.01404*y)) # Important change
@@ -101,9 +101,9 @@ stand_simulator <- function(core.stand=NULL){
     BA0 <- BA1
     QD0 <- QD1
     HD0 <- HD1
-    
+
     data.sim<-rbind(data.sim,c(y,HD1,NHA1,QD1,BA1,NHAN1,NHA991,BAN1,BA991,PBAN1,PNHAN1,SI))
-    
+
   }
 
   #sp.table is the final stand values. At the end of the simulation
@@ -129,30 +129,30 @@ stand_simulator <- function(core.stand=NULL){
 
   sp.table<-data.frame(sp.table)
   colnames(sp.table)<-c('SPECIE','N','BA','QD')
-  
+
   # Calculation of SDI_percentage
   b1 <- 1.4112
   SDI <- NHA1*(sp.table[5,4]/25.4)^b1  # Good for all DOM.SP
-  if (core.stand$DOM.SP==1 | core.stand$DOM.SP==4) { 
+  if (core.stand$DOM.SP==1 | core.stand$DOM.SP==4) {
     SDIMax <- 1155.0 # Rauli and Mixed
   }
-  if (core.stand$DOM.SP==2) { 
+  if (core.stand$DOM.SP==2) {
     SDIMax <- 908.8 # Roble
   }
-  if (core.stand$DOM.SP==2) { 
+  if (core.stand$DOM.SP==2) {
     SDIMax <- 1336.9   # Coigue
   }
-  SDIP <- round(100*SDI/SDIMax,6) 
+  SDIP <- round(100*SDI/SDIMax,6)
   PBAN <- sum(sp.table[1:3,3])/(sp.table[5,3])
   PNHAN <- sum(sp.table[1:3,2])/(sp.table[5,2])
-  
-  output <- list(zone=ZONE, DOM.SP=DOM.SP, AD=core.stand$AF, HD=HD1, SI=SI, 
+
+  output <- list(zone=ZONE, DOM.SP=DOM.SP, AD=core.stand$AF, HD=HD1, SI=SI,
                  SDIP=SDIP, PBAN=PBAN1, PNHAN=PNHAN1, AF=core.stand$AF,
-                 area=core.stand$area, type=core.stand$type, ddiam=core.stand$ddiam, 
+                 area=core.stand$area, type=core.stand$type, ddiam=core.stand$ddiam,
                  comp=core.stand$comp, NHA_model=core.stand$NHA_model, V_model=core.stand$V_model,
-                 IADBH_model=core.stand$IADBH_model, sp.table=sp.table, 
+                 IADBH_model=core.stand$IADBH_model, sp.table=sp.table,
                  DDdist=NA, tree.list=NA, data.sim=data.sim)
-  
+
   return(output)
 
 }
