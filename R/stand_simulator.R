@@ -76,7 +76,7 @@ stand_simulator <- function(core.stand=NULL){
 
   # Storing (internally) some output
   BA0 <- BAN0+BA990
-  data.sim<-data.frame(AGE=core.stand$AF,HD0,NHA0,QD0,BA0,NHAN0,NHA990,BAN0,BA990,PBAN0,PNHAN0,SI)
+  data.sim<-data.frame(AGE=core.stand$AD,HD0,NHA0,QD0,BA0,NHAN0,NHA990,BAN0,BA990,PBAN0,PNHAN0,SI)
 
   #Yearly simulations
   for (y in (core.stand$AD + 1):core.stand$AF){
