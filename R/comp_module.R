@@ -31,8 +31,6 @@
 #' sim.tree$comptype='PY'
 #' sim.comp<-comp_module(sim.tree=sim.tree, sim.stand=sim.stand)
 #'
-#'
-#'
 #' # Example 1: Proportional Yield
 #'
 #' # Example 2: Proportional Growth
@@ -45,7 +43,7 @@ comp_module <- function(sim.tree=NA, sim.stand=NA){
     NHA1.SIM <- sim.stand$sp.table$N[5]   # From stand_simulation
     BA.SIM <- sim.stand$sp.table$BA[5]    # Simulated BA from stand_simulator
     DBH1.SIM <- sim.tree$tree.list$DBH    # Simulated new diameter from tree_simulator
-    #DBH0 <- core.tree$tree.list$DBH                # Original DBH from tree_simulatior
+    #DBH0 <- core.tree$tree.list$DBH      # Original DBH from tree_simulatior
     FT.SIM <- sim.tree$tree.list$FT       # Expansion factor from tree_simulation
 
     # Proportional compatibility - PY
@@ -70,7 +68,7 @@ comp_module <- function(sim.tree=NA, sim.stand=NA){
 
     sim.tree$tree.list$DBH <- DBH1.SIM.COMP  # Updated DBH with compatibility
     sim.tree$tree.list$FT <- FT.COMP         # Updated FT (mortality with compatibility)
-    print(head(sim.tree$tree.list))
+    #print(head(sim.tree$tree.list))
 
     sim.tree$comp <- FALSE
     sim.tree$AD <- sim.tree$AD

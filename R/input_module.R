@@ -63,6 +63,7 @@ input_module <- function(ZONE=NA,
   sdmatrix <- NA
   plotdata <- NA
 
+
   ## Basic traps for simulations (all types)
   # Errors with Age
   if(is.na(AF)){
@@ -160,6 +161,12 @@ input_module <- function(ZONE=NA,
 
   # Gathering tree-level information
   if (type=='tree'){
+
+    #Check if the range of DBH is appropriate
+    if (any(tree.list$DBH <= 5 |tree.list$DBH > 90)){
+      warning('Some trees are smaller than 5cm or larger than 90 cm DBH')
+    }
+
 
     # Some checks from input
     if(nrow(tree.list)==0){
