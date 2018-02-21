@@ -9,27 +9,7 @@
 #' 4) If input is stand parameters: obtain species and stand-table (if required)
 #' 5) Update species and stand-table to include volume (stand- and tree-level)
 #'
-#' @param ZONE Growth zone (1, 2, 3, 4).
-#' @param DOM.SP The dominant specie (1: Rauli, 2: Roble, 3: Coigue, 4:Mixed)
-#' @param AD Dominant age (years) of the stand.
-#' @param HD Dominant height (m) of the stand.
-#' @param SI Site index at reference dominant age of 20 (m) of the stand.
-#' @param N Vector of number of trees (trees/ha) of the stand (1: Rauli, 2: Roble, 3: Coigue, 4:Others, 0: Total)
-#' @param BA Vector of basal area (m2/ha) of the stand (1: Rauli, 2: Roble, 3: Coigue, 4:Others, 0: Total)
-#' @param QD Vector of quadratic diameters (cm) of the stand (1: Rauli, 2: Roble, 3: Coigue, 4:Others, 0: Total)
-#' @param PBAN Proportion of basal area in the stand that correspond to Nothofagus.
-#' @param SDI Stand density index (trees/ha)
-#' @param PNHAN Proportion of number of trees per hectarea in the stand that correspond to Nothofagus.
-#' @param AF Final dominant age (years) for simulation
-#' @param tree.list Optional tree-list for a plot with columns: ID, SPECIE, DBH, HT, SS, FT)
-#' @param area Area of plot from tree-list data (m2).
-#' @param type Type of simulation required: stand: only stand-level, tree: only tree-level, both: both modules (default=stand)
-#' @param ddiam Logical for requesting generation of diameter distribution (default=FALSE)
-#' @param comp Logical for requesting compatibility between stand- and tree-level simulations (default=FALSE)
 #' @param input List created by inputmodule, that is used to pass the variables as a list
-#' @param NHA_model
-#' @param V_model
-#' @param stand_simulation XXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 #'
 #' @return A series of elements and parameters with updated tables (adding volume). The main output elmenets are:
 #'                 sp.table    table with stand level summary by species (1,2,3,4) and total (0), and volume
@@ -102,7 +82,16 @@
 #' input<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, N=N, BA=BA, type='stand', comp=FALSE, ddiam=FALSE)
 #' input$sp.table
 #' core_module(input=input)
-
+#'
+#' #' New Example - Compatibility
+#' plot2<- read.csv(file= 'data/Plot_example.csv')
+#' input<-input_module(type='tree',ZONE=2,AD=28,AF=28,HD=15.5,area=500,tree.list=plot2, comp='PG')
+#' input$sp.table
+#' head(input$tree.list)
+#' core.tree<-core_module(input=input)
+#' core.tree$sp.table
+#' core.tree$DDist[5,,]
+#' head(core.tree$tree.list)
 
 core_module <- function(input=NULL){
 
@@ -121,7 +110,7 @@ core_module <- function(input=NULL){
     area <- input$area
     type <- input$type
     ddiam <- input$ddiam
-    comp <- input$comp
+    comptype <- input$comptype
     NHA_model <- input$NHA_model
     V_model <- input$V_model
     IADBH_model <- input$IADBH_model
@@ -131,10 +120,6 @@ core_module <- function(input=NULL){
     stand.table <- NA
 
   # Flow with options: type (stand, tree), ddiam (TRUE, FALSE), comp (TRUE, FALSE)
-
-  ###################
-  # No compatibility
-  if (comp==FALSE) {
 
     #############################
     # STAND simulation (no comp.)
@@ -344,24 +329,7 @@ core_module <- function(input=NULL){
 
     }
 
-  }
-
-   # Using compatibility
-   if (comp==TRUE) {
-
-
-     # call type = STAND
-     # call type = TREE
-     # call comp.simulation
-
-   }
-
-    # List that is output from here input somewhere else
-    #input <- list(ZONE=ZONE, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDI=SDI, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-    #              area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
-    #              IADBH_model=IADBH_model, sp.table=sp.table, DDdist=DDist, tree.list=tree.list )
-
-    return(output=sims)
+  return(output=sims)
 
 }
 

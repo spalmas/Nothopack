@@ -17,7 +17,7 @@
 #' @param area Area of plot from tree-list data (m2).
 #' @param type Type of simulation required: stand: only stand-level, tree: only tree-level, both: both modules (default=stand)
 #' @param ddiam Logical for requesting generation of diameter distribution (default=FALSE)
-#' @param comp Logical for requesting compatibility between stand- and tree-level simulations (default=FALSE)
+#' @param comptype NA: No compatibility (Default), PY: Proportional Yield, PG: Proportional Growth
 #' @param NHA_model
 #' @param V_molel
 #' @param IADBH_model
@@ -50,7 +50,7 @@
 input_module <- function(ZONE=NA,
                          AD=NA, HD=NA, SI=NA,
                          N=NA, BA=NA, QD=NA,
-                         AF=NA, ddiam=FALSE, comp=FALSE, thinning=FALSE,
+                         AF=NA, ddiam=FALSE, comptype=NA, thinning=FALSE,
                          type='stand',
                          tree.list=NA, area=NA,
                          NHA_model=1, V_model=1, IADBH_model=1,
@@ -231,7 +231,7 @@ input_module <- function(ZONE=NA,
 
   # List that is output from here input somewhere else
   input <- list(ZONE=ZONE, DOM.SP=DOM.SP, AD=AD, HD=HD, SI=SI, SDIP=SDIP, PBAN=PBAN, PNHAN=PNHAN, AF=AF,
-                area=area, type=type, ddiam=ddiam, comp=comp, NHA_model=NHA_model, V_model=V_model,
+                area=area, type=type, ddiam=ddiam, comptype=comptype, NHA_model=NHA_model, V_model=V_model,
                 IADBH_model=IADBH_model, sp.table=sdmatrix, tree.list=plotdata)
 
   return(input=input)
