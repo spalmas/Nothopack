@@ -27,6 +27,7 @@
 #' sims.stand<-core_module(input=stand.input)
 #' sims.stand
 #' stand.input$ddiam=TRUE
+#' report(input=sims.stand)
 #'
 #' #Temp-Example 2: Input from tree-level data
 #' tree.list<-read.csv(file= 'data/Plot_example.csv')
@@ -196,6 +197,11 @@ core_module <- function(input=NULL){
   if (type=='tree') {
 
     sims<-tree_simulator(core.tree=input)
+    
+    ####
+    sims$tree.list$DBH0<-input$tree.list$DBH  # eliminate at the end before return!!
+    ####
+    
     sims$DDdist<-NA
     m <- nrow(sims$tree.list)
 
@@ -309,6 +315,21 @@ core_module <- function(input=NULL){
 
   }
 
+  #############################
+  # Compatibility simulation 
+  if (type=='comp') {
+  
+    input$type<-'stand'
+    input$ddiam<-FALSE
+    sim.stand<-core_module(input=input) # simulate stand
+
+    input$type='tree'
+    sim.tree<-core_module(input=input) # simulate tree
+    
+    sims<-comp_module(sim.tree=sim.tree, sim.stand=sim.stand)
+
+  }
+  
   return(output=sims)
 
 }
