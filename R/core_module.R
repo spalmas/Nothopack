@@ -20,29 +20,24 @@
 #'                             V_model,IADBH_model,start_time)
 #'
 #' @examples
-#' #Temp-Example 1: Input from stand-level data
+#' #Example 1: Input from stand-level data
 #' BA<-c(36.5,2.8,1.6,2.4)
 #' N<-c(464,23,16,48)
 #' stand.input<-input_module(ZONE=2, AD=28, HD=18.5, AF=35, N=N, BA=BA, type='stand', ddiam=FALSE)
 #' sims.stand<-core_module(input=stand.input)
 #' sims.stand
 #' stand.input$ddiam=TRUE
-#' report(input=sims.stand)
 #'
-#' #Temp-Example 2: Input from tree-level data
+#' #Example 2: Input from tree-level data
 #' tree.list<-read.csv(file= 'data/Plot_example.csv')
-#' plot1<-input_module(ZONE=2, AD=28, HD=23.5, AF=28, type='tree', area=500, tree.list=tree.list, Hest_method=1, ddiam=FALSE)
-#' plot<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, type='tree', area=500, tree.list=tree.list, Hest_method=1, ddiam=FALSE)
-#' sims.tree1<-core_module(input=plot1)
-#' sims.tree<-core_module(input=plot)
-#' head(sims.tree1$tree.list)
+#' input<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, type='tree', area=500, tree.list=tree.list, Hest_method=1, ddiam=FALSE)
+#' sims.tree<-core_module(input=input)
 #' head(sims.tree$tree.list)
 #' plot$sp.table
-#' sims.tree1$sp.table
 #' sims.tree$sp.table
 #' sims.tree$DDdist[5,,]
 
-#' #Example 1: Input from stand-level data
+#' #Example 3: Input from stand-level data
 #' BA<-c(36.5,2.8,0.0,2.4)
 #' N<-c(464,23,0,48)
 #' input<-input_module(type='stand',ZONE=1,AD=28,AF=40,HD=23.5,N=N,BA=BA,V_model=2,ddiam=FALSE)
@@ -56,19 +51,19 @@
 #' core.stand$DDist[5,,]
 #' core.stand
 #'
-#' # Example 2: Input from tree-level data (or file)
+#' # Example 4: Input from tree-level data (or file)
 #' plot2<- read.csv(file= 'data/Plot_example.csv')
 #' input<-input_module(type='tree',ZONE=2,AD=28,AF=28,HD=15.5,area=500,tree.list=plot2)
 #' input$sp.table
 #' head(input$tree.list)
 #' core.tree<-core_module(input=input)
 #' core.tree$sp.table
-#' core.tree$DDist[5,,]    #NOT WORKING
+#' core.tree$DDist[5,,]
 #' head(core.tree$tree.list)
 #' # Ploting distribution for all species
 #' barplot(as.matrix(core.tree$DDist[5,,5]), main='Diameter Distribution all species', xlab='DBH Class', beside=TRUE, col=4)
 #'
-#' New Example - Input from stand-level data
+#' #Example 5 - Input from stand-level data
 #' BA<-c(36.5,2.8,1.6,2.4)
 #' N<-c(464,23,16,48)
 #' input<-input_module(ZONE=2, AD=28, HD=23.5, AF=40, N=N, BA=BA, type='stand')
@@ -197,11 +192,11 @@ core_module <- function(input=NULL){
   if (type=='tree') {
 
     sims<-tree_simulator(core.tree=input)
-    
+
     ####
     sims$tree.list$DBH0<-input$tree.list$DBH  # eliminate at the end before return!!
     ####
-    
+
     sims$DDdist<-NA
     m <- nrow(sims$tree.list)
 
@@ -214,10 +209,12 @@ core_module <- function(input=NULL){
     #Definition of diameter groups
     class <- 5
     diam <- seq(from=5,to=90,by=class)   # Diameter classes
+    breaks. <- seq(from = 7.5, to = 87.5, by = 5)
 
     # Assigning trees to each diameter class (Dclass)
-    sims$tree.list$Dclass <- breaks[findInterval(x = sims$tree.list$DBH,
-                                                 breaks = diam, all.inside = TRUE)]
+    sims$tree.list$Dclass <- breaks.[findInterval(x = sims$tree.list$DBH,
+                                                  vec = breaks.,
+                                                  all.inside = TRUE)]
 
     sims$tree.list$Nst <- sims$tree.list$FT  #is it needed? Duplicate?
     sims$tree.list$BAst <- sims$tree.list$FT*(pi/4)*(sims$tree.list$DBH^2/10000)
@@ -318,20 +315,20 @@ core_module <- function(input=NULL){
   }
 
   #############################
-  # Compatibility simulation 
+  # Compatibility simulation
   if (type=='comp') {
-  
+
     input$type<-'stand'
     input$ddiam<-FALSE
     sim.stand<-core_module(input=input) # simulate stand
 
     input$type='tree'
     sim.tree<-core_module(input=input) # simulate tree
-    
+
     sims<-comp_module(sim.tree=sim.tree, sim.stand=sim.stand)
 
   }
-  
+
   return(output=sims)
 
 }
