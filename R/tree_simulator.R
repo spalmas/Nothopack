@@ -6,9 +6,9 @@
 #' The model of mortality is the same as whole-stand
 #'
 #' @param core.stand a stand list corrected from core_module
-#' 
+#'
 #' @references
-#' Moreno, P.; Palmas, S.; Escobedo, F.; Cropper, W.; Gezan, S. Individual-tree diameter growth models 
+#' Moreno, P.; Palmas, S.; Escobedo, F.; Cropper, W.; Gezan, S. Individual-tree diameter growth models
 #' for mixed nothofagus second growth forests in southern chile. Forests 2017, 8, 506, http://www.mdpi.com/1999-4907/8/12/506.
 #'
 #' @author
@@ -24,7 +24,7 @@
 #' head(sims$tree.list)
 #' plot$sp.table
 #' sims$sp.table
-#' 
+#'
 #' Original Example
 #' plot<- read.csv(file= 'data/Plot_example.csv')
 #' head(plot)
@@ -47,10 +47,10 @@ tree_simulator <- function(core.tree = NULL){
   DOM.SP <- core.tree$DOM.SP
   SI <- core.tree$SI
   HD <- core.tree$HD
-  
+
   FTv<-rep(1,length(core.tree$tree.list$ID))    #expansion factor vector
-  input.data1<-tree_covariates(ID=core.tree$tree.list$ID, FT=core.tree$tree.list$FT,    
-                               SPECIES=core.tree$tree.list$SPECIES, DBH=core.tree$tree.list$DBH,     
+  input.data1<-tree_covariates(ID=core.tree$tree.list$ID, FT=core.tree$tree.list$FT,
+                               SPECIES=core.tree$tree.list$SPECIES, DBH=core.tree$tree.list$DBH,
                                ZONE=ZONE, SS=core.tree$tree.list$SS)   #estimating stand and individual variables
 
   # Initial variables. This are updated every year.
@@ -64,7 +64,7 @@ tree_simulator <- function(core.tree = NULL){
   DAp <- FTv*core.tree$AD
   PSCALp <- input.data1$PScal
   SP <- input.data1$SPECIES
-  
+
   # FROM INITIAL AGE TO FINAL AGE (LOOP 1)
   for (k in core.tree$AD:(core.tree$AF-1)) {
     #BY TREE (LOOP 2)
@@ -86,7 +86,7 @@ tree_simulator <- function(core.tree = NULL){
     # NEW COVARIATES
     #data.temp<-covariates(ID=core.tree$tree.list$ID, Fa=Fap1, sp=input.data1$sp,DBH=DBHp1, ZONE=input.data1$ZONE, Ss=SSp)
     data.temp <- tree_covariates(ID=core.tree$tree.list$ID, FT=Fap1, SPECIES=SP, DBH=DBHp1, ZONE=ZONE, SS=SSp)
-    
+
     #UPDATE VALUES
     DBHp <- data.temp$DBH
     Fap <- data.temp$FT
@@ -99,9 +99,9 @@ tree_simulator <- function(core.tree = NULL){
     BAp <- data.temp$BA
     QDp <- data.temp$QD
     SSp <- data.temp$SS
-    
+
   }
-  
+
   plot.proy <- data.frame(data.temp,HT,Fap,Ap,DAp)
 
 
@@ -113,9 +113,9 @@ tree_simulator <- function(core.tree = NULL){
   Dif.HT <- matrix(data=0,nrow=m,ncol=1)
   HDp <- get_site(DOM.SP=DOM.SP, ZONE=ZONE, AD=DAp[1], SI=SI)
 
-  
+
   (HT<-height_param(DOM.SP=2, ZONE=2, HD=15, QD=12, DBH=24))
-  
+
   # predicted height at the start (AD)
   HTparam.0 <- height_param(DOM.SP=DOM.SP, ZONE=ZONE,
                             HD=HD, QD=input.data1$QD[1],
@@ -148,13 +148,13 @@ tree_simulator <- function(core.tree = NULL){
 
   # Actualization of many things
   updated.plot<-input_module(ZONE=ZONE, AD=core.tree$AF, HD=HDp, SI=SI, AF=core.tree$AF,
-                             ddiam=core.tree$ddiam, comp=core.tree$ddiam, thinning=core.tree$thinning,
+                             ddiam=core.tree$ddiam, comptype=core.tree$comptype, thinning=core.tree$thinning,
                              type=core.tree$type, tree.list=treedata, area=core.tree$area,
                              NHA_model=core.tree$NHA_model, V_model=core.tree$V_model, IADBH_model=core.tree$IADBH_model,
                              Hest_method=2)
-  
+
   return(output=updated.plot)
-  
+
   #return(list(input=input, comp.list =  comp.list))
 
 }

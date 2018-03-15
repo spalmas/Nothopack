@@ -205,10 +205,13 @@ core_module <- function(input=NULL){
                                  HT=sims$tree.list$HT, blength=sims$tree.list$HT)
 
 
+    #Definition of diameter groups
+    class <- 5
+    diam <- seq(from=5,to=90,by=class)   # Diameter classes
+
     # Assigning trees to each diameter class (Dclass)
-    breaks. <- seq(from = 7.5, to = 87.5, by = 5)
     sims$tree.list$Dclass <- breaks[findInterval(x = sims$tree.list$DBH,
-                                                 breaks = breaks., all.inside = TRUE)]
+                                                 breaks = diam, all.inside = TRUE)]
 
     sims$tree.list$Nst <- sims$tree.list$FT  #is it needed? Duplicate?
     sims$tree.list$BAst <- sims$tree.list$FT*(pi/4)*(sims$tree.list$DBH^2/10000)
@@ -220,8 +223,7 @@ core_module <- function(input=NULL){
     VT.agg <-aggregate(VOLst~Dclass+SPECIES,FUN=sum,data=sims$tree.list)
     data.agg<-data.frame(HT.agg,N.agg[3],BA.agg[3],VT.agg[3])
 
-    class <- 5
-    diam <- seq(from=5,to=90,by=class)   # Diameter classes
+
     nclass <- length(diam)-1
     DBH_LL <- matrix(data=0,nrow=nclass,ncol=1)
     DBH_UL <- matrix(data=0,nrow=nclass,ncol=1)
