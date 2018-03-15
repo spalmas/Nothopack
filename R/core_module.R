@@ -209,7 +209,7 @@ core_module <- function(input=NULL){
     #Definition of diameter groups
     class <- 5
     diam <- seq(from=5,to=90,by=class)   # Diameter classes
-    breaks. <- seq(from = 7.5, to = 87.5, by = 5)
+    breaks. <- seq(from = 7.5, to = 87.5, by = 5)  #improved Dclass calculation. Faster
 
     # Assigning trees to each diameter class (Dclass)
     sims$tree.list$Dclass <- breaks.[findInterval(x = sims$tree.list$DBH,

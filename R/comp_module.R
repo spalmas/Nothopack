@@ -1,6 +1,6 @@
 #' General Compatibility/Tree Simulator.
 #'
-#' \code{comp_simulator} General simulator for Tree simulations. It can run a tree simulator if core.tree$comp == 'None' or go
+#' \code{comp_module} General simulator for Tree simulations. It can run a tree simulator if core.tree$comp == 'None' or go
 #' to the PY or PG pathways. It could be improved by avoiding running stand_simulator if core.tree$comp == 'None'.
 #'
 #' @param sim.tree a simulated tree list from tree_simulator
@@ -10,7 +10,7 @@
 #' S.Gezan, S.Palmas and P.Moreno
 #'
 #' @examples
-#' # Test-Example 1: Proportional Yield
+#' # Example 1: Proportional Yield
 #' tree.list<-read.csv(file= 'data/Plot_example.csv')
 #' plot.tree<-input_module(ZONE=2, AD=28, HD=23.5, AF=32, type='tree', area=500, tree.list=tree.list, Hest_method=1, ddiam=FALSE)
 #' sim.tree<-core_module(input=plot.tree)
@@ -22,16 +22,12 @@
 #'
 #' sim.tree$sp.table
 #' sim.stand$sp.table
-#' sim.comp$sp.table
 #'
 #' head(sim.tree$tree.list)
 #' head(sim.stand$tree.list)
-#' head(sim.comp$tree.list)
 #'
 #' sim.tree$comptype='PY'
 #' sim.comp<-comp_module(sim.tree=sim.tree, sim.stand=sim.stand)
-#'
-#' # Example 1: Proportional Yield
 #'
 #' # Example 2: Proportional Growth
 #'
@@ -70,9 +66,17 @@ comp_module <- function(sim.tree=NA, sim.stand=NA){
     sim.tree$tree.list$FT <- FT.COMP         # Updated FT (mortality with compatibility)
     #print(head(sim.tree$tree.list))
 
-    sim.comp<-input.module(A=A, B=A, etc...., type='tree')  # re calculates sp.table
+    #for sp.table
+    sim.comp <- input_module(ZONE=sim.tree$ZONE,
+                             AD=sim.tree$AD, HD=sim.tree$HD, SI=sim.tree$SI,
+                             AF=sim.tree$AF, ddiam=sim.tree$ddiam, comptype=sim.tree$comptype, thinning=FALSE,
+                             type='tree',
+                             tree.list=sim.tree$tree.list, area=sim.tree$area,
+                             NHA_model=sim.tree$NHA_model, V_model=sim.tree$V_model, IADBH_model=sim.tree$IADBH_model,
+                             Hest_method=1) #Should it be other?Hest_method
+
     sim.comp <- core_module(input=sim.comp)                   # Needed to produce VOL
-    
+
     #sim.tree$comp <- FALSE
     #sim.tree$AD <- sim.tree$AD
     #sim.comp <- core_module(input=sim.tree)  # Needed to produce VOL and updated sp.table
