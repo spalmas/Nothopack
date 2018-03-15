@@ -70,9 +70,12 @@ comp_module <- function(sim.tree=NA, sim.stand=NA){
     sim.tree$tree.list$FT <- FT.COMP         # Updated FT (mortality with compatibility)
     #print(head(sim.tree$tree.list))
 
-    sim.tree$comp <- FALSE
-    sim.tree$AD <- sim.tree$AD
-    sim.comp <- core_module(input=sim.tree)  # Needed to produce VOL and updated sp.table
+    sim.comp<-input.module(A=A, B=A, etc...., type='tree')  # re calculates sp.table
+    sim.comp <- core_module(input=sim.comp)                   # Needed to produce VOL
+    
+    #sim.tree$comp <- FALSE
+    #sim.tree$AD <- sim.tree$AD
+    #sim.comp <- core_module(input=sim.tree)  # Needed to produce VOL and updated sp.table
 
     return(sim.comp=sim.comp)
 }
