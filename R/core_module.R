@@ -27,10 +27,7 @@
 #' sims.stand<-core_module(input=stand.input)
 #' sims.stand
 #' stand.input$ddiam=TRUE
-<<<<<<< HEAD
 #' report(core.stand=sims.stand)
-=======
->>>>>>> 94e82649d0ac017b922c6774678f0f1776fb1a07
 #'
 #' #Example 2: Input from tree-level data
 #' tree.list<-read.csv(file= 'data/Plot_example.csv')
@@ -216,15 +213,9 @@ core_module <- function(input=NULL){
     breaks. <- seq(from = 7.5, to = 87.5, by = 5)  #improved Dclass calculation. Faster
 
     # Assigning trees to each diameter class (Dclass)
-<<<<<<< HEAD
-    sims$tree.list$Dclass <- breaks[findInterval(x = sims$tree.list$DBH,
-                                                 breaks = diam, all.inside = TRUE)]
-=======
     sims$tree.list$Dclass <- breaks.[findInterval(x = sims$tree.list$DBH,
                                                   vec = breaks.,
                                                   all.inside = TRUE)]
-
->>>>>>> 94e82649d0ac017b922c6774678f0f1776fb1a07
     sims$tree.list$Nst <- sims$tree.list$FT  #is it needed? Duplicate?
     sims$tree.list$BAst <- sims$tree.list$FT*(pi/4)*(sims$tree.list$DBH^2/10000)
     sims$tree.list$VOLst <- sims$tree.list$FT*sims$tree.list$VOL
